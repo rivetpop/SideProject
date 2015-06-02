@@ -17,11 +17,11 @@ public class Player {
 	
 	private ArrayList<Card> playerHand;
 	
-	public Player(String pName){
+	public Player(String pName, int pStartMoney){
 		
 		playerHand = new ArrayList<Card>();
 		setName(pName);
-		setCash(STARTING_MONEY);
+		setCash(pStartMoney);
 		//setPlayerHand(pHand);
 	}
 	
@@ -81,7 +81,7 @@ public class Player {
 		return (validatePlayerHand(pHand));
 	}
 	
-	public boolean validateName(String pName){
+	public static boolean validateName(String pName){
 		
 		return (pName.length() < NAME_MAX_LENGTH && pName.length() > NAME_MIN_LENGTH);
 	}

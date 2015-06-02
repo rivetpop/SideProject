@@ -64,4 +64,9 @@ public class Dealer {
 		
 		return (pHand != null);
 	}
+	
+	public String toString(){
+		
+		return this.getName();
+	}
 }

@@ -169,7 +169,7 @@ public class Game {
 		Game g1 = new Game();
 		
 		Dealer d1 = new Dealer("Jean");
-		Player p1 = new Player("Guy");
+		Player p1 = new Player("Guy", 500);
 		
 	
 		p1.setPlayerHand(g1.deck.get(g1.currentCard));
