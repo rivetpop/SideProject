@@ -101,7 +101,7 @@ public class BlackJack {
 			
 			
 		}
-		//lool
+		
 		public void createButtons(){
 			
 			btnHit = new Button("Hit");

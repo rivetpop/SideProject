@@ -21,6 +21,8 @@ public class Game {
 		createDeck();
 	}
 	
+	//public void affectValue()
+	
 	public void createDeck(){
 		
 		Card c1 = new Card("2", 2, "Heart");
