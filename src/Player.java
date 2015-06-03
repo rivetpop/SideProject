@@ -22,19 +22,6 @@ public class Player {
 		playerHand = new ArrayList<Card>();
 		setName(pName);
 		setCash(pStartMoney);
-		//setPlayerHand(pHand);
-	}
-	
-	public int handTotal(){
-		
-		int handTotal = 0;
-		
-		for(int i = 0; i < playerHand.size(); i++){
-			
-			handTotal += playerHand.get(i).getValue();
-		}
-		
-		return handTotal;
 	}
 	
 	public ArrayList<Card> getPlayerHand(){

@@ -3,12 +3,10 @@ public class Card {
 	
 	private String name = null;
 	private String kind = null;
-	private int value = 0;
 	
-	public Card(String pName, int pValue, String pKind){
+	public Card(String pName, String pKind){
 		
 		setName(pName);
-		setValue(pValue);
 		setKind(pKind);
 		
 	}
@@ -21,11 +19,6 @@ public class Card {
 	public String getKind(){
 		
 		return kind;
-	}
-	
-	public int getValue(){
-		
-		return value;
 	}
 	
 	public void setName(String pName){
@@ -44,14 +37,6 @@ public class Card {
 		}
 	}
 	
-	public void setValue(int pValue){
-		
-		if(validateValue(pValue)){
-			
-			value = pValue;
-		}
-	}
-	
 	public static boolean validateName(String pName){
 		
 		return (pName == "2" || pName == "3" || pName == "4" || pName == "5" || pName == "6" 
@@ -64,14 +49,10 @@ public class Card {
 		return (pKind == "Heart" || pKind == "Diamond" || pKind == "Spade" || pKind == "Clover");
 	}
 	
-	public static boolean validateValue(int pValue){
-		
-		return (pValue > 0 && pValue < 12);
-	}
 	
 	public String toString(){
 		
-		String text = name + " " + value + " " + kind + "\n";
+		String text = name + " " + kind + "\n";
 		
 		return text;
 	}

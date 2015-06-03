@@ -13,18 +13,6 @@ public class Dealer {
 		name = pName;
 	}
 	
-	public int handTotal(){
-		
-		int handTotal = 0;
-		
-		for(int i = 0; i < dealerHand.size(); i++){
-			
-			handTotal += dealerHand.get(i).getValue();
-		}
-		
-		return handTotal;
-	}
-	
 	public String getName(){
 		
 		return name;

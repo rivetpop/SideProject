@@ -17,3 +17,9 @@
 {
 	-fx-alignment: center;	  
 }
+
+.title
+{
+	-fx-font-size: 30pt;
+	-fx-alignment: center;
+}

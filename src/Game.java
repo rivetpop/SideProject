@@ -25,70 +25,91 @@ public class Game {
 	
 	public void createDeck(){
 		
-		Card c1 = new Card("2", 2, "Heart");
-		Card c2 = new Card("2", 2, "Diamond");
-		Card c3 = new Card("2", 2, "Spade");
-		Card c4 = new Card("2", 2, "Clover");
+		for(int i = 2; i < 15; i++){
+			
+			deck.add(new Card("i", "Heart"));
+		}
 		
-		Card c5 = new Card("3", 3, "Heart");
-		Card c6 = new Card("3", 3, "Diamond");
-		Card c7 = new Card("3", 3, "Spade");
-		Card c8 = new Card("3", 3, "Clover");
+		for(int i = 2; i < 15; i++){
+			
+			deck.add(new Card("i", "Diamond"));
+		}
 		
-		Card c9 = new Card("4", 4, "Heart");
-		Card c10 = new Card("4", 4, "Diamond");
-		Card c11 = new Card("4", 4, "Spade");
-		Card c12 = new Card("4", 4, "Clover");
+		for(int i = 2; i < 15; i++){
+			
+			deck.add(new Card("i", "Spade"));
+		}
 		
-		Card c13 = new Card("5", 5, "Heart");
-		Card c14 = new Card("5", 5, "Diamond");
-		Card c15 = new Card("5", 5, "Spade");
-		Card c16 = new Card("5", 5, "Clover");
+		for(int i = 2; i < 15; i++){
+			
+			deck.add(new Card("i", "Clover"));
+		}
 		
-		Card c17 = new Card("6", 6, "Heart");
-		Card c18 = new Card("6", 6, "Diamond");
-		Card c19 = new Card("6", 6, "Spade");
-		Card c20 = new Card("6", 6, "Clover");
+		/*
+		Card c1 = new Card("2", "Heart");
+		Card c2 = new Card("2", "Diamond");
+		Card c3 = new Card("2", "Spade");
+		Card c4 = new Card("2", "Clover");
 		
-		Card c21 = new Card("7", 7, "Heart");
-		Card c22 = new Card("7", 7, "Diamond");
-		Card c23 = new Card("7", 7, "Spade");
-		Card c24 = new Card("7", 7, "Clover");
+		Card c5 = new Card("3", "Heart");
+		Card c6 = new Card("3", "Diamond");
+		Card c7 = new Card("3", "Spade");
+		Card c8 = new Card("3", "Clover");
 		
-		Card c25 = new Card("8", 8, "Heart");
-		Card c26 = new Card("8", 8, "Diamond");
-		Card c27 = new Card("8", 8, "Spade");
-		Card c28 = new Card("8", 8, "Clover");
+		Card c9 = new Card("4", "Heart");
+		Card c10 = new Card("4", "Diamond");
+		Card c11 = new Card("4", "Spade");
+		Card c12 = new Card("4", "Clover");
 		
-		Card c29 = new Card("9", 9, "Heart");
-		Card c30 = new Card("9", 9, "Diamond");
-		Card c31 = new Card("9", 9, "Spade");
-		Card c32 = new Card("9", 9, "Clover");
+		Card c13 = new Card("5", "Heart");
+		Card c14 = new Card("5", "Diamond");
+		Card c15 = new Card("5", "Spade");
+		Card c16 = new Card("5", "Clover");
 		
-		Card c33 = new Card("10", 10, "Heart");
-		Card c34 = new Card("10", 10, "Diamond");
-		Card c35 = new Card("10", 10, "Spade");
-		Card c36 = new Card("10", 10, "Clover");
+		Card c17 = new Card("6", "Heart");
+		Card c18 = new Card("6", "Diamond");
+		Card c19 = new Card("6", "Spade");
+		Card c20 = new Card("6", "Clover");
 		
-		Card c37 = new Card("Jack", 10, "Heart");
-		Card c38 = new Card("Jack", 10, "Diamond");
-		Card c39 = new Card("Jack", 10, "Spade");
-		Card c40 = new Card("Jack", 10, "Clover");
+		Card c21 = new Card("7", "Heart");
+		Card c22 = new Card("7", "Diamond");
+		Card c23 = new Card("7", "Spade");
+		Card c24 = new Card("7", "Clover");
 		
-		Card c41 = new Card("Queen", 10, "Heart");
-		Card c42 = new Card("Queen", 10, "Diamond");
-		Card c43 = new Card("Queen", 10, "Spade");
-		Card c44 = new Card("Queen", 10, "Clover");
+		Card c25 = new Card("8", "Heart");
+		Card c26 = new Card("8", "Diamond");
+		Card c27 = new Card("8", "Spade");
+		Card c28 = new Card("8", "Clover");
 		
-		Card c45 = new Card("King", 10, "Heart");
-		Card c46 = new Card("King", 10, "Diamond");
-		Card c47 = new Card("King", 10, "Spade");
-		Card c48 = new Card("King", 10, "Clover");
+		Card c29 = new Card("9", "Heart");
+		Card c30 = new Card("9", "Diamond");
+		Card c31 = new Card("9", "Spade");
+		Card c32 = new Card("9", "Clover");
 		
-		Card c49 = new Card("Ace", 11, "Heart");
-		Card c50 = new Card("Ace", 11, "Diamond");
-		Card c51 = new Card("Ace", 11, "Spade");
-		Card c52 = new Card("Ace", 11, "Clover");
+		Card c33 = new Card("10", "Heart");
+		Card c34 = new Card("10", "Diamond");
+		Card c35 = new Card("10", "Spade");
+		Card c36 = new Card("10", "Clover");
+		
+		Card c37 = new Card("Jack", "Heart");
+		Card c38 = new Card("Jack", "Diamond");
+		Card c39 = new Card("Jack", "Spade");
+		Card c40 = new Card("Jack", "Clover");
+		
+		Card c41 = new Card("Queen", "Heart");
+		Card c42 = new Card("Queen", "Diamond");
+		Card c43 = new Card("Queen", "Spade");
+		Card c44 = new Card("Queen", "Clover");
+		
+		Card c45 = new Card("King", "Heart");
+		Card c46 = new Card("King", "Diamond");
+		Card c47 = new Card("King", "Spade");
+		Card c48 = new Card("King", "Clover");
+		
+		Card c49 = new Card("Ace", "Heart");
+		Card c50 = new Card("Ace", "Diamond");
+		Card c51 = new Card("Ace", "Spade");
+		Card c52 = new Card("Ace", "Clover");
 		
 		deck.add(c1);
 		deck.add(c2);
@@ -143,6 +164,7 @@ public class Game {
 		deck.add(c51);
 		deck.add(c52);
 		
+		*/
 		Collections.shuffle(deck);
 	}
 	

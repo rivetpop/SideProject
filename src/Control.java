@@ -12,39 +12,37 @@ import javafx.stage.Stage;
 
 public class Control  extends Application{
 
-	private BlackJack view;
+	private Main_menu viewMainMenu;
+	private BlackJack viewBlackJack;
+	
 	private Game game;
 	private Stage stage;
 	private Player player = null;
 	private Dealer dealer = null;
-	private Main_menu mainMenu = null;
 	
 	public void start(Stage pStage){
 		
+		viewMainMenu = new Main_menu();
 		game = new Game();
-		view = new BlackJack();
+		viewBlackJack = new BlackJack();
 		
 		stage = pStage;
-		mainMenu = new Main_menu();
-		mainMenu.createMainMenu();
-
 		addListeners();
 		stage.setTitle("Casino");
-		stage.setScene(mainMenu.scene);
+		stage.setScene(viewMainMenu.scene);
 		stage.show();
 	}
 	
 	private void addListeners(){
 		
 		//Blackjack
-		view.menuItemNewGame.setOnAction(new ListenerMenu());
-		view.menuItemQuit.setOnAction(new ListenerMenu());
+		viewBlackJack.btnHit.setOnAction(new ListenerButton());
 		
-		view.btnHit.setOnAction(new ListenerButton());
-		
-		//Main_menu
-		mainMenu.blackjackButton.setOnAction(new ListenerButton());
-		mainMenu.rouletteButton.setOnAction(new ListenerButton());
+		//Main_menu<
+		viewMainMenu.menuItemNewGame.setOnAction(new ListenerMenu());
+		viewMainMenu.menuItemQuit.setOnAction(new ListenerMenu());
+		viewMainMenu.blackJackButton.setOnAction(new ListenerButton());
+		viewMainMenu.rouletteButton.setOnAction(new ListenerButton());
 	}
 	
 	public class ListenerMenu implements EventHandler<ActionEvent>{
@@ -52,12 +50,12 @@ public class Control  extends Application{
 		@Override
 		public void handle(ActionEvent e){
 			
-			if(e.getSource() == view.menuItemNewGame){
+			if(e.getSource() == viewMainMenu.menuItemNewGame){
 				
 				manageNewGame();
 			}
 			
-			if(e.getSource() == view.menuItemQuit){
+			if(e.getSource() == viewMainMenu.menuItemQuit){
 				
 				manageQuit();
 			}
@@ -69,21 +67,13 @@ public class Control  extends Application{
 		@Override
 		public void handle(ActionEvent e){
 			
-			if(e.getSource() == view.btnHit){
+			if(e.getSource() == viewMainMenu.blackJackButton){
 				
-				
-			}
-			
-			if(e.getSource() == view.btnStand){
-				
-				
-			}
-			
-			if(e.getSource() == mainMenu.blackjackButton){
 				startBlackjackGame();
 			}
 			
-			if(e.getSource() == mainMenu.rouletteButton){
+			if(e.getSource() == viewMainMenu.rouletteButton){
+				
 				startRouletteGame();
 			}
 		}
@@ -114,8 +104,8 @@ public class Control  extends Application{
 		if(createPlayer()){
 			
 			dealer = new Dealer("Garry");
-			view.txtDealerName.setText(dealer.getName());
-			view.txtPlayerName.setText(player.getName());
+			viewBlackJack.txtDealerName.setText(dealer.getName());
+			viewBlackJack.txtPlayerName.setText(player.getName());
 		}
 	}
 	
@@ -157,8 +147,9 @@ public class Control  extends Application{
 	
 	public void startBlackjackGame()
 	{
+		
 		stage.setTitle("BlackJack");
-		stage.setScene(view.scene);
+		stage.setScene(viewBlackJack.scene);
 		stage.show();
 	}
 	
