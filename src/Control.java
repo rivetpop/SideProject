@@ -17,24 +17,34 @@ public class Control  extends Application{
 	private Stage stage;
 	private Player player = null;
 	private Dealer dealer = null;
+	private Main_menu mainMenu = null;
 	
 	public void start(Stage pStage){
 		
-		stage = pStage;
 		game = new Game();
 		view = new BlackJack();
+		
+		stage = pStage;
+		mainMenu = new Main_menu();
+		mainMenu.createMainMenu();
+
 		addListeners();
-		stage.setTitle("BlackJack");
-		stage.setScene(view.scene);
+		stage.setTitle("Casino");
+		stage.setScene(mainMenu.scene);
 		stage.show();
 	}
 	
 	private void addListeners(){
 		
+		//Blackjack
 		view.menuItemNewGame.setOnAction(new ListenerMenu());
 		view.menuItemQuit.setOnAction(new ListenerMenu());
 		
 		view.btnHit.setOnAction(new ListenerButton());
+		
+		//Main_menu
+		mainMenu.blackjackButton.setOnAction(new ListenerButton());
+		mainMenu.rouletteButton.setOnAction(new ListenerButton());
 	}
 	
 	public class ListenerMenu implements EventHandler<ActionEvent>{
@@ -67,6 +77,14 @@ public class Control  extends Application{
 			if(e.getSource() == view.btnStand){
 				
 				
+			}
+			
+			if(e.getSource() == mainMenu.blackjackButton){
+				startBlackjackGame();
+			}
+			
+			if(e.getSource() == mainMenu.rouletteButton){
+				startRouletteGame();
 			}
 		}
 	}
@@ -135,6 +153,20 @@ public class Control  extends Application{
 		}
 		
 		return nameEntered.get();
+	}
+	
+	public void startBlackjackGame()
+	{
+		stage.setTitle("BlackJack");
+		stage.setScene(view.scene);
+		stage.show();
+	}
+	
+	public void startRouletteGame()
+	{
+		/*stage.setTitle("Roulette");
+		stage.setScene(roulette.scene);
+		stage.show();*/
 	}
 
 	public static void main(String[] args) {
