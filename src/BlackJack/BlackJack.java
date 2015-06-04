@@ -1,3 +1,4 @@
+package BlackJack;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
@@ -14,7 +15,7 @@ import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Text;
 
-
+//BlackJack Class
 public class BlackJack {
 
 		private MenuBar mainMenu = null;
@@ -24,19 +25,19 @@ public class BlackJack {
 		private VBox upperZone = null;
 		private HBox lowerZone = null;
 		protected BorderPane centerZone = null;
-		protected Text txtPlayerName = null;
-		protected Text txtDealerName = null;
+		public Text txtPlayerName = null;
+		public Text txtDealerName = null;
 		protected Text txtOptions = null;
 		protected HBox dealerZone = null;
 		protected HBox playerZone = null;
 		
 		
-		protected Button btnHit;
-		protected Button btnStand;
-		protected Button btnSplit;
-		protected Button btnDouble;
+		public Button btnHit;
+		public Button btnStand;
+		public Button btnSplit;
+		public Button btnDouble;
 		
-		protected Scene scene;
+		public Scene scene;
 		private BorderPane root;
 		
 		
