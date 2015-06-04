@@ -50,6 +50,7 @@ public class Control  extends Application{
 		
 		//Welcome
 		viewWelcome.blackJackButton.setOnAction(new ListenerButton());
+		viewWelcome.rouletteButton.setOnAction(new ListenerButton());
 	}
 	
 	public class ListenerMenu implements EventHandler<ActionEvent>{
