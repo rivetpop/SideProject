@@ -1,3 +1,5 @@
+///Transformer en BorderPane pour avoir un menu identique à BlackJack? Le menu devrait être dan le top du borderpane...
+
 package Roulette;
 
 import javafx.geometry.Insets;
@@ -28,8 +30,11 @@ public class Roulette
 	protected MenuItem menuItemQuit = null;
 	
 	//Images
-	private Image roulette_img = new Image("Roulette.png",500D,500D, true, false);
+	private Image roulette_img = new Image("Roulette.png",500D,0, true, false);
 	private ImageView roulette_imgView = null;
+	
+	private Image table_img = new Image("Roulette_table.png",600D,0, true, false);
+	private ImageView table_imgView = null;
 	
 	
 	public Roulette()
@@ -40,7 +45,7 @@ public class Roulette
 		createMenu();
 		setImages();
 		
-		root.getChildren().add(roulette_imgView);
+		root.getChildren().addAll(upperZone, roulette_imgView, table_imgView);
 		root.setBackground(new Background(new BackgroundFill(Color.GREEN, CornerRadii.EMPTY, Insets.EMPTY)));
 		scene.getStylesheets().add(getClass().getResource("style.css").toExternalForm());
 	}
@@ -63,6 +68,13 @@ public class Roulette
 	private void setImages()
 	{
 		roulette_imgView = new ImageView(roulette_img);
+		//roulette_imgView.setTranslateX(100);
+		//roulette_imgView.setTranslateY(50);
+		
+		table_imgView = new ImageView(table_img);
+		table_imgView.setTranslateX(100);
+		table_imgView.setTranslateY(500);
+		
 	}
 	
 	
