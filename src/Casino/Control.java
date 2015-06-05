@@ -5,6 +5,7 @@ import java.util.Optional;
 import BlackJack.BJGame;
 import BlackJack.BlackJack;
 import BlackJack.Dealer;
+import Roulette.Roulette;
 import javafx.application.Application;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
@@ -19,6 +20,7 @@ public class Control  extends Application{
 	private Main_menu viewMainMenu;
 	private Welcome viewWelcome;
 	private BlackJack viewBlackJack;
+	private Roulette viewRoulette;
 	
 	private BJGame game;
 	private Stage stage;
@@ -30,6 +32,7 @@ public class Control  extends Application{
 		viewMainMenu = new Main_menu();
 		viewWelcome = new Welcome();
 		viewBlackJack = new BlackJack();
+		viewRoulette = new Roulette();
 		
 		
 		stage = pStage;
@@ -80,6 +83,11 @@ public class Control  extends Application{
 			if(e.getSource() == viewWelcome.blackJackButton){
 				
 				manageBlackJack();
+			}
+			
+			if(e.getSource() == viewWelcome.rouletteButton){
+				
+				manageRoulette();
 			}
 			
 			
@@ -162,11 +170,11 @@ public class Control  extends Application{
 		stage.show();
 	}
 	
-	public void startRouletteGame(){
+	public void manageRoulette(){
 		
-		/*stage.setTitle("Roulette");
-		stage.setScene(roulette.scene);
-		stage.show();*/
+		stage.setTitle("Roulette");
+		stage.setScene(viewRoulette.scene);
+		stage.show();
 	}
 
 	public static void main(String[] args) {
