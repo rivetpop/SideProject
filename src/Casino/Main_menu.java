@@ -76,10 +76,10 @@ public class Main_menu{
 	private void createButtonZone(){
 		
 		//Create new/load game button and label
-		newPlayerButton = new Button("New Player");
+		newPlayerButton = new Button("New Player Profile");
 		newPlayerButton.setPrefSize(150, 50);
 		
-		loadPlayerButton = new Button("Load Player");
+		loadPlayerButton = new Button("Load Player Profile");
 		loadPlayerButton.setPrefSize(150, 50);
 		
 		quitButton = new Button("Quit Game");

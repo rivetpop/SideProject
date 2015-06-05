@@ -1,3 +1,7 @@
+//Note: Envisager de générer un ArrayList avec les informations des joueurs provenant du fichier de 
+//sauvegarde lors du démarrage du programme,
+//ca pourrais simplifier beaucoup certaines methodes.
+
 package Casino;
 
 import java.io.BufferedReader;
@@ -29,13 +33,14 @@ public class Control  extends Application{
 	private Welcome viewWelcome;
 	private BlackJack viewBlackJack;
 	private Roulette viewRoulette;
+	private Game_Interface_Components viewGameInterface;
 	
 	private BJGame game;
-	protected Stage stage;
+	private Stage stage;
 	private Player player = null;
 	private Dealer dealer = null;
 	
-	private File playerInfo = new File("Player_info.dat");
+	private File playerInfo = new File(".\\src\\Player_info.dat");
 	
 	public void start(Stage pStage){
 		
@@ -43,6 +48,7 @@ public class Control  extends Application{
 		viewWelcome = new Welcome();
 		viewBlackJack = new BlackJack();
 		viewRoulette = new Roulette();
+		viewGameInterface = new Game_Interface_Components();
 		
 		
 		stage = pStage;
@@ -57,13 +63,17 @@ public class Control  extends Application{
 		//Blackjack
 		viewBlackJack.btnHit.setOnAction(new ListenerButton());
 		
-		//Main_menu<
+		//Main_menu
 		viewMainMenu.newPlayerButton.setOnAction(new ListenerButton());
 		viewMainMenu.loadPlayerButton.setOnAction(new ListenerButton());
+		viewMainMenu.quitButton.setOnAction(new ListenerButton());
 		
 		//Welcome
 		viewWelcome.blackJackButton.setOnAction(new ListenerButton());
 		viewWelcome.rouletteButton.setOnAction(new ListenerButton());
+		
+		//Game_Interface_Components
+			//viewGameInterface.menuItemSave.setOnAction(new ListenerMenu());
 	}
 	
 	public class ListenerMenu implements EventHandler<ActionEvent>{
@@ -71,6 +81,10 @@ public class Control  extends Application{
 		@Override
 		public void handle(ActionEvent e){
 			
+			if (e.getSource() == viewGameInterface.menuItemSave)
+			{
+				manageSavePlayer();
+			}
 		
 		}
 	}
@@ -108,7 +122,6 @@ public class Control  extends Application{
 	}
 	
 	public void manageQuit(){
-		
 		if(player == null){
 			
 			System.exit(0);
@@ -152,26 +165,44 @@ public class Control  extends Application{
 		
 		boolean ok = false;
 		
-		String name = enterName("Enter player name:");
+		//Ask to choose a name
+			String name = enterName("Enter player name:");
+			
+			//while the file contains at least 1 line and the name is already used
+			while(!emptyFileCheck() && nameExists(name))
+			{
+				name = enterName("This name is already used. Please choose another name.");
+			}
+			
+			int cash = Player.STARTING_MONEY;
 		
-		//while the file contains at least 1 line and the name is already used
-		while(!emptyFileCheck() && nameExists(name))
-		{
-			name = enterName("This name is already used. Please enter another name.");
-		}
+		//Ask to choose an image
+			Alert img_alert = new Alert(AlertType.CONFIRMATION);
+			img_alert.setTitle("Image selection");
+			img_alert.setContentText("Do you want to set an image for your player profile");
+			
+			ButtonType yes_button = new ButtonType("Yes");
+			ButtonType no_button = new ButtonType("No");
+			
+			img_alert.getButtonTypes().setAll(yes_button, no_button);
+			
+			Optional<ButtonType> result = img_alert.showAndWait();
+			
+			String img="";
+			if(result.get() == yes_button)
+			{
+				img = choosePicture();
+			}
 		
-		int cash = Player.STARTING_MONEY;
-		
-		 String img = choosePicture();
-		
-		player = new Player(name, cash, img);
-		
-		if (player != null)
-		{
-			ok = true;
-		}
-		
-		return ok;
+		//Create the new player
+			player = new Player(name, cash, img);
+			
+			if (player != null)
+			{
+				ok = true;
+			}
+			
+			return ok;
 	}
 	
 	public static String enterName(String message){
@@ -201,9 +232,9 @@ public class Control  extends Application{
 		
 		try
 		{
-			System.out.println(playerInfo);
-			bufferFile = new BufferedReader(new FileReader(playerInfo));
 			
+			bufferFile = new BufferedReader(new FileReader(playerInfo));
+
 			String readTest = bufferFile.readLine(); //////////////////Erreur potentielle: si le fichier est vide, cette ligne revoit-elle une erreur de IO? Ça ne devrait pas...
 			
 			if (readTest == null)
@@ -292,7 +323,7 @@ public class Control  extends Application{
 		pictureChoice.getExtensionFilters().add(new ExtensionFilter("JPG", "*.jpeg"));
 		pictureChoice.getExtensionFilters().add(new ExtensionFilter("PNG", "*.png"));
 		pictureChoice.getExtensionFilters().add(new ExtensionFilter("GIF", "*.gif"));
-		pictureChoice.getExtensionFilters().add(new ExtensionFilter("PNG", "*.bmp"));
+		pictureChoice.getExtensionFilters().add(new ExtensionFilter("BMP", "*.bmp"));
 		
 		pictureChoice.setInitialDirectory(new File(System.getProperty("user.dir")));
 		File fichier = pictureChoice.showOpenDialog(stage);

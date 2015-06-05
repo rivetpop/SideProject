@@ -2,6 +2,7 @@
 
 package Roulette;
 
+import Casino.Game_Interface_Components;
 import javafx.geometry.Insets;
 import javafx.scene.Group;
 import javafx.scene.Scene;
@@ -17,17 +18,10 @@ import javafx.scene.layout.Pane;
 import javafx.scene.layout.HBox;
 import javafx.scene.paint.Color;
 
-public class Roulette 
+public class Roulette extends Game_Interface_Components 
 {
 	public Scene scene = null;
 	private Pane root  = null;
-	
-	//Menu
-	private HBox upperZone = null;
-	private MenuBar mainMenu = null;
-	private Menu gameMenu = null;
-	protected MenuItem menuItemNewGame = null;
-	protected MenuItem menuItemQuit = null;
 	
 	//Images
 	private Image roulette_img = new Image("Roulette.png",500D,0, true, false);
@@ -45,24 +39,9 @@ public class Roulette
 		createMenu();
 		setImages();
 		
-		root.getChildren().addAll(upperZone, roulette_imgView, table_imgView);
+		root.getChildren().addAll(super.upperZone, roulette_imgView, table_imgView);
 		root.setBackground(new Background(new BackgroundFill(Color.GREEN, CornerRadii.EMPTY, Insets.EMPTY)));
 		scene.getStylesheets().add(getClass().getResource("style.css").toExternalForm());
-	}
-	
-	private void createMenu()
-	{
-		
-		gameMenu = new Menu("Game");
-		menuItemNewGame = new MenuItem("New Game");
-		menuItemQuit = new MenuItem("Quit");
-		gameMenu.getItems().addAll(menuItemNewGame, menuItemQuit);
-		
-		mainMenu = new MenuBar();
-		mainMenu.getMenus().addAll(gameMenu);
-		
-		upperZone = new HBox();
-		upperZone.getChildren().addAll(mainMenu);	
 	}
 	
 	private void setImages()
