@@ -27,16 +27,20 @@ public class Roulette
 	protected MenuItem menuItemNewGame = null;
 	protected MenuItem menuItemQuit = null;
 	
+	//Images
+	private Image roulette_img = new Image("Roulette.png",500D,500D, true, false);
+	private ImageView roulette_imgView = null;
+	
+	
 	public Roulette()
 	{
 		root = new Pane();
 		scene = new Scene(root, 800,800);
 		
-		ImageView roulette_img = new ImageView(new Image("Roulette.jpg"));
-		
 		createMenu();
+		setImages();
 		
-		root.getChildren().add(roulette_img);
+		root.getChildren().add(roulette_imgView);
 		root.setBackground(new Background(new BackgroundFill(Color.GREEN, CornerRadii.EMPTY, Insets.EMPTY)));
 		scene.getStylesheets().add(getClass().getResource("style.css").toExternalForm());
 	}
@@ -54,6 +58,11 @@ public class Roulette
 		
 		upperZone = new VBox();
 		upperZone.getChildren().addAll(mainMenu);	
+	}
+	
+	private void setImages()
+	{
+		roulette_imgView = new ImageView(roulette_img);
 	}
 	
 	
