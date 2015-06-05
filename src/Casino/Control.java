@@ -82,12 +82,17 @@ public class Control  extends Application{
 			
 			if(e.getSource() == viewMainMenu.newPlayerButton){
 				
-				manageNewGame();
+				manageNewPlayer();
+			}
+			
+			if(e.getSource() == viewMainMenu.loadPlayerButton){
+				
+				manageLoadPlayer();
 			}
 			
 			if(e.getSource() == viewMainMenu.quitButton){
 				
-				
+				manageQuit();
 			}
 			
 			if(e.getSource() == viewWelcome.blackJackButton){
@@ -98,9 +103,7 @@ public class Control  extends Application{
 			if(e.getSource() == viewWelcome.rouletteButton){
 				
 				manageRoulette();
-			}
-			
-			
+			}		
 		}
 	}
 	
@@ -112,7 +115,7 @@ public class Control  extends Application{
 		}
 		
 		Alert alert = new Alert(AlertType.CONFIRMATION);
-		alert.setTitle("BlackJack");
+		alert.setTitle("Casino");
 		alert.setHeaderText("Hey! " + player.getName() + "! You still got " + player.getCash() + "$ to spend");
 		alert.setContentText("Do you really want to quit?");
 		
@@ -124,7 +127,7 @@ public class Control  extends Application{
 		}
 	}
 	
-	public void manageNewGame(){
+	public void manageNewPlayer(){
 		
 		if(createPlayer()){
 			
@@ -139,7 +142,7 @@ public class Control  extends Application{
 		else
 		{
 			Alert alert = new Alert(AlertType.ERROR);
-			alert.setTitle("New Game Error");
+			alert.setTitle("Player creation error");
 			alert.setContentText("The player could not be created");
 			alert.showAndWait();
 		}
@@ -198,6 +201,7 @@ public class Control  extends Application{
 		
 		try
 		{
+			System.out.println(playerInfo);
 			bufferFile = new BufferedReader(new FileReader(playerInfo));
 			
 			String readTest = bufferFile.readLine(); //////////////////Erreur potentielle: si le fichier est vide, cette ligne revoit-elle une erreur de IO? Ça ne devrait pas...
@@ -352,7 +356,7 @@ public class Control  extends Application{
 		{
 			Alert alert = new Alert(AlertType.INFORMATION);
 			alert.setTitle("Sauvegarde");
-			alert.setContentText("You must start or load a game before saving!");
+			alert.setContentText("You must create or load a player profile before saving!");
 		}
 		
 		//If a player profile is created or loaded AND if that player profile has been saved at least once before.
@@ -368,7 +372,7 @@ public class Control  extends Application{
 						
 				bufferRead = new BufferedReader(new FileReader(playerInfo));
 				
-				//Get all the text contained in the file (line by line) in a String variable (oldtext)
+				//Get all the text contained in the file (line by line) and put it in a String variable (oldText)
 				String oldText = "";
 				while((line = bufferRead.readLine())!= null)
 				{
@@ -376,14 +380,12 @@ public class Control  extends Application{
 				}
 				
 				//Create a new String variable containing the oldText, but replace the data for the line concerning the current player
-				String newText = oldText.replaceAll(regex, replacement)
-				
-				linenumberreader.read
+				// A regular expression is used in the method replaceAll to find the data we want to replace
+				String newText = oldText.replaceAll(player.getName()+";\\d+;[^\\\\]+", 
+													player.getName() + ";" + player.getCash() +";" +player.getImg());
 				
 				bufferWrite= new BufferedWriter(new FileWriter(playerInfo));
-				String player_save = player.getName() + ";" + player.getCash() + ";" + player.getImg();
-				bufferWrite.
-				bufferWrite.newLine();
+				bufferWrite.write(newText);
 			}
 			catch (IOException e)
 			{
@@ -413,8 +415,13 @@ public class Control  extends Application{
 		{
 			Alert alert = new Alert(AlertType.INFORMATION);
 			alert.setTitle("Sauvegarde");
-			alert.setContentText("You must start or load a game before saving!");
+			alert.setContentText("You must start or load a player profile before saving!");
 		}
+	}
+	
+	public void manageLoadPlayer()
+	{
+		
 	}
 	
 	public void manageBlackJack(){
