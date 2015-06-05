@@ -1,5 +1,11 @@
 package Casino;
 
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.Optional;
 
 import BlackJack.BJGame;
@@ -13,6 +19,8 @@ import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.TextInputDialog;
 import javafx.scene.control.Alert.AlertType;
+import javafx.stage.FileChooser;
+import javafx.stage.FileChooser.ExtensionFilter;
 import javafx.stage.Stage;
 
 public class Control  extends Application{
@@ -23,9 +31,11 @@ public class Control  extends Application{
 	private Roulette viewRoulette;
 	
 	private BJGame game;
-	private Stage stage;
+	protected Stage stage;
 	private Player player = null;
 	private Dealer dealer = null;
+	
+	private File playerInfo = new File("Player_info.dat");
 	
 	public void start(Stage pStage){
 		
@@ -125,18 +135,36 @@ public class Control  extends Application{
 			stage.setScene(viewWelcome.scene);
 			stage.show();
 		}
+		
+		else
+		{
+			Alert alert = new Alert(AlertType.ERROR);
+			alert.setTitle("New Game Error");
+			alert.setContentText("The player could not be created");
+			alert.showAndWait();
+		}
 	}
 	
 	public boolean createPlayer(){
 		
 		boolean ok = false;
-		String name = null;
 		
-		name = enterName("Enter player name:");
+		String name = enterName("Enter player name:");
 		
-		if(name != null){
-			
-			player = new Player(name, Player.STARTING_MONEY);
+		//while the file contains at least 1 line and the name is already used
+		while(!emptyFileCheck() && nameAlreadyUsedCheck(name))
+		{
+			name = enterName("This name is already used. Please enter another name.");
+		}
+		
+		int cash = Player.STARTING_MONEY;
+		
+		 String img = choosePicture();
+		
+		player = new Player(name, cash, img);
+		
+		if (player != null)
+		{
 			ok = true;
 		}
 		
@@ -147,7 +175,7 @@ public class Control  extends Application{
 		
 		Optional<String>nameEntered = null;
 		TextInputDialog dialog = new TextInputDialog();
-		dialog.setTitle("Black Jack");
+		dialog.setTitle("Casino");
 		dialog.setHeaderText("Enter your name");
 		dialog.setContentText(message);
 		
@@ -161,6 +189,132 @@ public class Control  extends Application{
 		}
 		
 		return nameEntered.get();
+	}
+	
+	public boolean emptyFileCheck()
+	{
+		boolean emptyFileCheck = false;
+		BufferedReader bufferFile = null;
+		
+		try
+		{
+			bufferFile = new BufferedReader(new FileReader(playerInfo));
+			
+			String readTest = bufferFile.readLine(); //////////////////Erreur potentielle: si le fichier est vide, cette ligne revoit-elle une erreur de IO? Ça ne devrait pas...
+			
+			if (readTest == null)
+			{
+				emptyFileCheck = true;
+			}	
+		}
+		catch (IOException e)
+		{
+			Alert alert = new Alert(AlertType.ERROR);
+			alert.setTitle("IO Error");
+			alert.setContentText("File error: Cannot read " + playerInfo);
+			alert.showAndWait();
+		}	
+		
+		finally
+		{
+			try
+			{
+				bufferFile.close();
+			}
+			catch(IOException e)
+			{
+				Alert alert = new Alert(AlertType.ERROR);
+				alert.setTitle("IO Error");
+				alert.setContentText("File error: " + playerInfo + " stream cannot be closed)");
+				alert.showAndWait();
+			}
+		}
+		
+		return emptyFileCheck;
+	}
+	
+	public boolean nameAlreadyUsedCheck(String p_name)
+	{
+		boolean nameAlreadyUsedCheck = false;
+		String line = "";
+		BufferedReader bufferRead = null;
+		
+		try
+		{
+			bufferRead = new BufferedReader(new FileReader(playerInfo));
+			
+			while((line = bufferRead.readLine())!= null)
+			{
+				String[] vector = line.split(";");
+				if (vector[0] == p_name)
+				{
+					nameAlreadyUsedCheck = true;
+				}
+			}
+		}
+		catch (IOException e)
+		{
+			Alert alert = new Alert(AlertType.ERROR);
+			alert.setTitle("IO Error");
+			alert.setContentText("File error: Cannot read " + playerInfo);
+			alert.showAndWait();
+		}
+		
+		finally
+		{
+			try
+			{
+				bufferRead.close();
+			}
+			catch(IOException e)
+			{
+				Alert alert = new Alert(AlertType.ERROR);
+				alert.setTitle("IO Error");
+				alert.setContentText("File error: " + playerInfo + " stream cannot be closed)");
+				alert.showAndWait();
+			}
+		}
+		
+		return nameAlreadyUsedCheck;
+	}
+	
+	public String choosePicture()
+	{
+		String picture_URL = null;
+		
+		FileChooser pictureChoice = new FileChooser();
+		
+		//Allow only image extension files to be chosen
+		pictureChoice.getExtensionFilters().add(new ExtensionFilter("JPG", "*.jpeg"));
+		pictureChoice.getExtensionFilters().add(new ExtensionFilter("PNG", "*.png"));
+		pictureChoice.getExtensionFilters().add(new ExtensionFilter("GIF", "*.gif"));
+		pictureChoice.getExtensionFilters().add(new ExtensionFilter("PNG", "*.bmp"));
+		
+		pictureChoice.setInitialDirectory(new File(System.getProperty("user.dir")));
+		File fichier = pictureChoice.showOpenDialog(stage);
+		
+		
+		if (fichier == null)
+		{
+			picture_URL = Player.DEFAULT_IMG_URL;
+		}
+		
+		else
+		{
+			picture_URL = fichier.getPath();
+		}
+		
+		return picture_URL;
+	}
+	
+	public manageSavePlayer()
+	{
+		
+		BufferedWriter bufferWrite = new BufferedWriter(new FileWriter(playerInfo));
+		
+		String newPlayer = name + ";" + cash + ";" + choosePicture();
+		bufferWrite.write(newPlayer);
+		bufferWrite.newLine();
 	}
 	
 	public void manageBlackJack(){

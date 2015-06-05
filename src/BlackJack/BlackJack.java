@@ -103,8 +103,8 @@ public class BlackJack {
 			
 		}
 		
-		public void createButtons(){
-			
+		public void createButtons()
+		{
 			btnHit = new Button("Hit");
 			btnHit.setPrefSize(125, 50);
 			btnHit.getStyleClass().add("Button");
@@ -124,7 +124,6 @@ public class BlackJack {
 			lowerZone = new HBox();
 			lowerZone.setPadding(new Insets(0, 40, 0, 40));
 			lowerZone.setSpacing(10);
-			lowerZone.getChildren().addAll(btnHit, btnStand);
-			
+			lowerZone.getChildren().addAll(btnHit, btnStand);		
 		}
 }

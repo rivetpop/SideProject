@@ -1,5 +1,18 @@
 package Casino;
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Optional;
+
+import javafx.scene.control.Alert;
+import javafx.scene.control.Alert.AlertType;
+import javafx.scene.control.TextInputDialog;
+import javafx.scene.image.Image;
+import javafx.stage.FileChooser;
 
 
 public class Player {
@@ -12,22 +25,19 @@ public class Player {
 	
 	public static final int STARTING_MONEY = 500;
 	
+	public static final String DEFAULT_IMG_URL = "anonym.jpg";
+	
 	private String name = "";
 	
 	private int cash = 0;
 	
-	private ArrayList<Card> playerHand;
+	private String picture_URL = null;
 	
-	public Player(String pName, int pStartMoney){
-		
-		playerHand = new ArrayList<Card>();
-		setName(pName);
-		setCash(pStartMoney);
-	}
-	
-	public ArrayList<Card> getPlayerHand(){
-		
-		return playerHand;
+	public Player(String p_name, int p_cash, String p_picture_URL)
+	{
+		setName(p_name);
+		setCash(p_cash);
+		setImg(p_picture_URL);
 	}
 	
 	public String getName(){
@@ -60,13 +70,9 @@ public class Player {
 		return(validateCash(pCash));
 	}
 	
-	public boolean setPlayerHand(Card pHand){
-		
-		if(validatePlayerHand(pHand)){
-			
-			playerHand.add(pHand);
-		}
-		return (validatePlayerHand(pHand));
+	public void setImg(String p_picture_URL)
+	{
+		picture_URL = p_picture_URL;
 	}
 	
 	public static boolean validateName(String pName){

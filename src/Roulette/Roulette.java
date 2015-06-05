@@ -14,7 +14,7 @@ import javafx.scene.layout.Background;
 import javafx.scene.layout.BackgroundFill;
 import javafx.scene.layout.CornerRadii;
 import javafx.scene.layout.Pane;
-import javafx.scene.layout.VBox;
+import javafx.scene.layout.HBox;
 import javafx.scene.paint.Color;
 
 public class Roulette 
@@ -23,7 +23,7 @@ public class Roulette
 	private Pane root  = null;
 	
 	//Menu
-	private VBox upperZone = null;
+	private HBox upperZone = null;
 	private MenuBar mainMenu = null;
 	private Menu gameMenu = null;
 	protected MenuItem menuItemNewGame = null;
@@ -61,7 +61,7 @@ public class Roulette
 		mainMenu = new MenuBar();
 		mainMenu.getMenus().addAll(gameMenu);
 		
-		upperZone = new VBox();
+		upperZone = new HBox();
 		upperZone.getChildren().addAll(mainMenu);	
 	}
 	
