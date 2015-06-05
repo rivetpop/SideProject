@@ -29,8 +29,8 @@ public class Main_menu{
 	
 	//New Game / Load Game buttons
 	private VBox newLoadButton = null; 
-	Button newGameButton = null;
-	Button loadGameButton = null;
+	Button newPlayerButton = null;
+	Button loadPlayerButton = null;
 	Button quitButton = null;
 	
 	
@@ -76,11 +76,11 @@ public class Main_menu{
 	private void createButtonZone(){
 		
 		//Create new/load game button and label
-		newGameButton = new Button("New Game");
-		newGameButton.setPrefSize(150, 50);
+		newPlayerButton = new Button("New Player");
+		newPlayerButton.setPrefSize(150, 50);
 		
-		loadGameButton = new Button("Load Game");
-		loadGameButton.setPrefSize(150, 50);
+		loadPlayerButton = new Button("Load Player");
+		loadPlayerButton.setPrefSize(150, 50);
 		
 		quitButton = new Button("Quit Game");
 		quitButton.setPrefSize(150, 50);
@@ -90,7 +90,7 @@ public class Main_menu{
 		newLoadButton.setAlignment(Pos.CENTER);
 		newLoadButton.setPadding(new Insets(0,0,50,0));
 		
-		newLoadButton.getChildren().addAll(newGameButton, loadGameButton, quitButton);
+		newLoadButton.getChildren().addAll(newPlayerButton, loadPlayerButton, quitButton);
 		
 	}
 }

@@ -75,6 +75,11 @@ public class Player {
 		picture_URL = p_picture_URL;
 	}
 	
+	public String getImg()
+	{
+		return picture_URL;
+	}
+	
 	public static boolean validateName(String pName){
 		
 		return (pName.length() < NAME_MAX_LENGTH && pName.length() > NAME_MIN_LENGTH);

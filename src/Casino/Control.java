@@ -58,8 +58,8 @@ public class Control  extends Application{
 		viewBlackJack.btnHit.setOnAction(new ListenerButton());
 		
 		//Main_menu<
-		viewMainMenu.newGameButton.setOnAction(new ListenerButton());
-		viewMainMenu.loadGameButton.setOnAction(new ListenerButton());
+		viewMainMenu.newPlayerButton.setOnAction(new ListenerButton());
+		viewMainMenu.loadPlayerButton.setOnAction(new ListenerButton());
 		
 		//Welcome
 		viewWelcome.blackJackButton.setOnAction(new ListenerButton());
@@ -80,7 +80,7 @@ public class Control  extends Application{
 		@Override
 		public void handle(ActionEvent e){
 			
-			if(e.getSource() == viewMainMenu.newGameButton){
+			if(e.getSource() == viewMainMenu.newPlayerButton){
 				
 				manageNewGame();
 			}
@@ -152,7 +152,7 @@ public class Control  extends Application{
 		String name = enterName("Enter player name:");
 		
 		//while the file contains at least 1 line and the name is already used
-		while(!emptyFileCheck() && nameAlreadyUsedCheck(name))
+		while(!emptyFileCheck() && nameExists(name))
 		{
 			name = enterName("This name is already used. Please enter another name.");
 		}
@@ -233,9 +233,9 @@ public class Control  extends Application{
 		return emptyFileCheck;
 	}
 	
-	public boolean nameAlreadyUsedCheck(String p_name)
+	public boolean nameExists(String p_name)
 	{
-		boolean nameAlreadyUsedCheck = false;
+		boolean nameExists = false;
 		String line = "";
 		BufferedReader bufferRead = null;
 		
@@ -248,7 +248,7 @@ public class Control  extends Application{
 				String[] vector = line.split(";");
 				if (vector[0] == p_name)
 				{
-					nameAlreadyUsedCheck = true;
+					nameExists = true;
 				}
 			}
 		}
@@ -275,7 +275,7 @@ public class Control  extends Application{
 			}
 		}
 		
-		return nameAlreadyUsedCheck;
+		return nameExists;
 	}
 	
 	public String choosePicture()
@@ -307,14 +307,114 @@ public class Control  extends Application{
 		return picture_URL;
 	}
 	
-	public manageSavePlayer()
+	public void manageSavePlayer()
 	{
 		
-		BufferedWriter bufferWrite = new BufferedWriter(new FileWriter(playerInfo));
+		BufferedWriter bufferWrite = null;
+		BufferedReader bufferRead = null;
 		
-		String newPlayer = name + ";" + cash + ";" + choosePicture();
-		bufferWrite.write(newPlayer);
-		bufferWrite.newLine();
+		//If a player profile is created or loaded AND if that player profile has never been saved
+		//In this case, we save the name, cash and picture of the player profile
+		if (player != null && !nameExists(player.getName()))
+		{
+			try
+			{
+				bufferWrite= new BufferedWriter(new FileWriter(playerInfo, true));
+				String player_save = player.getName() + ";" + player.getCash() + ";" + player.getImg();
+				bufferWrite.write(player_save);
+				bufferWrite.newLine();
+			}
+			catch (IOException e)
+			{
+				Alert alert = new Alert(AlertType.ERROR);
+				alert.setTitle("IO Error");
+				alert.setContentText("File error: Cannot write in " + playerInfo);
+				alert.showAndWait();
+			}
+			
+			finally
+			{
+				try
+				{
+					bufferWrite.close();
+				}
+				catch(IOException e)
+				{
+					Alert alert = new Alert(AlertType.ERROR);
+					alert.setTitle("IO Error");
+					alert.setContentText("File error: " + playerInfo + " stream cannot be closed)");
+					alert.showAndWait();
+				}
+			}
+		}
+		
+		else
+		{
+			Alert alert = new Alert(AlertType.INFORMATION);
+			alert.setTitle("Sauvegarde");
+			alert.setContentText("You must start or load a game before saving!");
+		}
+		
+		//If a player profile is created or loaded AND if that player profile has been saved at least once before.
+		/*In this case, we want to overwrite the player data in the file, 
+		otherwise if we just save everything we're gonna create a player profile repetition, and the
+		program will crash if we ever try to load that profile again */
+		
+		if (player != null && nameExists(player.getName()))
+		{			
+			try
+			{	
+				String line = "";
+						
+				bufferRead = new BufferedReader(new FileReader(playerInfo));
+				
+				//Get all the text contained in the file (line by line) in a String variable (oldtext)
+				String oldText = "";
+				while((line = bufferRead.readLine())!= null)
+				{
+					oldText += line+"\n";
+				}
+				
+				//Create a new String variable containing the oldText, but replace the data for the line concerning the current player
+				String newText = oldText.replaceAll(regex, replacement)
+				
+				linenumberreader.read
+				
+				bufferWrite= new BufferedWriter(new FileWriter(playerInfo));
+				String player_save = player.getName() + ";" + player.getCash() + ";" + player.getImg();
+				bufferWrite.
+				bufferWrite.newLine();
+			}
+			catch (IOException e)
+			{
+				Alert alert = new Alert(AlertType.ERROR);
+				alert.setTitle("IO Error");
+				alert.setContentText("File error: Cannot write in " + playerInfo);
+				alert.showAndWait();
+			}
+			
+			finally
+			{
+				try
+				{
+					bufferWrite.close();
+				}
+				catch(IOException e)
+				{
+					Alert alert = new Alert(AlertType.ERROR);
+					alert.setTitle("IO Error");
+					alert.setContentText("File error: " + playerInfo + " stream cannot be closed)");
+					alert.showAndWait();
+				}
+			}
+		}
+		
+		else
+		{
+			Alert alert = new Alert(AlertType.INFORMATION);
+			alert.setTitle("Sauvegarde");
+			alert.setContentText("You must start or load a game before saving!");
+		}
 	}
 	
 	public void manageBlackJack(){
