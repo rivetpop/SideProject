@@ -1,7 +1,12 @@
 package Casino;
+import java.net.MalformedURLException;
+import java.net.URL;
+
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -31,8 +36,7 @@ public class Welcome {
 	//Pick a game text
 	private Text pickGameText = null;
 	
-	//Create player stats and image
-	Image pinzaru = new Image("Pinzaru.png");
+	//Create player stats
 	public Text playerStats = null; 
 	private HBox statsZone = null;
 	
@@ -69,24 +73,35 @@ public class Welcome {
 		titleWelcome2.getStyleClass().add("title");
 		
 		titleZone.getChildren().addAll(titleWelcome, titleWelcome2);
-	
 	}
 	
 	private void createPlayerZone(){
 		
-		ImageView player = new ImageView();
-		player.setImage(pinzaru);
-		player.setFitWidth(150);
-		player.setPreserveRatio(true);
-		player.setSmooth(true);
-		player.setCache(true);
+		Image image = null;
+		
+		ImageView player_img = new ImageView();
+		if (Control.current_player.getImg() == Player.DEFAULT_IMG_URL)
+		{
+			image = new Image(Player.DEFAULT_IMG_URL);
+		}
+		
+		else
+		{
+			image = new Image("file:"+Control.current_player.getImg());
+		}
+
+		player_img.setImage(image);
+		player_img.setFitWidth(150);
+		player_img.setPreserveRatio(true);
+		player_img.setSmooth(true);
+		player_img.setCache(true);
 		
 		playerStats = new Text();
 		playerStats.getStyleClass().add("text");
 		
 		statsZone = new HBox();
 		statsZone.setAlignment(Pos.CENTER);
-		statsZone.getChildren().addAll(player, playerStats);
+		statsZone.getChildren().addAll(player_img, playerStats);
 	}
 	
 	private void createPickGameZone(){

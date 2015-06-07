@@ -13,7 +13,7 @@ public class Game_Interface_Components
 	//Menu	
 		public HBox upperZone = null;
 		private MenuBar mainMenu = null;
-		private Menu gameMenu = null;
+		public Menu gameMenu = null;
 		public MenuItem menuItemNewPlayer = null;
 		public MenuItem menuItemLoadPlayer = null;
 		public MenuItem menuItemSave = null;

@@ -10,6 +10,8 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.Optional;
 
 import BlackJack.BJGame;
@@ -17,10 +19,12 @@ import BlackJack.BlackJack;
 import BlackJack.Dealer;
 import Roulette.Roulette;
 import javafx.application.Application;
+import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
+import javafx.scene.control.MenuItem;
 import javafx.scene.control.TextInputDialog;
 import javafx.scene.control.Alert.AlertType;
 import javafx.stage.FileChooser;
@@ -37,19 +41,14 @@ public class Control  extends Application{
 	
 	private BJGame game;
 	private Stage stage;
-	private Player player = null;
+	public static Player current_player = null;
 	private Dealer dealer = null;
 	
-	private File playerInfo = new File(".\\src\\Player_info.dat");
+	private File playerInfoFile = new File(".\\src\\Player_info.dat");
 	
 	public void start(Stage pStage){
 		
 		viewMainMenu = new Main_menu();
-		viewWelcome = new Welcome();
-		viewBlackJack = new BlackJack();
-		viewRoulette = new Roulette();
-		viewGameInterface = new Game_Interface_Components();
-		
 		
 		stage = pStage;
 		addListeners();
@@ -60,33 +59,34 @@ public class Control  extends Application{
 	
 	private void addListeners(){
 		
-		//Blackjack
-		viewBlackJack.btnHit.setOnAction(new ListenerButton());
-		
 		//Main_menu
 		viewMainMenu.newPlayerButton.setOnAction(new ListenerButton());
 		viewMainMenu.loadPlayerButton.setOnAction(new ListenerButton());
 		viewMainMenu.quitButton.setOnAction(new ListenerButton());
-		
-		//Welcome
-		viewWelcome.blackJackButton.setOnAction(new ListenerButton());
-		viewWelcome.rouletteButton.setOnAction(new ListenerButton());
-		
-		//Game_Interface_Components
-			//viewGameInterface.menuItemSave.setOnAction(new ListenerMenu());
 	}
 	
 	public class ListenerMenu implements EventHandler<ActionEvent>{
 		
 		@Override
+		public void handle(ActionEvent e)
+		{
+			Object optionMenu = e.getSource();
+			ObservableList<MenuItem> options = viewGameInterface.gameMenu.getItems();
+			
+			if (optionMenu == options.get(0))
+			{
+				manageSavePlayer();
+			}
+		}
+		
+		/*@Override
 		public void handle(ActionEvent e){
 			
 			if (e.getSource() == viewGameInterface.menuItemSave)
 			{
 				manageSavePlayer();
 			}
-		
-		}
+		}*/
 	}
 	
 	public class ListenerButton implements EventHandler<ActionEvent>{
@@ -122,14 +122,14 @@ public class Control  extends Application{
 	}
 	
 	public void manageQuit(){
-		if(player == null){
+		if(current_player == null){
 			
 			System.exit(0);
 		}
 		
 		Alert alert = new Alert(AlertType.CONFIRMATION);
 		alert.setTitle("Casino");
-		alert.setHeaderText("Hey! " + player.getName() + "! You still got " + player.getCash() + "$ to spend");
+		alert.setHeaderText("Hey! " + current_player.getName() + "! You still got " + current_player.getCash() + "$ to spend");
 		alert.setContentText("Do you really want to quit?");
 		
 		Optional<ButtonType> result = alert.showAndWait();
@@ -144,9 +144,15 @@ public class Control  extends Application{
 		
 		if(createPlayer()){
 			
-			viewWelcome.titleWelcome.setText("Welcome " + player.getName() + "!");
+			viewWelcome = new Welcome();
+			
+			//Welcome screen listeners
+			viewWelcome.blackJackButton.setOnAction(new ListenerButton());
+			viewWelcome.rouletteButton.setOnAction(new ListenerButton());
+			
+			viewWelcome.titleWelcome.setText("Welcome " + current_player.getName() + "!");
 			viewWelcome.titleWelcome2.setText("Enjoy your stay and make some money!");
-			viewWelcome.playerStats.setText("    Your cash : " + player.getCash() + "$");
+			viewWelcome.playerStats.setText("    Your cash : " + current_player.getCash() + "$");
 			stage.setTitle("Welcome!");
 			stage.setScene(viewWelcome.scene);
 			stage.show();
@@ -188,16 +194,22 @@ public class Control  extends Application{
 			
 			Optional<ButtonType> result = img_alert.showAndWait();
 			
-			String img="";
+			String img = null;
 			if(result.get() == yes_button)
 			{
 				img = choosePicture();
 			}
+			
+			if(result.get() == no_button)
+			{
+				img = Player.DEFAULT_IMG_URL;
+			}
 		
 		//Create the new player
-			player = new Player(name, cash, img);
+			Player player = new Player(name, cash, img);
+			current_player = player;
 			
-			if (player != null)
+			if (current_player != null)
 			{
 				ok = true;
 			}
@@ -233,7 +245,7 @@ public class Control  extends Application{
 		try
 		{
 			
-			bufferFile = new BufferedReader(new FileReader(playerInfo));
+			bufferFile = new BufferedReader(new FileReader(playerInfoFile));
 
 			String readTest = bufferFile.readLine(); //////////////////Erreur potentielle: si le fichier est vide, cette ligne revoit-elle une erreur de IO? Ça ne devrait pas...
 			
@@ -246,7 +258,7 @@ public class Control  extends Application{
 		{
 			Alert alert = new Alert(AlertType.ERROR);
 			alert.setTitle("IO Error");
-			alert.setContentText("File error: Cannot read " + playerInfo);
+			alert.setContentText("File error: Cannot read " + playerInfoFile);
 			alert.showAndWait();
 		}	
 		
@@ -260,7 +272,7 @@ public class Control  extends Application{
 			{
 				Alert alert = new Alert(AlertType.ERROR);
 				alert.setTitle("IO Error");
-				alert.setContentText("File error: " + playerInfo + " stream cannot be closed)");
+				alert.setContentText("File error: " + playerInfoFile + " stream cannot be closed)");
 				alert.showAndWait();
 			}
 		}
@@ -276,7 +288,7 @@ public class Control  extends Application{
 		
 		try
 		{
-			bufferRead = new BufferedReader(new FileReader(playerInfo));
+			bufferRead = new BufferedReader(new FileReader(playerInfoFile));
 			
 			while((line = bufferRead.readLine())!= null)
 			{
@@ -291,7 +303,7 @@ public class Control  extends Application{
 		{
 			Alert alert = new Alert(AlertType.ERROR);
 			alert.setTitle("IO Error");
-			alert.setContentText("File error: Cannot read " + playerInfo);
+			alert.setContentText("File error: Cannot read " + playerInfoFile);
 			alert.showAndWait();
 		}
 		
@@ -305,7 +317,7 @@ public class Control  extends Application{
 			{
 				Alert alert = new Alert(AlertType.ERROR);
 				alert.setTitle("IO Error");
-				alert.setContentText("File error: " + playerInfo + " stream cannot be closed)");
+				alert.setContentText("File error: " + playerInfoFile + " stream cannot be closed)");
 				alert.showAndWait();
 			}
 		}
@@ -315,7 +327,8 @@ public class Control  extends Application{
 	
 	public String choosePicture()
 	{
-		String picture_URL = null;
+		String picture_path = null;
+		//URL picture_URL = null;
 		
 		FileChooser pictureChoice = new FileChooser();
 		
@@ -331,15 +344,15 @@ public class Control  extends Application{
 		
 		if (fichier == null)
 		{
-			picture_URL = Player.DEFAULT_IMG_URL;
+				picture_path = Player.DEFAULT_IMG_URL;	
 		}
 		
 		else
 		{
-			picture_URL = fichier.getPath();
+			picture_path = fichier.getPath();
 		}
 		
-		return picture_URL;
+		return picture_path;
 	}
 	
 	public void manageSavePlayer()
@@ -350,12 +363,12 @@ public class Control  extends Application{
 		
 		//If a player profile is created or loaded AND if that player profile has never been saved
 		//In this case, we save the name, cash and picture of the player profile
-		if (player != null && !nameExists(player.getName()))
+		if (current_player != null && !nameExists(current_player.getName()))
 		{
 			try
 			{
-				bufferWrite= new BufferedWriter(new FileWriter(playerInfo, true));
-				String player_save = player.getName() + ";" + player.getCash() + ";" + player.getImg();
+				bufferWrite= new BufferedWriter(new FileWriter(playerInfoFile, true));
+				String player_save = current_player.getName() + ";" + current_player.getCash() + ";" + current_player.getImg();
 				bufferWrite.write(player_save);
 				bufferWrite.newLine();
 			}
@@ -363,7 +376,7 @@ public class Control  extends Application{
 			{
 				Alert alert = new Alert(AlertType.ERROR);
 				alert.setTitle("IO Error");
-				alert.setContentText("File error: Cannot write in " + playerInfo);
+				alert.setContentText("File error: Cannot write in " + playerInfoFile);
 				alert.showAndWait();
 			}
 			
@@ -377,7 +390,7 @@ public class Control  extends Application{
 				{
 					Alert alert = new Alert(AlertType.ERROR);
 					alert.setTitle("IO Error");
-					alert.setContentText("File error: " + playerInfo + " stream cannot be closed)");
+					alert.setContentText("File error: " + playerInfoFile + " stream cannot be closed)");
 					alert.showAndWait();
 				}
 			}
@@ -395,13 +408,13 @@ public class Control  extends Application{
 		otherwise if we just save everything we're gonna create a player profile repetition, and the
 		program will crash if we ever try to load that profile again */
 		
-		if (player != null && nameExists(player.getName()))
+		if (current_player != null && nameExists(current_player.getName()))
 		{			
 			try
 			{	
 				String line = "";
 						
-				bufferRead = new BufferedReader(new FileReader(playerInfo));
+				bufferRead = new BufferedReader(new FileReader(playerInfoFile));
 				
 				//Get all the text contained in the file (line by line) and put it in a String variable (oldText)
 				String oldText = "";
@@ -412,17 +425,17 @@ public class Control  extends Application{
 				
 				//Create a new String variable containing the oldText, but replace the data for the line concerning the current player
 				// A regular expression is used in the method replaceAll to find the data we want to replace
-				String newText = oldText.replaceAll(player.getName()+";\\d+;[^\\\\]+", 
-													player.getName() + ";" + player.getCash() +";" +player.getImg());
+				String newText = oldText.replaceAll(current_player.getName()+";\\d+;[^\\\\]+", 
+													current_player.getName() + ";" + current_player.getCash() +";" +current_player.getImg());
 				
-				bufferWrite= new BufferedWriter(new FileWriter(playerInfo));
+				bufferWrite= new BufferedWriter(new FileWriter(playerInfoFile));
 				bufferWrite.write(newText);
 			}
 			catch (IOException e)
 			{
 				Alert alert = new Alert(AlertType.ERROR);
 				alert.setTitle("IO Error");
-				alert.setContentText("File error: Cannot write in " + playerInfo);
+				alert.setContentText("File error: Cannot write in " + playerInfoFile);
 				alert.showAndWait();
 			}
 			
@@ -436,7 +449,7 @@ public class Control  extends Application{
 				{
 					Alert alert = new Alert(AlertType.ERROR);
 					alert.setTitle("IO Error");
-					alert.setContentText("File error: " + playerInfo + " stream cannot be closed)");
+					alert.setContentText("File error: " + playerInfoFile + " stream cannot be closed)");
 					alert.showAndWait();
 				}
 			}
@@ -457,16 +470,30 @@ public class Control  extends Application{
 	
 	public void manageBlackJack(){
 		
+		viewBlackJack = new BlackJack();
+		viewGameInterface = new Game_Interface_Components();
+		
+		//BlackJack Listeners
+			viewBlackJack.btnHit.setOnAction(new ListenerButton());
+		
 		stage.setTitle("BlackJack");
 		stage.setScene(viewBlackJack.scene);
 		stage.show();
 	}
 	
-	public void manageRoulette(){
+	public void manageRoulette()
+	{
+		viewRoulette = new Roulette();
+		viewGameInterface = new Game_Interface_Components();
 		
 		stage.setTitle("Roulette");
 		stage.setScene(viewRoulette.scene);
+		
 		stage.show();
+		
+		//Menu Listeners
+		viewGameInterface.menuItemQuit.setOnAction(new ListenerMenu());	
+		viewGameInterface.menuItemSave.setOnAction(new ListenerMenu()); //Trouver le fuck avec ce listener, il ne fonctionne pas et genere un nullpointerexception
 	}
 
 	public static void main(String[] args) {
