@@ -23,6 +23,7 @@ import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.scene.control.Alert;
+import javafx.scene.control.ButtonBar.ButtonData;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.TextInputDialog;
@@ -37,7 +38,6 @@ public class Control  extends Application{
 	private Welcome viewWelcome;
 	private BlackJack viewBlackJack;
 	private Roulette viewRoulette;
-	private Game_Interface_Components viewGameInterface;
 	
 	private BJGame game;
 	private Stage stage;
@@ -49,6 +49,7 @@ public class Control  extends Application{
 	public void start(Stage pStage){
 		
 		viewMainMenu = new Main_menu();
+		
 		
 		stage = pStage;
 		addListeners();
@@ -67,26 +68,15 @@ public class Control  extends Application{
 	
 	public class ListenerMenu implements EventHandler<ActionEvent>{
 		
+		
 		@Override
-		public void handle(ActionEvent e)
-		{
-			Object optionMenu = e.getSource();
-			ObservableList<MenuItem> options = viewGameInterface.gameMenu.getItems();
+		public void handle(ActionEvent e){
 			
-			if (optionMenu == options.get(0))
+			if (e.getSource() == viewRoulette.menuItemSave)
 			{
 				manageSavePlayer();
 			}
 		}
-		
-		/*@Override
-		public void handle(ActionEvent e){
-			
-			if (e.getSource() == viewGameInterface.menuItemSave)
-			{
-				manageSavePlayer();
-			}
-		}*/
 	}
 	
 	public class ListenerButton implements EventHandler<ActionEvent>{
@@ -247,7 +237,7 @@ public class Control  extends Application{
 			
 			bufferFile = new BufferedReader(new FileReader(playerInfoFile));
 
-			String readTest = bufferFile.readLine(); //////////////////Erreur potentielle: si le fichier est vide, cette ligne revoit-elle une erreur de IO? Ça ne devrait pas...
+			String readTest = bufferFile.readLine(); 
 			
 			if (readTest == null)
 			{
@@ -276,7 +266,6 @@ public class Control  extends Application{
 				alert.showAndWait();
 			}
 		}
-		
 		return emptyFileCheck;
 	}
 	
@@ -291,10 +280,10 @@ public class Control  extends Application{
 			bufferRead = new BufferedReader(new FileReader(playerInfoFile));
 			
 			while((line = bufferRead.readLine())!= null)
-			{
+			{	
 				String[] vector = line.split(";");
-				if (vector[0] == p_name)
-				{
+				if (vector[0].equals(p_name))
+				{	
 					nameExists = true;
 				}
 			}
@@ -321,7 +310,6 @@ public class Control  extends Application{
 				alert.showAndWait();
 			}
 		}
-		
 		return nameExists;
 	}
 	
@@ -357,11 +345,10 @@ public class Control  extends Application{
 	
 	public void manageSavePlayer()
 	{
-		
 		BufferedWriter bufferWrite = null;
 		BufferedReader bufferRead = null;
 		
-		//If a player profile is created or loaded AND if that player profile has never been saved
+		//If a player profile is created or loaded AND if that player profile has never been saved.
 		//In this case, we save the name, cash and picture of the player profile
 		if (current_player != null && !nameExists(current_player.getName()))
 		{
@@ -399,14 +386,14 @@ public class Control  extends Application{
 		else
 		{
 			Alert alert = new Alert(AlertType.INFORMATION);
-			alert.setTitle("Sauvegarde");
+			alert.setTitle("Saving");
 			alert.setContentText("You must create or load a player profile before saving!");
 		}
 		
 		//If a player profile is created or loaded AND if that player profile has been saved at least once before.
 		/*In this case, we want to overwrite the player data in the file, 
 		otherwise if we just save everything we're gonna create a player profile repetition, and the
-		program will crash if we ever try to load that profile again */
+		program will probably crash if we ever try to load that profile again */
 		
 		if (current_player != null && nameExists(current_player.getName()))
 		{			
@@ -458,20 +445,97 @@ public class Control  extends Application{
 		else
 		{
 			Alert alert = new Alert(AlertType.INFORMATION);
-			alert.setTitle("Sauvegarde");
+			alert.setTitle("Saving");
 			alert.setContentText("You must start or load a player profile before saving!");
 		}
 	}
 	
 	public void manageLoadPlayer()
 	{
-		
+		//If the current player is not null, ask the player to save the 
+		//current player profile before to load another one.
+		if (current_player != null)
+		{
+			Alert save_alert = new Alert(AlertType.CONFIRMATION);
+			save_alert.setTitle("Save");
+			save_alert.setContentText("Do you want to save before to load a new player profile?");
+			
+			ButtonType yes_button = new ButtonType("Yes");
+			ButtonType no_button = new ButtonType("No");
+			ButtonType cancel_button = new ButtonType("Cancel", ButtonData.CANCEL_CLOSE);
+			
+			save_alert.getButtonTypes().setAll(yes_button, no_button, cancel_button);
+			
+			Optional<ButtonType> result = save_alert.showAndWait();
+			
+			if(result.get() == yes_button)
+			{
+				manageSavePlayer();
+			}
+			
+			if(result.get() == no_button)
+			{
+			}
+			
+			String name = enterName("Enter the name of the player profile you want to load");
+			
+			String line = "";
+			BufferedReader bufferRead = null;
+			//Read the save file (Player_info.dat) to find the player profile infos (name, cash and picture)
+			try
+			{
+				bufferRead = new BufferedReader(new FileReader(playerInfoFile));
+				
+				//Vector to get the player profile infos (name, cash and picture), if found
+				String[] vector = null;
+				
+					//Look for the name in the save file
+					while((line = bufferRead.readLine())!= null)
+					{	
+						vector = line.split(";");
+						if (vector[0].equals(name))
+						{	
+							//If the player profile is found, create a new current player
+							// using its infos and stop the "while" research loop
+							Player player = new Player(vector[0], Integer.parseInt(vector[1]), vector[2]);
+							current_player = player;
+							break;
+						}
+					}
+				//If no match is found in the save file, ask the user for another name
+				//or to cancel the load
+				///////////////////////////////À FAIRE!!!!!!!!!!//////////////////////////
+				
+			}
+			catch (IOException e)
+			{
+				Alert alert = new Alert(AlertType.ERROR);
+				alert.setTitle("IO Error");
+				alert.setContentText("File error: Cannot read " + playerInfoFile);
+				alert.showAndWait();
+			}
+			
+			finally
+			{
+				try
+				{
+					bufferRead.close();
+				}
+				catch(IOException e)
+				{
+					Alert alert = new Alert(AlertType.ERROR);
+					alert.setTitle("IO Error");
+					alert.setContentText("File error: " + playerInfoFile + " stream cannot be closed)");
+					alert.showAndWait();
+				}
+			}
+		}
 	}
 	
-	public void manageBlackJack(){
-		
+	public void manageBlackJack()
+	{	
 		viewBlackJack = new BlackJack();
-		viewGameInterface = new Game_Interface_Components();
+		
 		
 		//BlackJack Listeners
 			viewBlackJack.btnHit.setOnAction(new ListenerButton());
@@ -484,16 +548,16 @@ public class Control  extends Application{
 	public void manageRoulette()
 	{
 		viewRoulette = new Roulette();
-		viewGameInterface = new Game_Interface_Components();
+		
+		//Menu Listeners
+		//viewGameInterface.menuItemSave.setOnAction(new ListenerMenu());
+		
+		viewRoulette.menuItemSave.setOnAction(new ListenerMenu());
 		
 		stage.setTitle("Roulette");
 		stage.setScene(viewRoulette.scene);
 		
 		stage.show();
-		
-		//Menu Listeners
-		viewGameInterface.menuItemQuit.setOnAction(new ListenerMenu());	
-		viewGameInterface.menuItemSave.setOnAction(new ListenerMenu()); //Trouver le fuck avec ce listener, il ne fonctionne pas et genere un nullpointerexception
 	}
 
 	public static void main(String[] args) {

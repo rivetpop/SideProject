@@ -8,7 +8,7 @@ import javafx.scene.control.MenuItem;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 
-public class Game_Interface_Components 
+public class Game_Interface_Components
 {
 	//Menu	
 		public HBox upperZone = null;
@@ -29,7 +29,7 @@ public class Game_Interface_Components
 		//Layout for the cash total and current gain
 		private HBox cashGain = null;
 		
-	public void createMenu()
+	public Game_Interface_Components()
 	{
 		menuItemNewPlayer = new MenuItem("New Player");
 		menuItemLoadPlayer = new MenuItem("Change Player");

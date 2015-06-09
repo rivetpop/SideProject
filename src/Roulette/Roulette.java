@@ -1,5 +1,3 @@
-///Transformer en BorderPane pour avoir un menu identique à BlackJack? Le menu devrait être dan le top du borderpane...
-
 package Roulette;
 
 import Casino.Game_Interface_Components;
@@ -29,14 +27,16 @@ public class Roulette extends Game_Interface_Components
 	
 	private Image table_img = new Image("Roulette_table.png",600D,0, true, false);
 	private ImageView table_imgView = null;
+	private Game_Interface_Components gameInterface;
 	
 	
 	public Roulette()
 	{
+		gameInterface=  new Game_Interface_Components();
+		
 		root = new Pane();
 		scene = new Scene(root, 800,800);
 		
-		createMenu();
 		setImages();
 		
 		root.getChildren().addAll(super.upperZone, roulette_imgView, table_imgView);
