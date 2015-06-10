@@ -2,6 +2,8 @@
 //sauvegarde lors du démarrage du programme,
 //ca pourrais simplifier beaucoup certaines methodes.
 
+//Note: Envisager de créer un fichier de sauvegarde par profile de joueur
+
 package Casino;
 
 import java.io.BufferedReader;
@@ -76,6 +78,11 @@ public class Control  extends Application{
 			{
 				manageSavePlayer();
 			}
+			
+			if (e.getSource() == viewRoulette.menuItemLoadPlayer)
+			{
+				manageLoadPlayer();
+			}
 		}
 	}
 	
@@ -89,22 +96,22 @@ public class Control  extends Application{
 				manageNewPlayer();
 			}
 			
-			if(e.getSource() == viewMainMenu.loadPlayerButton){
+			else if(e.getSource() == viewMainMenu.loadPlayerButton){
 				
 				manageLoadPlayer();
 			}
 			
-			if(e.getSource() == viewMainMenu.quitButton){
+			else if(e.getSource() == viewMainMenu.quitButton){
 				
 				manageQuit();
 			}
 			
-			if(e.getSource() == viewWelcome.blackJackButton){
+			else if(e.getSource() == viewWelcome.blackJackButton){
 				
 				manageBlackJack();
 			}
 			
-			if(e.getSource() == viewWelcome.rouletteButton){
+			else if(e.getSource() == viewWelcome.rouletteButton){
 				
 				manageRoulette();
 			}		
@@ -132,7 +139,7 @@ public class Control  extends Application{
 	
 	public void manageNewPlayer(){
 		
-		if(createPlayer()){
+		if(current_player != null || createPlayer()){
 			
 			viewWelcome = new Welcome();
 			
@@ -310,6 +317,7 @@ public class Control  extends Application{
 				alert.showAndWait();
 			}
 		}
+		System.out.println(nameExists);
 		return nameExists;
 	}
 	
@@ -348,16 +356,84 @@ public class Control  extends Application{
 		BufferedWriter bufferWrite = null;
 		BufferedReader bufferRead = null;
 		
+		//If a player profile is created or loaded AND if that player profile has been saved at least once before.
+				/*In this case, we want to overwrite the player data in the file, 
+				otherwise if we just save everything it will create a player profile repetition, and the
+				program won't work as expected if we ever try to load that profile again */
+				
+				if (current_player != null && nameExists(current_player.getName()))
+				{			
+					try
+					{	
+						System.out.println("test");
+						String line = "";
+								
+						bufferRead = new BufferedReader(new FileReader(playerInfoFile));
+						
+						//Get all the text contained in the file (line by line) and put it in a String variable (oldText)
+						String oldText = "";
+						while((line = bufferRead.readLine())!= null)
+						{
+							oldText += line+"\n";
+						}
+						
+						//Create a new String variable containing the oldText, but replace the data for the line concerning the current player
+						// A regular expression is used in the method replaceAll to find the data we want to replace
+						String newText = oldText.replaceAll(current_player.getName()+";\\d+;[^\\\\]+", 
+															current_player.getName() + ";" + current_player.getCash() +";" +current_player.getImg());
+						
+						bufferWrite= new BufferedWriter(new FileWriter(playerInfoFile));
+						bufferWrite.write(newText);
+					}
+					catch (IOException e)
+					{
+						Alert alert = new Alert(AlertType.ERROR);
+						alert.setTitle("IO Error");
+						alert.setContentText("File error: Cannot write in " + playerInfoFile);
+						alert.showAndWait();
+					}
+					
+					finally
+					{
+						try
+						{
+							bufferWrite.close();
+						}
+						catch(IOException e)
+						{
+							Alert alert = new Alert(AlertType.ERROR);
+							alert.setTitle("IO Error");
+							alert.setContentText("File error: " + playerInfoFile + " stream cannot be closed)");
+							alert.showAndWait();
+						}
+					}
+				}
+				
+				else
+				{
+					Alert alert = new Alert(AlertType.INFORMATION);
+					alert.setTitle("Saving");
+					alert.setContentText("You must start or load a player profile before saving!");
+				}
+			
+		
 		//If a player profile is created or loaded AND if that player profile has never been saved.
-		//In this case, we save the name, cash and picture of the player profile
+		//In this case, we save the name, cash and picture of the player profile on a new line
 		if (current_player != null && !nameExists(current_player.getName()))
 		{
+			
 			try
 			{
 				bufferWrite= new BufferedWriter(new FileWriter(playerInfoFile, true));
-				String player_save = current_player.getName() + ";" + current_player.getCash() + ";" + current_player.getImg();
+				
+				String player_save = null;
+				
+				player_save = current_player.getName() + ";" + current_player.getCash() + ";" + current_player.getImg();
+				
 				bufferWrite.write(player_save);
 				bufferWrite.newLine();
+				
+				
 			}
 			catch (IOException e)
 			{
@@ -389,66 +465,8 @@ public class Control  extends Application{
 			alert.setTitle("Saving");
 			alert.setContentText("You must create or load a player profile before saving!");
 		}
+	}	
 		
-		//If a player profile is created or loaded AND if that player profile has been saved at least once before.
-		/*In this case, we want to overwrite the player data in the file, 
-		otherwise if we just save everything we're gonna create a player profile repetition, and the
-		program will probably crash if we ever try to load that profile again */
-		
-		if (current_player != null && nameExists(current_player.getName()))
-		{			
-			try
-			{	
-				String line = "";
-						
-				bufferRead = new BufferedReader(new FileReader(playerInfoFile));
-				
-				//Get all the text contained in the file (line by line) and put it in a String variable (oldText)
-				String oldText = "";
-				while((line = bufferRead.readLine())!= null)
-				{
-					oldText += line+"\n";
-				}
-				
-				//Create a new String variable containing the oldText, but replace the data for the line concerning the current player
-				// A regular expression is used in the method replaceAll to find the data we want to replace
-				String newText = oldText.replaceAll(current_player.getName()+";\\d+;[^\\\\]+", 
-													current_player.getName() + ";" + current_player.getCash() +";" +current_player.getImg());
-				
-				bufferWrite= new BufferedWriter(new FileWriter(playerInfoFile));
-				bufferWrite.write(newText);
-			}
-			catch (IOException e)
-			{
-				Alert alert = new Alert(AlertType.ERROR);
-				alert.setTitle("IO Error");
-				alert.setContentText("File error: Cannot write in " + playerInfoFile);
-				alert.showAndWait();
-			}
-			
-			finally
-			{
-				try
-				{
-					bufferWrite.close();
-				}
-				catch(IOException e)
-				{
-					Alert alert = new Alert(AlertType.ERROR);
-					alert.setTitle("IO Error");
-					alert.setContentText("File error: " + playerInfoFile + " stream cannot be closed)");
-					alert.showAndWait();
-				}
-			}
-		}
-		
-		else
-		{
-			Alert alert = new Alert(AlertType.INFORMATION);
-			alert.setTitle("Saving");
-			alert.setContentText("You must start or load a player profile before saving!");
-		}
-	}
 	
 	public void manageLoadPlayer()
 	{
@@ -472,15 +490,17 @@ public class Control  extends Application{
 			{
 				manageSavePlayer();
 			}
-			
-			if(result.get() == no_button)
-			{
-			}
-			
-			String name = enterName("Enter the name of the player profile you want to load");
-			
+		}
+		
+		String msg = "Enter the name of the player profile you want to load";
+		boolean name_found = false;
+		
+		while (!name_found)
+		{
+			String name = enterName(msg);	
 			String line = "";
 			BufferedReader bufferRead = null;
+			
 			//Read the save file (Player_info.dat) to find the player profile infos (name, cash and picture)
 			try
 			{
@@ -499,37 +519,46 @@ public class Control  extends Application{
 							// using its infos and stop the "while" research loop
 							Player player = new Player(vector[0], Integer.parseInt(vector[1]), vector[2]);
 							current_player = player;
+							
+							name_found = true;
+							
 							break;
 						}
 					}
+					
 				//If no match is found in the save file, ask the user for another name
 				//or to cancel the load
-				///////////////////////////////À FAIRE!!!!!!!!!!//////////////////////////
-				
+				if (!name_found)
+				{
+					msg = "This name cannot be found, please enter another name";
+				}			
+			}		
+		
+		catch (IOException e)
+		{
+			Alert alert = new Alert(AlertType.ERROR);
+			alert.setTitle("IO Error");
+			alert.setContentText("File error: Cannot read " + playerInfoFile);
+			alert.showAndWait();
+		}
+		
+		finally
+		{
+			try
+			{
+				bufferRead.close();
 			}
-			catch (IOException e)
+			catch(IOException e)
 			{
 				Alert alert = new Alert(AlertType.ERROR);
 				alert.setTitle("IO Error");
-				alert.setContentText("File error: Cannot read " + playerInfoFile);
+				alert.setContentText("File error: " + playerInfoFile + " stream cannot be closed)");
 				alert.showAndWait();
 			}
-			
-			finally
-			{
-				try
-				{
-					bufferRead.close();
-				}
-				catch(IOException e)
-				{
-					Alert alert = new Alert(AlertType.ERROR);
-					alert.setTitle("IO Error");
-					alert.setContentText("File error: " + playerInfoFile + " stream cannot be closed)");
-					alert.showAndWait();
-				}
-			}
 		}
+		}
+		
+		manageNewPlayer();
 	}
 	
 	public void manageBlackJack()
@@ -549,10 +578,9 @@ public class Control  extends Application{
 	{
 		viewRoulette = new Roulette();
 		
-		//Menu Listeners
-		//viewGameInterface.menuItemSave.setOnAction(new ListenerMenu());
-		
-		viewRoulette.menuItemSave.setOnAction(new ListenerMenu());
+		//Menu Listeners	
+			viewRoulette.menuItemSave.setOnAction(new ListenerMenu());
+			viewRoulette.menuItemLoadPlayer.setOnAction(new ListenerMenu());
 		
 		stage.setTitle("Roulette");
 		stage.setScene(viewRoulette.scene);
@@ -564,5 +592,4 @@ public class Control  extends Application{
 
 		Application.launch(args);
 	}
-
 }
