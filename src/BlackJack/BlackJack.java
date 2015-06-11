@@ -22,7 +22,7 @@ public class BlackJack {
 		private Menu gameMenu = null;
 		protected MenuItem menuItemNewGame = null;
 		protected MenuItem menuItemQuit = null;
-		private VBox upperZone = null;
+		private HBox upperZone = null;
 		private HBox lowerZone = null;
 		protected BorderPane centerZone = null;
 		public Text txtPlayerName = null;
@@ -70,7 +70,7 @@ public class BlackJack {
 			mainMenu = new MenuBar();
 			mainMenu.getMenus().addAll(gameMenu);
 			
-			upperZone = new VBox();
+			upperZone = new HBox();
 			upperZone.getChildren().addAll(mainMenu);
 			
 		}
