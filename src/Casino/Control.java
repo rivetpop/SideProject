@@ -24,6 +24,7 @@ import javafx.application.Application;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
+import javafx.scene.*;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonBar.ButtonData;
 import javafx.scene.control.ButtonType;
@@ -317,7 +318,7 @@ public class Control  extends Application{
 				alert.showAndWait();
 			}
 		}
-		System.out.println(nameExists);
+		
 		return nameExists;
 	}
 	
