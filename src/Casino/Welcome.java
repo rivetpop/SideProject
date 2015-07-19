@@ -21,7 +21,7 @@ import javafx.scene.text.Text;
 
 
 //Welcome menu class
-public class Welcome {
+public class Welcome extends GameInterface{
 
 	protected Scene scene;
 	
@@ -36,9 +36,6 @@ public class Welcome {
 	//Pick a game text
 	private Text pickGameText = null;
 	
-	//Create player stats
-	public Text playerStats = null; 
-	private HBox statsZone = null;
 	
 	//A button for each game
 	private VBox buttonZone = null;
@@ -49,12 +46,11 @@ public class Welcome {
 	public Welcome(){
 		
 		createWelcomeZone();
-		createPlayerZone();
 		createPickGameZone();
 		
 		root = new BorderPane();
 		root.setTop(titleZone);
-		root.setCenter(statsZone);
+		root.setCenter(super.playerInfo);
 		root.setBottom(buttonZone);
 		
 		scene = new Scene(root, 800, 800);
@@ -73,35 +69,6 @@ public class Welcome {
 		titleWelcome2.getStyleClass().add("title");
 		
 		titleZone.getChildren().addAll(titleWelcome, titleWelcome2);
-	}
-	
-	private void createPlayerZone(){
-		
-		Image image = null;
-		
-		ImageView player_img = new ImageView();
-		if (Control.current_player.getImg() == Player.DEFAULT_IMG_URL)
-		{
-			image = new Image(Player.DEFAULT_IMG_URL);
-		}
-		
-		else
-		{
-			image = new Image("file:"+Control.current_player.getImg());
-		}
-
-		player_img.setImage(image);
-		player_img.setFitWidth(150);
-		player_img.setPreserveRatio(true);
-		player_img.setSmooth(true);
-		player_img.setCache(true);
-		
-		playerStats = new Text();
-		playerStats.getStyleClass().add("text");
-		
-		statsZone = new HBox();
-		statsZone.setAlignment(Pos.CENTER);
-		statsZone.getChildren().addAll(player_img, playerStats);
 	}
 	
 	private void createPickGameZone(){

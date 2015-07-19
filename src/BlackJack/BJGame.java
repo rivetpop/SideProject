@@ -4,6 +4,9 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Scanner;
 
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
+import javafx.scene.image.Image;
 import Casino.Card;
 import Casino.Player;
 
@@ -28,8 +31,9 @@ public class BJGame {
 		deck = new ArrayList<Card>(CARDS_PER_DECK);
 		dealer = pDealer;
 		player = pPlayer;
-		createDeck();
+		//createDeck();
 	}
+	
 	
 	//public void affectValue()
 	
@@ -37,22 +41,42 @@ public class BJGame {
 		
 		for(int i = 2; i < 15; i++){
 			
-			deck.add(new Card("i", "Heart"));
+			String imgName = i + "H.png";
+			
+			Image imgCard = null;
+			imgCard = new Image(imgName);
+			
+			deck.add(new Card("i", "Heart", imgCard));
 		}
 		
 		for(int i = 2; i < 15; i++){
 			
-			deck.add(new Card("i", "Diamond"));
+			String imgName = i + "D.png";
+			
+			Image imgCard = null;
+			imgCard = new Image(imgName);
+			
+			deck.add(new Card("i", "Diamond", imgCard));
 		}
 		
 		for(int i = 2; i < 15; i++){
 			
-			deck.add(new Card("i", "Spade"));
+			String imgName = i + "S.png";
+			
+			Image imgCard = null;
+			imgCard = new Image(imgName);
+			
+			deck.add(new Card("i", "Spade", imgCard));
 		}
 		
 		for(int i = 2; i < 15; i++){
 			
-			deck.add(new Card("i", "Clover"));
+			String imgName = i + "D.png";
+			
+			Image imgCard = null;
+			imgCard = new Image(imgName);
+			
+			deck.add(new Card("i", "Clover", imgCard));
 		}
 		
 		Collections.shuffle(deck);
