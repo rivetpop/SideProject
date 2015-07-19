@@ -41,6 +41,7 @@ public class Control  extends Application{
 	private Welcome viewWelcome;
 	private BlackJack viewBlackJack;
 	private Roulette viewRoulette;
+	private LoadPlayerScreen viewLoadPlayer;
 	
 	private BJGame game;
 	private Stage stage;
@@ -107,6 +108,10 @@ public class Control  extends Application{
 				manageQuit();
 			}
 			
+			else if(e.getSource() == viewLoadPlayer.cancelButton){
+				start(stage);
+			}
+			
 			else if(e.getSource() == viewWelcome.blackJackButton){
 				
 				manageBlackJack();
@@ -115,7 +120,7 @@ public class Control  extends Application{
 			else if(e.getSource() == viewWelcome.rouletteButton){
 				
 				manageRoulette();
-			}		
+			}
 		}
 	}
 	
@@ -471,95 +476,21 @@ public class Control  extends Application{
 	
 	public void manageLoadPlayer()
 	{
-		//If the current player is not null, ask the player to save the 
-		//current player profile before to load another one.
-		if (current_player != null)
-		{
-			Alert save_alert = new Alert(AlertType.CONFIRMATION);
-			save_alert.setTitle("Save");
-			save_alert.setContentText("Do you want to save before to load a new player profile?");
-			
-			ButtonType yes_button = new ButtonType("Yes");
-			ButtonType no_button = new ButtonType("No");
-			ButtonType cancel_button = new ButtonType("Cancel", ButtonData.CANCEL_CLOSE);
-			
-			save_alert.getButtonTypes().setAll(yes_button, no_button, cancel_button);
-			
-			Optional<ButtonType> result = save_alert.showAndWait();
-			
-			if(result.get() == yes_button)
-			{
-				manageSavePlayer();
-			}
-		}
+		viewLoadPlayer = new LoadPlayerScreen();
 		
-		String msg = "Enter the name of the player profile you want to load";
-		boolean name_found = false;
-		
-		while (!name_found)
-		{
-			String name = enterName(msg);	
-			String line = "";
-			BufferedReader bufferRead = null;
-			
-			//Read the save file (Player_info.dat) to find the player profile infos (name, cash and picture)
-			try
-			{
-				bufferRead = new BufferedReader(new FileReader(playerInfoFile));
+			//Load Player Screen Listeners
+			viewLoadPlayer.loadPlayerButton.setOnAction(new ListenerButton());
+			viewLoadPlayer.cancelButton.setOnAction(new ListenerButton());
+						
+		stage.setTitle("Load Player Profile");
+		stage.setScene(viewLoadPlayer.scene);
 				
-				//Vector to get the player profile infos (name, cash and picture), if found
-				String[] vector = null;
-				
-					//Look for the name in the save file
-					while((line = bufferRead.readLine())!= null)
-					{	
-						vector = line.split(";");
-						if (vector[0].equals(name))
-						{	
-							//If the player profile is found, create a new current player
-							// using its infos and stop the "while" research loop
-							Player player = new Player(vector[0], Integer.parseInt(vector[1]), vector[2]);
-							current_player = player;
-							
-							name_found = true;
-							
-							break;
-						}
-					}
-					
-				//If no match is found in the save file, ask the user for another name
-				//or to cancel the load
-				if (!name_found)
-				{
-					msg = "This name cannot be found, please enter another name";
-				}			
-			}		
+		stage.show();
+	}
+	
+	public void loadPlayer()
+	{
 		
-		catch (IOException e)
-		{
-			Alert alert = new Alert(AlertType.ERROR);
-			alert.setTitle("IO Error");
-			alert.setContentText("File error: Cannot read " + playerInfoFile);
-			alert.showAndWait();
-		}
-		
-		finally
-		{
-			try
-			{
-				bufferRead.close();
-			}
-			catch(IOException e)
-			{
-				Alert alert = new Alert(AlertType.ERROR);
-				alert.setTitle("IO Error");
-				alert.setContentText("File error: " + playerInfoFile + " stream cannot be closed)");
-				alert.showAndWait();
-			}
-		}
-		}
-		
-		manageNewPlayer();
 	}
 	
 	public void manageBlackJack()

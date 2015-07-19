@@ -3,7 +3,7 @@ package Roulette;
 import java.util.ArrayList;
 import java.util.Arrays;
 
-import Casino.Game_Interface_Components;
+import Casino.GameInterface;
 import javafx.geometry.HPos;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -40,7 +40,7 @@ import javafx.scene.text.Text;
 import javafx.scene.text.TextAlignment;
 import javafx.scene.text.TextBoundsType;
 
-public class Roulette extends Game_Interface_Components 
+public class Roulette extends GameInterface
 {
 	public Scene scene = null;
 	private Pane root  = null;
@@ -63,7 +63,7 @@ public class Roulette extends Game_Interface_Components
 	//Table image
 	private Image table_img = new Image("Roulette_table.png",600D,0, true, false);
 	private ImageView table_imgView = null;
-	private Game_Interface_Components gameInterface;*/
+	private GameInterface gameInterface;*/
 	
 	
 	//Table Layout
@@ -81,7 +81,7 @@ public class Roulette extends Game_Interface_Components
 	
 	public Roulette()
 	{
-		Game_Interface_Components gameInterface =  new Game_Interface_Components();
+		GameInterface gameInterface =  new GameInterface();
 		
 		root = new Pane();
 		scene = new Scene(root, 800,800);

@@ -117,7 +117,7 @@ public class Welcome {
 		buttonZone = new VBox();
 		buttonZone.setAlignment(Pos.CENTER);
 		buttonZone.setPadding(new Insets(0,0,80,0));
-		 
+		
 		buttonGame = new HBox();
 		buttonGame.setAlignment(Pos.CENTER);
 		buttonGame.setPadding(new Insets(30,0,0,0));
