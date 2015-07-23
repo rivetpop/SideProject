@@ -1,15 +1,19 @@
 package Casino;
 
+import javafx.scene.image.Image;
+
 public class Card {
 	
 	private String name = null;
 	private String kind = null;
-	
-	public Card(String pName, String pKind){
+	private Image cardImage = null;
+ 
+	//Card constructor
+	public Card(String pName, String pKind, Image cardImage){
 		
 		setName(pName);
 		setKind(pKind);
-		
+		setImage(cardImage);
 	}
 	
 	public String getName(){
@@ -20,6 +24,11 @@ public class Card {
 	public String getKind(){
 		
 		return kind;
+	}
+	
+	public Image getImage(){
+		
+		return cardImage;
 	}
 	
 	public void setName(String pName){
@@ -34,8 +43,14 @@ public class Card {
 		
 		if(validateKind(pKind)){
 			
-			kind= pKind;
+			kind = pKind;
 		}
+	}
+	
+	public void setImage(Image pCardImage){
+			
+		cardImage = pCardImage;
+		
 	}
 	
 	public static boolean validateName(String pName){

@@ -1,11 +1,11 @@
 package BlackJack;
+import Casino.GameInterface;
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.geometry.Insets;
+import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
-import javafx.scene.control.Menu;
-import javafx.scene.control.MenuBar;
-import javafx.scene.control.MenuItem;
-import javafx.scene.image.ImageView;
 import javafx.scene.layout.Background;
 import javafx.scene.layout.BackgroundFill;
 import javafx.scene.layout.BorderPane;
@@ -16,20 +16,21 @@ import javafx.scene.paint.Color;
 import javafx.scene.text.Text;
 
 //BlackJack Class
-public class BlackJack {
+public class BlackJack extends GameInterface {
 
-		private MenuBar mainMenu = null;
-		private Menu gameMenu = null;
-		protected MenuItem menuItemNewGame = null;
-		protected MenuItem menuItemQuit = null;
-		private VBox upperZone = null;
+	
 		private HBox lowerZone = null;
 		protected BorderPane centerZone = null;
-		public Text txtPlayerName = null;
+		//public Text txtPlayerName = null;
 		public Text txtDealerName = null;
 		protected Text txtOptions = null;
-		protected HBox dealerZone = null;
-		protected HBox playerZone = null;
+		
+		protected VBox playerZone = null;
+		protected HBox playerCard = null;
+		
+		protected VBox dealerZone = null;
+		protected HBox dealerCard = null;
+		
 		
 		
 		public Button btnHit;
@@ -43,55 +44,41 @@ public class BlackJack {
 		
 		public BlackJack(){
 			
-			createMenu();
+			//GameInterface gameInterface = new GameInterface();
+			
 			createMid();
 			createButtons();
 			
 			root = new BorderPane();
-			root.setTop(upperZone);
+			root.setTop(super.upperZone);
 			root.setBottom(lowerZone);
 			root.setCenter(centerZone);
-			
-			//ImageView spade4 = new ImageView();
-			//spade4.setImage(arg0);
 			
 			scene = new Scene(root, 800, 800);
 			root.setBackground(new Background(new BackgroundFill(Color.GREEN, CornerRadii.EMPTY, Insets.EMPTY)));
 			scene.getStylesheets().add(getClass().getResource("style.css").toExternalForm());
 		}
 		
-		public void createMenu(){
-			
-			gameMenu = new Menu("Game");
-			menuItemNewGame = new MenuItem("New Game");
-			menuItemQuit = new MenuItem("Quit");
-			gameMenu.getItems().addAll(menuItemNewGame, menuItemQuit);
-			
-			mainMenu = new MenuBar();
-			mainMenu.getMenus().addAll(gameMenu);
-			
-			upperZone = new VBox();
-			upperZone.getChildren().addAll(mainMenu);
-			
-		}
 		
 		public void createMid(){
 			
 			
-			txtPlayerName = new Text();
-			txtPlayerName.getStyleClass().add("text");
+			playerCard = new HBox();
 			
 			txtDealerName = new Text();
 			txtDealerName.getStyleClass().add("text");
+			dealerCard = new HBox();
 			
 			txtOptions = new Text();
 			txtOptions.getStyleClass().add("text");
 			
-			dealerZone = new HBox();
-			dealerZone.getChildren().addAll(txtDealerName);
+			dealerZone = new VBox();
+			dealerZone.setAlignment(Pos.CENTER);
+			dealerZone.getChildren().addAll(txtDealerName, dealerCard);
 			
-			playerZone = new HBox();
-			playerZone.getChildren().addAll(txtPlayerName);
+			playerZone = new VBox();
+			playerZone.setAlignment(Pos.CENTER);
+			playerZone.getChildren().addAll(playerCard, super.playerInfo);
 			
 			
 			centerZone = new BorderPane();

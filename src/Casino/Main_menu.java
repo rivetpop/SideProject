@@ -76,14 +76,14 @@ public class Main_menu{
 	private void createButtonZone(){
 		
 		//Create new/load game button and label
-		newPlayerButton = new Button("New Player Profile");
-		newPlayerButton.setPrefSize(150, 50);
+		newPlayerButton = new Button("New Profile");
+		newPlayerButton.setPrefSize(175, 50);
 		
-		loadPlayerButton = new Button("Load Player Profile");
-		loadPlayerButton.setPrefSize(150, 50);
+		loadPlayerButton = new Button("Load Profile");
+		loadPlayerButton.setPrefSize(175, 50);
 		
 		quitButton = new Button("Quit Game");
-		quitButton.setPrefSize(150, 50);
+		quitButton.setPrefSize(175, 50);
 		
 		//Add buttons in the VBox
 		newLoadButton = new VBox();

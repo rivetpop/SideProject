@@ -81,7 +81,7 @@ public class Roulette extends GameInterface
 	
 	public Roulette()
 	{
-		GameInterface gameInterface =  new GameInterface();
+		//GameInterface gameInterface =  new GameInterface();
 		
 		root = new Pane();
 		scene = new Scene(root, 800,800);

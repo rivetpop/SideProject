@@ -25,12 +25,15 @@ import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.scene.*;
+import javafx.geometry.Pos;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonBar.ButtonData;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.TextInputDialog;
 import javafx.scene.control.Alert.AlertType;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.stage.FileChooser;
 import javafx.stage.FileChooser.ExtensionFilter;
 import javafx.stage.Stage;
@@ -39,14 +42,16 @@ public class Control  extends Application{
 
 	private Main_menu viewMainMenu;
 	private Welcome viewWelcome;
+	private GameInterface viewGameInterface;
 	private BlackJack viewBlackJack;
 	private Roulette viewRoulette;
 	private LoadPlayerScreen viewLoadPlayer;
 	
-	private BJGame game;
+	private BJGame bjGame;
 	private Stage stage;
-	public static Player current_player = null;
-	private Dealer dealer = null;
+		
+	public static Player currentPlayer = null;
+	public static Dealer currentDealer = null;
 	
 	private File playerInfoFile = new File(".\\src\\Player_info.dat");
 	
@@ -72,19 +77,19 @@ public class Control  extends Application{
 	
 	public class ListenerMenu implements EventHandler<ActionEvent>{
 		
-		
 		@Override
 		public void handle(ActionEvent e){
 			
-			if (e.getSource() == viewRoulette.menuItemSave)
-			{
-				manageSavePlayer();
+			if (e.getSource() == viewBlackJack.menuItemCasinoHall){
+				
+				manageWelcome();
 			}
 			
-			if (e.getSource() == viewRoulette.menuItemLoadPlayer)
-			{
-				manageLoadPlayer();
+			else if (e.getSource() == viewBlackJack.menuItemQuit){
+				
+				manageQuit();
 			}
+			
 		}
 	}
 	
@@ -100,7 +105,7 @@ public class Control  extends Application{
 			
 			else if(e.getSource() == viewMainMenu.loadPlayerButton){
 				
-				manageLoadPlayer();
+				manageLoadProfile();
 			}
 			
 			else if(e.getSource() == viewMainMenu.quitButton){
@@ -120,19 +125,28 @@ public class Control  extends Application{
 			else if(e.getSource() == viewWelcome.rouletteButton){
 				
 				manageRoulette();
+			
+			}
+			
+			else if(e.getSource() == viewBlackJack.btnHit){
+				
+			}
+			
+			else if(e.getSource() == viewBlackJack.btnStand){
+				
 			}
 		}
 	}
 	
 	public void manageQuit(){
-		if(current_player == null){
+		if(currentPlayer == null){
 			
 			System.exit(0);
 		}
 		
 		Alert alert = new Alert(AlertType.CONFIRMATION);
 		alert.setTitle("Casino");
-		alert.setHeaderText("Hey! " + current_player.getName() + "! You still got " + current_player.getCash() + "$ to spend");
+		alert.setHeaderText("Hey! " + currentPlayer.getName() + "! You still got " + currentPlayer.getCash() + "$ to spend");
 		alert.setContentText("Do you really want to quit?");
 		
 		Optional<ButtonType> result = alert.showAndWait();
@@ -145,20 +159,9 @@ public class Control  extends Application{
 	
 	public void manageNewPlayer(){
 		
-		if(current_player != null || createPlayer()){
+		if(currentPlayer != null || createPlayer()){
 			
-			viewWelcome = new Welcome();
-			
-			//Welcome screen listeners
-			viewWelcome.blackJackButton.setOnAction(new ListenerButton());
-			viewWelcome.rouletteButton.setOnAction(new ListenerButton());
-			
-			viewWelcome.titleWelcome.setText("Welcome " + current_player.getName() + "!");
-			viewWelcome.titleWelcome2.setText("Enjoy your stay and make some money!");
-			viewWelcome.playerStats.setText("    Your cash : " + current_player.getCash() + "$");
-			stage.setTitle("Welcome!");
-			stage.setScene(viewWelcome.scene);
-			stage.show();
+			manageWelcome();
 		}
 		
 		else
@@ -168,6 +171,36 @@ public class Control  extends Application{
 			alert.setContentText("The player could not be created");
 			alert.showAndWait();
 		}
+	}
+	
+	public void manageWelcome(){
+		
+		viewWelcome = new Welcome();
+		
+		//Welcome screen listeners
+		viewWelcome.blackJackButton.setOnAction(new ListenerButton());
+		viewWelcome.rouletteButton.setOnAction(new ListenerButton());
+		
+		viewWelcome.titleWelcome.setText("Welcome " + currentPlayer.getName() + "!");
+		viewWelcome.titleWelcome2.setText("Enjoy your stay and make some money!");
+		viewWelcome.playerStats.setText("    " + currentPlayer.getName() + "\n    Your cash : " + currentPlayer.getCash() + "$");
+		
+		Image pImg = null;
+		
+		if (currentPlayer.getImg() == Player.DEFAULT_IMG_URL){
+			
+			pImg = new Image(Player.DEFAULT_IMG_URL);
+		}
+		
+		else{
+			
+			pImg = new Image("file:" + currentPlayer.getImg());
+		}
+		viewWelcome.playerImg.setImage(pImg);
+		
+		stage.setTitle("Welcome!");
+		stage.setScene(viewWelcome.scene);
+		stage.show();
 	}
 	
 	public boolean createPlayer(){
@@ -186,33 +219,33 @@ public class Control  extends Application{
 			int cash = Player.STARTING_MONEY;
 		
 		//Ask to choose an image
-			Alert img_alert = new Alert(AlertType.CONFIRMATION);
-			img_alert.setTitle("Image selection");
-			img_alert.setContentText("Do you want to set an image for your player profile");
+			Alert imgAlert = new Alert(AlertType.CONFIRMATION);
+			imgAlert.setTitle("Image selection");
+			imgAlert.setContentText("Do you want to set an image for your player profile");
 			
-			ButtonType yes_button = new ButtonType("Yes");
-			ButtonType no_button = new ButtonType("No");
+			ButtonType yesButton = new ButtonType("Yes");
+			ButtonType noButton = new ButtonType("No");
 			
-			img_alert.getButtonTypes().setAll(yes_button, no_button);
+			imgAlert.getButtonTypes().setAll(yesButton, noButton);
 			
-			Optional<ButtonType> result = img_alert.showAndWait();
+			Optional<ButtonType> result = imgAlert.showAndWait();
 			
 			String img = null;
-			if(result.get() == yes_button)
+			if(result.get() == yesButton)
 			{
 				img = choosePicture();
 			}
 			
-			if(result.get() == no_button)
+			if(result.get() == noButton)
 			{
 				img = Player.DEFAULT_IMG_URL;
 			}
 		
 		//Create the new player
 			Player player = new Player(name, cash, img);
-			current_player = player;
+			currentPlayer = player;
 			
-			if (current_player != null)
+			if (currentPlayer != null)
 			{
 				ok = true;
 			}
@@ -357,7 +390,7 @@ public class Control  extends Application{
 		return picture_path;
 	}
 	
-	public void manageSavePlayer()
+	public void manageSaveProfile()
 	{
 		BufferedWriter bufferWrite = null;
 		BufferedReader bufferRead = null;
@@ -367,7 +400,7 @@ public class Control  extends Application{
 				otherwise if we just save everything it will create a player profile repetition, and the
 				program won't work as expected if we ever try to load that profile again */
 				
-				if (current_player != null && nameExists(current_player.getName()))
+				if (currentPlayer != null && nameExists(currentPlayer.getName()))
 				{			
 					try
 					{	
@@ -385,8 +418,8 @@ public class Control  extends Application{
 						
 						//Create a new String variable containing the oldText, but replace the data for the line concerning the current player
 						// A regular expression is used in the method replaceAll to find the data we want to replace
-						String newText = oldText.replaceAll(current_player.getName()+";\\d+;[^\\\\]+", 
-															current_player.getName() + ";" + current_player.getCash() +";" +current_player.getImg());
+						String newText = oldText.replaceAll(currentPlayer.getName()+";\\d+;[^\\\\]+", 
+															currentPlayer.getName() + ";" + currentPlayer.getCash() +";" +currentPlayer.getImg());
 						
 						bufferWrite= new BufferedWriter(new FileWriter(playerInfoFile));
 						bufferWrite.write(newText);
@@ -425,7 +458,7 @@ public class Control  extends Application{
 		
 		//If a player profile is created or loaded AND if that player profile has never been saved.
 		//In this case, we save the name, cash and picture of the player profile on a new line
-		if (current_player != null && !nameExists(current_player.getName()))
+		if (currentPlayer != null && !nameExists(currentPlayer.getName()))
 		{
 			
 			try
@@ -434,7 +467,7 @@ public class Control  extends Application{
 				
 				String player_save = null;
 				
-				player_save = current_player.getName() + ";" + current_player.getCash() + ";" + current_player.getImg();
+				player_save = currentPlayer.getName() + ";" + currentPlayer.getCash() + ";" + currentPlayer.getImg();
 				
 				bufferWrite.write(player_save);
 				bufferWrite.newLine();
@@ -474,7 +507,7 @@ public class Control  extends Application{
 	}	
 		
 	
-	public void manageLoadPlayer()
+	public void manageLoadProfile()
 	{
 		viewLoadPlayer = new LoadPlayerScreen();
 		
@@ -496,13 +529,37 @@ public class Control  extends Application{
 	public void manageBlackJack()
 	{	
 		viewBlackJack = new BlackJack();
+		currentDealer = new Dealer("Garry");
+		bjGame = new BJGame(currentPlayer, currentDealer);
+		viewGameInterface = new GameInterface();
 		
 		
 		//BlackJack Listeners
-			viewBlackJack.btnHit.setOnAction(new ListenerButton());
+		viewBlackJack.menuItemCasinoHall.setOnAction(new ListenerMenu());
+		viewBlackJack.menuItemQuit.setOnAction(new ListenerMenu());
+		viewBlackJack.btnHit.setOnAction(new ListenerButton());
+		viewBlackJack.btnStand.setOnAction(new ListenerButton());
+		
+		viewBlackJack.playerInfo.setAlignment(Pos.CENTER);
+		
+		Image pImg = null;
+	
+		if (currentPlayer.getImg() == Player.DEFAULT_IMG_URL){
+			
+			pImg = new Image(Player.DEFAULT_IMG_URL);
+		}
+		
+		else{
+			
+			pImg = new Image("file:" + currentPlayer.getImg());
+		}
+		viewBlackJack.playerImg.setImage(pImg);
+		viewBlackJack.playerStats.setText("    " + currentPlayer.getName() + "\n    Your cash : " + currentPlayer.getCash() + "$");
+		viewBlackJack.txtDealerName.setText(currentDealer.getName());
 		
 		stage.setTitle("BlackJack");
 		stage.setScene(viewBlackJack.scene);
+		
 		stage.show();
 	}
 	
@@ -511,8 +568,8 @@ public class Control  extends Application{
 		viewRoulette = new Roulette();
 		
 		//Menu Listeners	
-			viewRoulette.menuItemSave.setOnAction(new ListenerMenu());
-			viewRoulette.menuItemLoadPlayer.setOnAction(new ListenerMenu());
+		viewRoulette.menuItemCasinoHall.setOnAction(new ListenerMenu());
+		viewRoulette.menuItemQuit.setOnAction(new ListenerMenu());
 		
 		stage.setTitle("Roulette");
 		stage.setScene(viewRoulette.scene);
