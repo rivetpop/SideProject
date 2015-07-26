@@ -1,7 +1,12 @@
 package Casino;
+import java.net.MalformedURLException;
+import java.net.URL;
+
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -16,7 +21,7 @@ import javafx.scene.text.Text;
 
 
 //Welcome menu class
-public class Welcome {
+public class Welcome extends GameInterface{
 
 	protected Scene scene;
 	
@@ -31,10 +36,6 @@ public class Welcome {
 	//Pick a game text
 	private Text pickGameText = null;
 	
-	//Create player stats and image
-	Image pinzaru = new Image("Pinzaru.png");
-	public Text playerStats = null; 
-	private HBox statsZone = null;
 	
 	//A button for each game
 	private VBox buttonZone = null;
@@ -45,12 +46,11 @@ public class Welcome {
 	public Welcome(){
 		
 		createWelcomeZone();
-		createPlayerZone();
 		createPickGameZone();
 		
 		root = new BorderPane();
 		root.setTop(titleZone);
-		root.setCenter(statsZone);
+		root.setCenter(super.playerInfo);
 		root.setBottom(buttonZone);
 		
 		scene = new Scene(root, 800, 800);
@@ -69,24 +69,6 @@ public class Welcome {
 		titleWelcome2.getStyleClass().add("title");
 		
 		titleZone.getChildren().addAll(titleWelcome, titleWelcome2);
-	
-	}
-	
-	private void createPlayerZone(){
-		
-		ImageView player = new ImageView();
-		player.setImage(pinzaru);
-		player.setFitWidth(150);
-		player.setPreserveRatio(true);
-		player.setSmooth(true);
-		player.setCache(true);
-		
-		playerStats = new Text();
-		playerStats.getStyleClass().add("text");
-		
-		statsZone = new HBox();
-		statsZone.setAlignment(Pos.CENTER);
-		statsZone.getChildren().addAll(player, playerStats);
 	}
 	
 	private void createPickGameZone(){
@@ -102,7 +84,7 @@ public class Welcome {
 		buttonZone = new VBox();
 		buttonZone.setAlignment(Pos.CENTER);
 		buttonZone.setPadding(new Insets(0,0,80,0));
-		 
+		
 		buttonGame = new HBox();
 		buttonGame.setAlignment(Pos.CENTER);
 		buttonGame.setPadding(new Insets(30,0,0,0));
