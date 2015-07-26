@@ -114,7 +114,13 @@ public class Control  extends Application{
 			}
 			
 			else if(e.getSource() == viewLoadPlayer.cancelButton){
+				
 				start(stage);
+			}
+			
+			else if(e.getSource() == viewLoadPlayer.loadPlayerButton){
+				
+				loadPlayer();
 			}
 			
 			else if(e.getSource() == viewWelcome.blackJackButton){
@@ -404,7 +410,6 @@ public class Control  extends Application{
 				{			
 					try
 					{	
-						System.out.println("test");
 						String line = "";
 								
 						bufferRead = new BufferedReader(new FileReader(playerInfoFile));
@@ -523,7 +528,66 @@ public class Control  extends Application{
 	
 	public void loadPlayer()
 	{
+		/*Get the line number corresponding to the selected profile in the list view. 
+		 * For a profile, this line number from the listView is the same as the line number 
+		 * of the profile in the save file.
+		 */
+			int lineNumber = viewLoadPlayer.profileListView.getSelectionModel().getSelectedIndex();
 		
+		//Read the file line by line until the one corresponding to the player profile is reached	
+			String name = "";
+			int cash = 0;
+			String img = "";
+			
+			BufferedReader bufferRead = null;
+			
+			try
+			{
+				bufferRead = new BufferedReader(new FileReader(playerInfoFile));
+						 
+					String line = "";
+					int fileLineCount = 0;
+					while(fileLineCount <= lineNumber)//Read until desired profile's line is reached
+					{
+						line = bufferRead.readLine();
+						String[] temp_vector = line.split(";");
+						name = temp_vector[0];
+						cash = Integer.parseInt(temp_vector[1]);
+						img = temp_vector[2];
+						fileLineCount++;
+					}				
+			}		
+		
+			catch (IOException e)
+			{
+				Alert alert = new Alert(AlertType.ERROR);
+				alert.setTitle("IO Error");
+				alert.setContentText("File error: Cannot read " + playerInfoFile);
+				alert.showAndWait();
+			}
+		
+			finally
+			{
+				try
+				{
+					bufferRead.close();
+				}
+				catch(IOException e)
+				{
+					Alert alert = new Alert(AlertType.ERROR);
+					alert.setTitle("IO Error");
+					alert.setContentText("File error: " + playerInfoFile + " stream cannot be closed)");
+					alert.showAndWait();
+				}
+			}
+			
+		//Create the new player using the infos read in the file. Make it the currentPlayer.
+			Player player = new Player(name, cash, img);
+			currentPlayer = player;
+			System.out.println(currentPlayer.getImg());
+			
+		//Load the Welcome Screen
+			manageWelcome();	
 	}
 	
 	public void manageBlackJack()

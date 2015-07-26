@@ -15,6 +15,7 @@ import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.ListView;
+import javafx.scene.control.SelectionMode;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.Background;
@@ -41,6 +42,8 @@ public class LoadPlayerScreen
 	
 	Button loadPlayerButton = null;
 	Button cancelButton = null;
+	
+	ListView<String> profileListView = null;
 	
 	public LoadPlayerScreen()
 	{
@@ -71,7 +74,7 @@ public class LoadPlayerScreen
 			subtitle.getStyleClass().add("title2");
 			
 			ArrayList playerProfiles_array = readPlayersProfiles();
-			ListView<String> profileListView= createPlayersList(playerProfiles_array);
+			profileListView= createPlayersList(playerProfiles_array);
 			profileListView.setMaxSize(500, 300);
 			
 			VBox centerBox = new VBox();
