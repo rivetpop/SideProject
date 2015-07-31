@@ -86,6 +86,8 @@ public class Roulette extends GameInterface
 		root = new Pane();
 		scene = new Scene(root, 800,800);
 		
+		createMenu();
+		createPlayerInfo();
 		setImages();
 		setTable();
 		
@@ -116,7 +118,7 @@ public class Roulette extends GameInterface
 			
 			double zerosZonesOuterHeight = (int)(zerosZonesInnerHeight + 2*TABLE_MAIN_CELL_GAP);
 			double zerosZonesOuterTriangleWidth = (int)(zerosZonesInnerTriangleWidth + (Math.sqrt((Math.pow(TABLE_MAIN_CELL_GAP,2))*2)));//Pythagorean theorem used to calculate the difference between the inner and outer triangle's width
-			System.out.println(zerosZonesOuterHeight);
+			
 			
 			Polygon bet_00outerZone = new Polygon();
 			bet_00outerZone.getPoints().addAll(new Double[]{0.0, -zerosZonesOuterHeight/2, zerosZonesOuterTriangleWidth-TABLE_MAIN_CELL_GAP, 0.0, zerosZonesOuterTriangleWidth+TABLE_MAIN_CELL_WIDTH+TABLE_MAIN_CELL_GAP, 0.0, zerosZonesOuterTriangleWidth+TABLE_MAIN_CELL_WIDTH+TABLE_MAIN_CELL_GAP, -zerosZonesOuterHeight, zerosZonesOuterTriangleWidth-TABLE_MAIN_CELL_GAP, -zerosZonesOuterHeight});

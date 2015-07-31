@@ -75,21 +75,38 @@ public class Control  extends Application{
 		viewMainMenu.quitButton.setOnAction(new ListenerButton());
 	}
 	
-	public class ListenerMenu implements EventHandler<ActionEvent>{
-		
+	public class ListenerMenu implements EventHandler<ActionEvent>
+	{
 		@Override
-		public void handle(ActionEvent e){
+		public void handle(ActionEvent e)
+		{
+			if (viewBlackJack != null)
+			{
+				if (e.getSource() == viewBlackJack.menuItemCasinoHall)
+				{
+					
+					manageWelcome();
+				}
 			
-			if (e.getSource() == viewBlackJack.menuItemCasinoHall){
-				
-				manageWelcome();
+				else if (e.getSource() == viewBlackJack.menuItemQuit)
+				{
+					
+					manageQuit();
+				}
 			}
 			
-			else if (e.getSource() == viewBlackJack.menuItemQuit){
+			if (viewRoulette != null)
+			{
+				if (e.getSource() == viewRoulette.menuItemCasinoHall)
+				{
+					manageWelcome();
+				}
 				
-				manageQuit();
+				else if (e.getSource() == viewRoulette.menuItemQuit)
+				{
+					manageQuit();
+				}
 			}
-			
 		}
 	}
 	
@@ -98,48 +115,57 @@ public class Control  extends Application{
 		@Override
 		public void handle(ActionEvent e){
 			
-			if(e.getSource() == viewMainMenu.newPlayerButton){
+			if(viewMainMenu != null){
 				
-				manageNewPlayer();
+				if(e.getSource() == viewMainMenu.newPlayerButton){
+					
+					manageNewPlayer();
+				}
+				
+				else if(e.getSource() == viewMainMenu.loadPlayerButton){
+					
+					manageLoadProfile();
+				}
+				
+				else if(e.getSource() == viewMainMenu.quitButton){
+					
+					manageQuit();
+				}
 			}
 			
-			else if(e.getSource() == viewMainMenu.loadPlayerButton){
+			if (viewLoadPlayer != null){
 				
-				manageLoadProfile();
+					if(e.getSource() == viewLoadPlayer.cancelButton){
+						
+						start(stage);
+					}
+					
+					else if(e.getSource() == viewLoadPlayer.loadPlayerButton){
+						
+						loadPlayer();
+					}
+				}
+			
+			if (viewWelcome != null){
+				
+				if(e.getSource() == viewWelcome.blackJackButton){
+					
+					manageBlackJack();
+				}
+				
+				else if(e.getSource() == viewWelcome.rouletteButton){
+					
+					manageRoulette();
+				}
 			}
 			
-			else if(e.getSource() == viewMainMenu.quitButton){
+			if (viewBlackJack != null){
 				
-				manageQuit();
-			}
-			
-			else if(e.getSource() == viewLoadPlayer.cancelButton){
+				if(e.getSource() == viewBlackJack.btnHit){	
+				}
 				
-				start(stage);
-			}
-			
-			else if(e.getSource() == viewLoadPlayer.loadPlayerButton){
-				
-				loadPlayer();
-			}
-			
-			else if(e.getSource() == viewWelcome.blackJackButton){
-				
-				manageBlackJack();
-			}
-			
-			else if(e.getSource() == viewWelcome.rouletteButton){
-				
-				manageRoulette();
-			
-			}
-			
-			else if(e.getSource() == viewBlackJack.btnHit){
-				
-			}
-			
-			else if(e.getSource() == viewBlackJack.btnStand){
-				
+				else if(e.getSource() == viewBlackJack.btnStand){	
+				}
 			}
 		}
 	}
@@ -165,7 +191,7 @@ public class Control  extends Application{
 	
 	public void manageNewPlayer(){
 		
-		if(currentPlayer != null || createPlayer()){
+		if(currentPlayer != null  || createPlayer()){
 			
 			manageWelcome();
 		}
@@ -532,8 +558,8 @@ public class Control  extends Application{
 		 * For a profile, this line number from the listView is the same as the line number 
 		 * of the profile in the save file.
 		 */
-			int lineNumber = viewLoadPlayer.profileListView.getSelectionModel().getSelectedIndex();
-		
+			int lineNumber = viewLoadPlayer.profileTableView.getSelectionModel().getSelectedIndex();
+			
 		//Read the file line by line until the one corresponding to the player profile is reached	
 			String name = "";
 			int cash = 0;
@@ -581,13 +607,27 @@ public class Control  extends Application{
 				}
 			}
 			
-		//Create the new player using the infos read in the file. Make it the currentPlayer.
-			Player player = new Player(name, cash, img);
-			currentPlayer = player;
-			System.out.println(currentPlayer.getImg());
+		//Create the new player using the infos in the file. Make it the currentPlayer.
+			if (name!="" && cash!=0 && img!="")//Prevent the creation of an empty player if not profile is loaded (if the user didn't click on a profile before to load)
+			{
+				Player player = new Player(name, cash, img);
+				currentPlayer = player;
+			}
 			
-		//Load the Welcome Screen
-			manageWelcome();	
+		//If the user chose a profile by clicking, load the Welcome Screen
+			if (lineNumber != -1) // If the user didn't click on a profile, the default lineNumber value is -1
+			{
+				manageWelcome();
+			}
+			
+			else
+			{
+				Alert alert = new Alert(AlertType.WARNING);
+				alert.setTitle("Error");
+				alert.setHeaderText("Warning");
+				alert.setContentText("You must select the player profile you want to load.");
+				alert.showAndWait();
+			}
 	}
 	
 	public void manageBlackJack()

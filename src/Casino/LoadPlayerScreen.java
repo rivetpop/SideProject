@@ -6,6 +6,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 
+import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
@@ -16,11 +17,15 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.ListView;
 import javafx.scene.control.SelectionMode;
+import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableView;
+import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.Background;
 import javafx.scene.layout.BackgroundFill;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.BorderStrokeStyle;
 import javafx.scene.layout.CornerRadii;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
@@ -43,7 +48,7 @@ public class LoadPlayerScreen
 	Button loadPlayerButton = null;
 	Button cancelButton = null;
 	
-	ListView<String> profileListView = null;
+	TableView<PlayerProfile> profileTableView = null;
 	
 	public LoadPlayerScreen()
 	{
@@ -68,20 +73,43 @@ public class LoadPlayerScreen
 			titleZone.getChildren().addAll(titleText, casinoView);
 			root.setTop(titleZone);
 		
-		//Center zone (text + ListView)
-			Text subtitle = new Text("Enter the name of the player profile\nyou want to load");
-			subtitle.setTextAlignment(TextAlignment.CENTER);
-			subtitle.getStyleClass().add("title2");
+		//Center zone (text + TableView)
+			//Text
+				Text subtitle = new Text("Enter the name of the player profile\nyou want to load");
+				subtitle.setTextAlignment(TextAlignment.CENTER);
+				subtitle.getStyleClass().add("title2");
 			
-			ArrayList playerProfiles_array = readPlayersProfiles();
-			profileListView= createPlayersList(playerProfiles_array);
-			profileListView.setMaxSize(500, 300);
+			//TableView
+				ArrayList <String> playerProfiles_array = readPlayersProfiles();
+				profileTableView= new TableView<PlayerProfile>();
+				
+				//First column
+					TableColumn<PlayerProfile,String> playerNameCol= new TableColumn<PlayerProfile,String>("Profile name");
+					playerNameCol.setMinWidth(325);
+					playerNameCol.setCellValueFactory(new PropertyValueFactory<PlayerProfile,String>("playerName"));
+					
+				//Second column
+					TableColumn<PlayerProfile,String> cashCol = new TableColumn<PlayerProfile,String>("Cash");
+					cashCol.setMinWidth(175);
+					cashCol.setCellValueFactory(new PropertyValueFactory<PlayerProfile,String>("cash"));
+					
+				profileTableView.getColumns().addAll(playerNameCol, cashCol);
+				
+				//Populate the table
+					profileTableView.setItems(createPlayersList(playerProfiles_array));
 			
-			VBox centerBox = new VBox();
-			centerBox.getChildren().addAll(subtitle, profileListView);
-			centerBox.setAlignment(Pos.CENTER);
+				
+				profileTableView.setMaxSize(500, 300);
+			
+			//Add the Text and TableView to the VBox
+				VBox centerBox = new VBox();
+				centerBox.getChildren().addAll(subtitle, profileTableView);
+				profileTableView.setPadding(new Insets(10,0,0,0));
+				centerBox.setAlignment(Pos.TOP_CENTER);
+				centerBox.setPadding(new Insets(15,0,0,0));
+				centerBox.setMargin(profileTableView, new Insets(10,0,0,0));
+				
 			root.setCenter(centerBox);
-			root.setAlignment(centerBox, Pos.TOP_CENTER);
 		
 		//Bottom zone (buttons)
 			loadPlayerButton = new Button("Load");
@@ -93,6 +121,10 @@ public class LoadPlayerScreen
 			buttonsZone.setAlignment(Pos.TOP_CENTER);
 			root.setBottom(buttonsZone);
 			BorderPane.setAlignment(buttonsZone, Pos.TOP_CENTER);
+			buttonsZone.setPrefHeight(75);
+			
+			root.setBackground(new Background(new BackgroundFill(Color.WHITE, CornerRadii.EMPTY, Insets.EMPTY)));
+			root.setPadding(new Insets(2, 2, 2, 0));
 		
 		root.setBackground(new Background(new BackgroundFill(Color.GREEN, CornerRadii.EMPTY, Insets.EMPTY)));
 		scene.getStylesheets().add(getClass().getResource("style.css").toExternalForm());
@@ -149,21 +181,50 @@ public class LoadPlayerScreen
 		return playerProfiles_array;
 	}
 	
-	private ListView<String> createPlayersList(ArrayList<String> playerProfiles_array)
+	private ObservableList<PlayerProfile> createPlayersList(ArrayList<String> playerProfiles_array)
 	{
-		ListView<String> profileList = new ListView<String>();
-		ObservableList<String> profilesInfo = FXCollections.observableArrayList();
+		ObservableList<PlayerProfile> profileList = FXCollections.observableArrayList();
 		
 		//Add the profiles info Strings to the ObservableList		
 			for (int array_pointer = 0; array_pointer < playerProfiles_array.size(); array_pointer+=2)
 			{
-				String info_temp = "Profile name: " + playerProfiles_array.get(array_pointer)
-									+ "\tCash:" + playerProfiles_array.get(array_pointer+1);
-				profilesInfo.add(info_temp);
+				PlayerProfile player_temp = new PlayerProfile(playerProfiles_array.get(array_pointer), playerProfiles_array.get(array_pointer+1));//profile name
+				profileList.add(player_temp);
 			}
-		
-		profileList.setItems(profilesInfo);
-		
+			
 		return profileList;
+	}
+	
+	public static class PlayerProfile //Class used to populate the TableView
+	{
+		private final SimpleStringProperty playerNameProperty;
+		private final SimpleStringProperty  cashProperty;
+		
+		public PlayerProfile(String playerName, String cash)
+		{
+			playerNameProperty = new SimpleStringProperty(playerName);
+			cashProperty = new SimpleStringProperty(cash);
+		}
+		
+		public String getPlayerName()
+		{
+			return playerNameProperty.get();
+		}
+		
+		public String getCash()
+		{
+			return cashProperty.get();
+		}
+		
+		public void setPlayerName(String playerName)
+		{
+			playerNameProperty.set(playerName);
+		}
+		
+		public void setCash(String cash)
+		{
+			cashProperty.set(cash);
+		}
+		
 	}
 }

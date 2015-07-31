@@ -24,8 +24,8 @@ public class Main_menu{
 	private BorderPane root = null;
 		
 	//Main menu title
-	private VBox titleZone = null;
-	private Text titleText = null;
+	protected static VBox titleZone = null;
+	protected static Text titleText = null;
 	
 	//New Game / Load Game buttons
 	private VBox newLoadButton = null; 
@@ -35,7 +35,7 @@ public class Main_menu{
 	
 	
 	//Create Casino image
-	Image casino = new Image("CasinoMenu.jpg");
+	static Image casino = new Image("CasinoMenu.jpg");
 	
 	//Add the different menu items to the mainMenu Bordepane. 
 	public Main_menu(){
