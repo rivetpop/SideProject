@@ -75,7 +75,7 @@ public class LoadPlayerScreen
 		
 		//Center zone (text + TableView)
 			//Text
-				Text subtitle = new Text("Enter the name of the player profile\nyou want to load");
+				Text subtitle = new Text("Select a player profile");
 				subtitle.setTextAlignment(TextAlignment.CENTER);
 				subtitle.getStyleClass().add("title2");
 			
@@ -85,12 +85,12 @@ public class LoadPlayerScreen
 				
 				//First column
 					TableColumn<PlayerProfile,String> playerNameCol= new TableColumn<PlayerProfile,String>("Profile name");
-					playerNameCol.setMinWidth(325);
+					playerNameCol.setMinWidth(324);
 					playerNameCol.setCellValueFactory(new PropertyValueFactory<PlayerProfile,String>("playerName"));
 					
 				//Second column
 					TableColumn<PlayerProfile,String> cashCol = new TableColumn<PlayerProfile,String>("Cash");
-					cashCol.setMinWidth(175);
+					cashCol.setMinWidth(174);
 					cashCol.setCellValueFactory(new PropertyValueFactory<PlayerProfile,String>("cash"));
 					
 				profileTableView.getColumns().addAll(playerNameCol, cashCol);
@@ -98,13 +98,12 @@ public class LoadPlayerScreen
 				//Populate the table
 					profileTableView.setItems(createPlayersList(playerProfiles_array));
 			
-				
+				//Size
 				profileTableView.setMaxSize(500, 300);
 			
 			//Add the Text and TableView to the VBox
 				VBox centerBox = new VBox();
 				centerBox.getChildren().addAll(subtitle, profileTableView);
-				profileTableView.setPadding(new Insets(10,0,0,0));
 				centerBox.setAlignment(Pos.TOP_CENTER);
 				centerBox.setPadding(new Insets(15,0,0,0));
 				centerBox.setMargin(profileTableView, new Insets(10,0,0,0));
@@ -181,6 +180,7 @@ public class LoadPlayerScreen
 		return playerProfiles_array;
 	}
 	
+	//This function receives an arrayList of player profiles infos and returns them in a collection of PlayerProfile objects
 	private ObservableList<PlayerProfile> createPlayersList(ArrayList<String> playerProfiles_array)
 	{
 		ObservableList<PlayerProfile> profileList = FXCollections.observableArrayList();
