@@ -33,6 +33,9 @@ public class Welcome extends GameInterface{
 	public Text titleWelcome = null;
 	public Text titleWelcome2 = null;
 	
+	//Player info zone
+	private HBox playerZone;
+	
 	//Pick a game text
 	private Text pickGameText = null;
 	
@@ -46,11 +49,12 @@ public class Welcome extends GameInterface{
 	public Welcome(){
 		
 		createWelcomeZone();
+		createPlayerZone();
 		createPickGameZone();
 		
 		root = new BorderPane();
 		root.setTop(titleZone);
-		root.setCenter(super.playerInfo);
+		root.setCenter(playerZone);
 		root.setBottom(buttonZone);
 		
 		scene = new Scene(root, 800, 800);
@@ -62,7 +66,7 @@ public class Welcome extends GameInterface{
 		
 		titleZone = new VBox();
 		titleZone.setAlignment(Pos.TOP_CENTER);
-		titleZone.setPadding(new Insets(30,0,0,0));
+		titleZone.setPadding(new Insets(30,0,150,0));
 		titleWelcome = new Text();
 		titleWelcome.getStyleClass().add("title");
 		titleWelcome2 = new Text();
@@ -71,6 +75,13 @@ public class Welcome extends GameInterface{
 		titleZone.getChildren().addAll(titleWelcome, titleWelcome2);
 	}
 	
+	private void createPlayerZone(){
+		
+		playerZone = new HBox();
+		playerZone.setAlignment(Pos.CENTER);
+		playerZone.getChildren().addAll(super.playerInfo);
+		
+	}
 	private void createPickGameZone(){
 		
 		//Create one button for each game

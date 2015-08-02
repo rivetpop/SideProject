@@ -42,7 +42,6 @@ public class Control  extends Application{
 
 	private Main_menu viewMainMenu;
 	private Welcome viewWelcome;
-	private GameInterface viewGameInterface;
 	private BlackJack viewBlackJack;
 	private Roulette viewRoulette;
 	private LoadPlayerScreen viewLoadPlayer;
@@ -75,8 +74,8 @@ public class Control  extends Application{
 		viewMainMenu.quitButton.setOnAction(new ListenerButton());
 	}
 	
-	public class ListenerMenu implements EventHandler<ActionEvent>
-	{
+	public class ListenerMenu implements EventHandler<ActionEvent>{
+		
 		@Override
 		public void handle(ActionEvent e)
 		{
@@ -161,10 +160,38 @@ public class Control  extends Application{
 			
 			if (viewBlackJack != null){
 				
-				if(e.getSource() == viewBlackJack.btnHit){	
+				if(e.getSource() == viewBlackJack.btnHit){
+					
 				}
 				
-				else if(e.getSource() == viewBlackJack.btnStand){	
+				else if(e.getSource() == viewBlackJack.btnStand){
+					
+				}
+				
+				else if(e.getSource() == viewBlackJack.btnDraw){
+					
+					//Draw 2 cards for both dealer and player
+					bjGame.drawCard();
+					viewBlackJack.playerCard1.setImage(bjGame.playerHand.get(0).getImage());
+					viewBlackJack.playerCard2.setImage(bjGame.playerHand.get(1).getImage());
+					viewBlackJack.dealerCard1.setImage(bjGame.dealerHand.get(0).getImage());
+					Image backCard = new Image("b1fv.png");
+					viewBlackJack.dealerCard2.setImage(backCard);
+					
+					//Disable draw button, enable Hit and Stand button
+					viewBlackJack.btnDraw.setDisable(true);
+					viewBlackJack.btnHit.setDisable(false);
+					viewBlackJack.btnStand.setDisable(false);
+					
+					System.out.println(bjGame.countHand(bjGame.playerHand));
+				}
+				
+				else if(e.getSource() == viewBlackJack.btnBet){
+					
+					bjGame.placeBet();
+					viewBlackJack.btnBet.setDisable(true);
+					viewBlackJack.txtOptions.setText("Your current bet : " + bjGame.getBet());
+					viewBlackJack.btnDraw.setDisable(false);
 				}
 			}
 		}
@@ -213,6 +240,7 @@ public class Control  extends Application{
 		viewWelcome.blackJackButton.setOnAction(new ListenerButton());
 		viewWelcome.rouletteButton.setOnAction(new ListenerButton());
 		
+		viewWelcome.playerInfo.setAlignment(Pos.CENTER);
 		viewWelcome.titleWelcome.setText("Welcome " + currentPlayer.getName() + "!");
 		viewWelcome.titleWelcome2.setText("Enjoy your stay and make some money!");
 		viewWelcome.playerStats.setText("    " + currentPlayer.getName() + "\n    Your cash : " + currentPlayer.getCash() + "$");
@@ -634,7 +662,6 @@ public class Control  extends Application{
 		viewBlackJack = new BlackJack();
 		currentDealer = new Dealer("Garry");
 		bjGame = new BJGame(currentPlayer, currentDealer);
-		viewGameInterface = new GameInterface();
 		
 		
 		//BlackJack Listeners
@@ -642,6 +669,8 @@ public class Control  extends Application{
 		viewBlackJack.menuItemQuit.setOnAction(new ListenerMenu());
 		viewBlackJack.btnHit.setOnAction(new ListenerButton());
 		viewBlackJack.btnStand.setOnAction(new ListenerButton());
+		viewBlackJack.btnBet.setOnAction(new ListenerButton());
+		viewBlackJack.btnDraw.setOnAction(new ListenerButton());
 		
 		viewBlackJack.playerInfo.setAlignment(Pos.CENTER);
 		
@@ -659,6 +688,8 @@ public class Control  extends Application{
 		viewBlackJack.playerImg.setImage(pImg);
 		viewBlackJack.playerStats.setText("    " + currentPlayer.getName() + "\n    Your cash : " + currentPlayer.getCash() + "$");
 		viewBlackJack.txtDealerName.setText(currentDealer.getName());
+		viewBlackJack.txtOptions.setText("Welcome to BlackJack! Minimum bet is 10 and maximum bet is 200.");
+		viewBlackJack.btnBet.setDisable(false);
 		
 		stage.setTitle("BlackJack");
 		stage.setScene(viewBlackJack.scene);

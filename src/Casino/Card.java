@@ -4,19 +4,41 @@ import javafx.scene.image.Image;
 
 public class Card {
 	
-	private String name = null;
+	private int name;
 	private String kind = null;
 	private Image cardImage = null;
  
 	//Card constructor
-	public Card(String pName, String pKind, Image cardImage){
+	public Card(int pName, int pKind, Image cardImage){
 		
 		setName(pName);
-		setKind(pKind);
+		setKind(convertKind(pKind));
 		setImage(cardImage);
 	}
 	
-	public String getName(){
+	private String convertKind(int pKind){
+		
+		switch(pKind){
+		
+		case 0:
+			return "Heart";
+		
+		case 1:
+			return "Diamond";
+		
+		case 2:
+			return "Spade";
+		
+		case 3:
+			return "Clover";
+		
+		default:
+			return null;
+		
+		}
+	}
+	
+	public int getName(){
 		
 		return name;
 	}
@@ -31,7 +53,7 @@ public class Card {
 		return cardImage;
 	}
 	
-	public void setName(String pName){
+	public void setName(int pName){
 		
 		if(validateName(pName)){
 			
@@ -53,11 +75,11 @@ public class Card {
 		
 	}
 	
-	public static boolean validateName(String pName){
+	public static boolean validateName(int pName){
 		
-		return (pName == "2" || pName == "3" || pName == "4" || pName == "5" || pName == "6" 
-				|| pName == "7" || pName == "8" || pName == "9" || pName == "10" 
-				|| pName == "Jack" || pName == "Queen" || pName == "King" || pName == "Ace");
+		return (pName == 2 || pName == 3 || pName == 4 || pName == 5 || pName == 6 
+				|| pName == 7 || pName == 8 || pName == 9 || pName == 10 
+				|| pName == 11 || pName == 12 || pName == 13 || pName == 14);
 	}
 	
 	public static boolean validateKind(String pKind){

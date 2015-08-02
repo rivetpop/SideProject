@@ -52,8 +52,8 @@ public class GameInterface{
 		playerInfo = new HBox();
 		
 		playerImg = new ImageView();
-		playerImg.setFitWidth(150);
-		playerImg.setPreserveRatio(true);
+		playerImg.setFitWidth(100);
+		playerImg.setFitHeight(100);
 		playerImg.setSmooth(true);
 		playerImg.setCache(true);
 		
