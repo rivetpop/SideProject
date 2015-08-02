@@ -81,8 +81,6 @@ public class Roulette extends GameInterface
 	
 	public Roulette()
 	{
-		//GameInterface gameInterface =  new GameInterface();
-		
 		root = new Pane();
 		scene = new Scene(root, 800,800);
 		
@@ -91,7 +89,10 @@ public class Roulette extends GameInterface
 		setImages();
 		setTable();
 		
-		root.getChildren().addAll(super.upperZone, roulette_imgView, tableLayout);
+		root.getChildren().addAll(super.playerInfo, super.upperZone, roulette_imgView, tableLayout);
+		super.playerInfo.setTranslateX(450);
+		super.playerInfo.setTranslateY(5);
+		
 		root.setBackground(new Background(new BackgroundFill(Color.GREEN, CornerRadii.EMPTY, Insets.EMPTY)));
 		scene.getStylesheets().add(getClass().getResource("style.css").toExternalForm());
 	}

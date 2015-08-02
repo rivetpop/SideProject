@@ -216,18 +216,17 @@ public class Control  extends Application{
 		viewWelcome.titleWelcome.setText("Welcome " + currentPlayer.getName() + "!");
 		viewWelcome.titleWelcome2.setText("Enjoy your stay and make some money!");
 		viewWelcome.playerStats.setText("    " + currentPlayer.getName() + "\n    Your cash : " + currentPlayer.getCash() + "$");
+		System.out.println(currentPlayer.getImg());
 		
 		Image pImg = null;
-		
-		if (currentPlayer.getImg() == Player.DEFAULT_IMG_URL){
-			
+		if (currentPlayer.getImg().equals(Player.DEFAULT_IMG_URL)){
 			pImg = new Image(Player.DEFAULT_IMG_URL);
 		}
 		
 		else{
-			
 			pImg = new Image("file:" + currentPlayer.getImg());
 		}
+		
 		viewWelcome.playerImg.setImage(pImg);
 		
 		stage.setTitle("Welcome!");
@@ -648,7 +647,7 @@ public class Control  extends Application{
 		
 		Image pImg = null;
 	
-		if (currentPlayer.getImg() == Player.DEFAULT_IMG_URL){
+		if (currentPlayer.getImg().equals(Player.DEFAULT_IMG_URL)){
 			
 			pImg = new Image(Player.DEFAULT_IMG_URL);
 		}
@@ -672,8 +671,24 @@ public class Control  extends Application{
 		viewRoulette = new Roulette();
 		
 		//Menu Listeners	
-		viewRoulette.menuItemCasinoHall.setOnAction(new ListenerMenu());
-		viewRoulette.menuItemQuit.setOnAction(new ListenerMenu());
+			viewRoulette.menuItemCasinoHall.setOnAction(new ListenerMenu());
+			viewRoulette.menuItemQuit.setOnAction(new ListenerMenu());
+		
+		//Set playerInfos
+			Image pImg = null;
+			
+			if (currentPlayer.getImg().equals(Player.DEFAULT_IMG_URL)){
+				
+				pImg = new Image(Player.DEFAULT_IMG_URL);
+			}
+			
+			else{
+				
+				pImg = new Image("file:" + currentPlayer.getImg());
+			}
+			
+			viewRoulette.playerImg.setImage(pImg);
+			viewRoulette.playerStats.setText("    " + currentPlayer.getName() + "\n    Your cash : " + currentPlayer.getCash() + "$");
 		
 		stage.setTitle("Roulette");
 		stage.setScene(viewRoulette.scene);
