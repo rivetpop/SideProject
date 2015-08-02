@@ -10,10 +10,13 @@ import javafx.geometry.Pos;
 import javafx.scene.Group;
 import javafx.scene.Node;
 import javafx.scene.Scene;
+import javafx.scene.control.Button;
 import javafx.scene.control.Control;
+import javafx.scene.control.Label;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuBar;
 import javafx.scene.control.MenuItem;
+import javafx.scene.control.TextArea;
 import javafx.scene.effect.BlendMode;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -44,6 +47,9 @@ public class Roulette extends GameInterface
 {
 	public Scene scene = null;
 	private Pane root  = null;
+	private Group buttonsGroup = null;
+	private VBox msgZone = null;
+	private Label msg = null;
 	
 	//Constants for the layouts
 		//Constants
@@ -88,10 +94,20 @@ public class Roulette extends GameInterface
 		createPlayerInfo();
 		setImages();
 		setTable();
+		setButtons();
+		setMessage("Click on the table to place a bet!");
+		setMessageZone();
 		
-		root.getChildren().addAll(super.playerInfo, super.upperZone, roulette_imgView, tableLayout);
-		super.playerInfo.setTranslateX(450);
-		super.playerInfo.setTranslateY(5);
+		root.getChildren().addAll(msgZone, super.playerInfo, super.upperZone, roulette_imgView, tableLayout, buttonsGroup);
+		
+		super.playerInfo.setTranslateX(500);
+		super.playerInfo.setTranslateY(15);
+		
+		buttonsGroup.setTranslateX(420);
+		buttonsGroup.setTranslateY(370);
+		
+		msgZone.setTranslateX(475);
+		msgZone.setTranslateY(130);
 		
 		root.setBackground(new Background(new BackgroundFill(Color.GREEN, CornerRadii.EMPTY, Insets.EMPTY)));
 		scene.getStylesheets().add(getClass().getResource("style.css").toExternalForm());
@@ -100,8 +116,8 @@ public class Roulette extends GameInterface
 	private void setImages()
 	{
 		roulette_imgView = new ImageView(roulette_img);
-		//roulette_imgView.setTranslateX(100);
-		//roulette_imgView.setTranslateY(50);
+		roulette_imgView.setTranslateX(-10);
+		roulette_imgView.setTranslateY(10);
 		
 		/*table_imgView = new ImageView(table_img);
 		table_imgView.setTranslateX(100);
@@ -379,8 +395,8 @@ public class Roulette extends GameInterface
 			tableLeftZone.setTranslateX(leftZoneTranslateValue);
 		
 		//Set the position of the tableLayout Pane
-			tableLayout.setTranslateX(100);
-			tableLayout.setTranslateY(500);
+			tableLayout.setTranslateX(150);
+			tableLayout.setTranslateY(520);
 			
 		//Set the border of the table. Made of a white background with gaps between the cells.
 			tableCenterZone.setBackground(new Background(new BackgroundFill(Color.WHITE, CornerRadii.EMPTY, Insets.EMPTY)));
@@ -394,6 +410,55 @@ public class Roulette extends GameInterface
 			tableRightZone.setPadding(new Insets(TABLE_MAIN_CELL_GAP, TABLE_MAIN_CELL_GAP, TABLE_MAIN_CELL_GAP, 0));
 	}
 	
+	private void setButtons()
+	{
+		Button spinTheWheelButton = new Button("Spin the wheel!");
+		spinTheWheelButton.setPrefSize(200, 75);
+		spinTheWheelButton.setDisable(true);
+		spinTheWheelButton.setTranslateX(60);
+		spinTheWheelButton.setStyle("-fx-font-size:18pt; -fx-background-color: linear-gradient(#f2f2f2, #d6d6d6), linear-gradient(#fcfcfc 0%, #d9d9d9 20%, #d6d6d6 100%), linear-gradient(#dddddd 0%, #f6f6f6 50%); -fx-background-radius: 8,7,6; -fx-background-insets: 0,1,2; -fx-text-fill: black;");
+		
+		Button removeLastBetButton = new Button("Remove last bet");
+		removeLastBetButton.setPrefSize(150, 50);
+		removeLastBetButton.setDisable(true);
+		removeLastBetButton.setTranslateY(85);
+		removeLastBetButton.setStyle("-fx-font-size:12pt; -fx-background-color: linear-gradient(#f2f2f2, #d6d6d6), linear-gradient(#fcfcfc 0%, #d9d9d9 20%, #d6d6d6 100%), linear-gradient(#dddddd 0%, #f6f6f6 50%); -fx-background-radius: 8,7,6; -fx-background-insets: 0,1,2; -fx-text-fill: black;");
+		
+		Button removeAllBetsButton = new Button("Remove all bets");
+		removeAllBetsButton.setPrefSize(150, 50);
+		removeAllBetsButton.setDisable(true);
+		removeAllBetsButton.setTranslateX(160);
+		removeAllBetsButton.setTranslateY(85);
+		removeAllBetsButton.setStyle("-fx-font-size:12pt; -fx-background-color: linear-gradient(#f2f2f2, #d6d6d6), linear-gradient(#fcfcfc 0%, #d9d9d9 20%, #d6d6d6 100%), linear-gradient(#dddddd 0%, #f6f6f6 50%); -fx-background-radius: 8,7,6; -fx-background-insets: 0,1,2; -fx-text-fill: black;");
+		
+		
+		buttonsGroup = new Group(spinTheWheelButton, removeLastBetButton, removeAllBetsButton);
+	}
+	
+	private void setMessageZone()
+	{
+		msgZone = new VBox();
+		
+		msgZone.getChildren().add(msg);
+		msgZone.setAlignment(Pos.CENTER);
+		
+		int msgZoneSizeX = 300;
+		int msgZoneSizeY = 225;
+		msgZone.setMinHeight(msgZoneSizeY);
+		msgZone.setMaxHeight(msgZoneSizeY);
+		msgZone.setMinWidth(msgZoneSizeX);
+		msgZone.setMaxWidth(msgZoneSizeX);
+		msgZone.setPrefSize(msgZoneSizeX, msgZoneSizeY);
+	}
+	
+	private void setMessage(String message)
+	{
+		msg = new Label(message);
+		msg.setStyle("-fx-font-size: 20pt; -fx-font-family: \"Dialog\";");
+		msg.setMaxWidth(300);
+		msg.setWrapText(true);
+		msg.setTextAlignment(TextAlignment.CENTER);
+	}
 	
 	/*public static void main(String[] args)
 	{
