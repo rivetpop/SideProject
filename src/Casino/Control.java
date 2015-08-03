@@ -194,6 +194,24 @@ public class Control  extends Application{
 					viewBlackJack.btnDraw.setDisable(false);
 				}
 			}
+			
+			if (viewRoulette != null)
+			{
+				if(e.getSource() == viewRoulette.spinTheWheelButton)
+				{
+					viewRoulette.spinTheWheel();
+				}
+				
+				else if(e.getSource() == viewRoulette.removeLastBetButton)
+				{
+					
+				}
+				
+				else if (e.getSource() == viewRoulette.removeAllBetsButton)
+				{
+					
+				}
+			}
 		}
 	}
 	
@@ -704,6 +722,10 @@ public class Control  extends Application{
 		//Menu Listeners	
 			viewRoulette.menuItemCasinoHall.setOnAction(new ListenerMenu());
 			viewRoulette.menuItemQuit.setOnAction(new ListenerMenu());
+		//Button Listeners
+			viewRoulette.spinTheWheelButton.setOnAction(new ListenerButton());
+			viewRoulette.removeLastBetButton.setOnAction(new ListenerButton());
+			viewRoulette.removeAllBetsButton.setOnAction(new ListenerButton());
 		
 		//Set playerInfos
 			Image pImg = null;

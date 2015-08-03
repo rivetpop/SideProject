@@ -1,9 +1,17 @@
 package Roulette;
 
+import javafx.animation.Interpolator;
+import javafx.animation.KeyFrame;
+import javafx.animation.KeyValue;
+import javafx.animation.SequentialTransition;
+import javafx.animation.Timeline;
+import javafx.animation.Transition;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 
 import Casino.GameInterface;
+import javafx.animation.RotateTransition;
 import javafx.geometry.HPos;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -42,6 +50,7 @@ import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextAlignment;
 import javafx.scene.text.TextBoundsType;
+import javafx.util.Duration;
 
 public class Roulette extends GameInterface
 {
@@ -50,6 +59,10 @@ public class Roulette extends GameInterface
 	private Group buttonsGroup = null;
 	private VBox msgZone = null;
 	private Label msg = null;
+	
+	public Button spinTheWheelButton = null;
+	public Button removeLastBetButton = null;
+	public Button removeAllBetsButton = null;
 	
 	//Constants for the layouts
 		//Constants
@@ -412,19 +425,19 @@ public class Roulette extends GameInterface
 	
 	private void setButtons()
 	{
-		Button spinTheWheelButton = new Button("Spin the wheel!");
+		spinTheWheelButton = new Button("Spin the wheel!");
 		spinTheWheelButton.setPrefSize(200, 75);
-		spinTheWheelButton.setDisable(true);
+		//spinTheWheelButton.setDisable(true);
 		spinTheWheelButton.setTranslateX(60);
 		spinTheWheelButton.setStyle("-fx-font-size:18pt; -fx-background-color: linear-gradient(#f2f2f2, #d6d6d6), linear-gradient(#fcfcfc 0%, #d9d9d9 20%, #d6d6d6 100%), linear-gradient(#dddddd 0%, #f6f6f6 50%); -fx-background-radius: 8,7,6; -fx-background-insets: 0,1,2; -fx-text-fill: black;");
 		
-		Button removeLastBetButton = new Button("Remove last bet");
+		removeLastBetButton = new Button("Remove last bet");
 		removeLastBetButton.setPrefSize(150, 50);
 		removeLastBetButton.setDisable(true);
 		removeLastBetButton.setTranslateY(85);
 		removeLastBetButton.setStyle("-fx-font-size:12pt; -fx-background-color: linear-gradient(#f2f2f2, #d6d6d6), linear-gradient(#fcfcfc 0%, #d9d9d9 20%, #d6d6d6 100%), linear-gradient(#dddddd 0%, #f6f6f6 50%); -fx-background-radius: 8,7,6; -fx-background-insets: 0,1,2; -fx-text-fill: black;");
 		
-		Button removeAllBetsButton = new Button("Remove all bets");
+		removeAllBetsButton = new Button("Remove all bets");
 		removeAllBetsButton.setPrefSize(150, 50);
 		removeAllBetsButton.setDisable(true);
 		removeAllBetsButton.setTranslateX(160);
@@ -454,10 +467,43 @@ public class Roulette extends GameInterface
 	private void setMessage(String message)
 	{
 		msg = new Label(message);
-		msg.setStyle("-fx-font-size: 20pt; -fx-font-family: \"Dialog\";");
+		msg.setStyle("-fx-font-size: 20pt;");
 		msg.setMaxWidth(300);
 		msg.setWrapText(true);
 		msg.setTextAlignment(TextAlignment.CENTER);
+	}
+	
+	public void spinTheWheel()
+	{
+		RotateTransition wheelRotation1 = new RotateTransition(Duration.millis(3000), roulette_imgView);
+		
+		//Rotations
+		int decisiveLastWheelRotationAngle = (int)(Math.random()*360);
+		
+		wheelRotation1.setByAngle(3600+decisiveLastWheelRotationAngle);
+		
+		//SequentialTransition
+		SequentialTransition seqTransition = new SequentialTransition();
+		seqTransition.getChildren().addAll(wheelRotation1);
+		
+		seqTransition.play();
+		
+		/*
+		final KeyValue keyValue = new KeyValue(roulette_imgView.rotateProperty(), 360);
+		final KeyFrame keyFrame = new KeyFrame(Duration.millis(3000), keyValue);
+		final KeyValue keyValue2 = new KeyValue(roulette_imgView.rotateProperty(), 360);
+		final KeyFrame keyFrame2 = new KeyFrame(Duration.millis(1000), keyValue2);
+		
+		//Timeline
+		final Timeline timeLine = new Timeline();
+		timeLine.getKeyFrames().add(keyFrame);
+		
+		final Timeline timeLine2 = new Timeline();
+		timeLine2.getKeyFrames().add(keyFrame2);
+		
+		timeLine.play();
+		//timeLine2.play();*/
+		
 	}
 	
 	/*public static void main(String[] args)
