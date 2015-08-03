@@ -1,5 +1,6 @@
 package Casino;
 
+import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuBar;
@@ -51,6 +52,7 @@ public class GameInterface{
 		
 		playerInfo = new HBox();
 		
+		playerInfo.setPadding(new Insets(50, 0, 0, 0));
 		playerImg = new ImageView();
 		playerImg.setFitWidth(100);
 		playerImg.setFitHeight(100);

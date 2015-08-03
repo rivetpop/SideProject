@@ -7,6 +7,8 @@ import java.util.Scanner;
 
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.TextInputDialog;
 import javafx.scene.image.Image;
 import Casino.Card;
@@ -28,7 +30,7 @@ public class BJGame {
 	public ArrayList<Card> playerHand = null;
 	public ArrayList<Card> dealerHand = null;
 	
-	int currentCard;
+	int currentCard = 0;
 	
 	private Player player = null;
 	private Dealer dealer = null;
@@ -43,6 +45,7 @@ public class BJGame {
 		dealer = pDealer;
 		player = pPlayer;
 		createDeck();
+		System.out.println(formatDeck(deck));
 	}
 	
 	public int getBet(){
@@ -92,12 +95,16 @@ public class BJGame {
 		return bet;
 	}
 	
-	public void drawCard(){
+	public void hitCardPlayer(){
 		
-		playerHand.add(deck.get(0));
-		dealerHand.add(deck.get(1));
-		playerHand.add(deck.get(2));
-		dealerHand.add(deck.get(3));
+		playerHand.add(deck.get(currentCard));
+		currentCard++;
+	}
+	
+	public void hitCardDealer(){
+		
+		dealerHand.add(deck.get(currentCard));
+		currentCard++;
 	}
 	
 	public void createDeck(){
@@ -115,18 +122,22 @@ public class BJGame {
 				case 0:
 					
 					imgName = j + "H.png";
+					break;
 					
 				case 1:
 					
 					imgName = j + "D.png";
-				
+					break;
+					
 				case 2:
 					
 					imgName = j + "S.png";
+					break;
 					
 				case 3:
 					
 					imgName = j + "C.png";
+					break;
 				}
 				
 				imgCard = new Image(imgName);
@@ -141,14 +152,26 @@ public class BJGame {
 	}
 	
 	
-	public void checkWin(){
+	public boolean checkWin(){
+		
+		//if i = 0 means hand value under 21
+		//if i = 1 means hand value equal 21
+		//if i = 2 means hand value over 21
+		boolean ok = false;
+		
+		if(countHand(playerHand) == 21){
+			
+			ok = true;
+		}
 		
 		
+		return ok;
 	}
 	
 	public int countHand(ArrayList<Card> pHand){
 		
 		int handValue = 0;
+		int acePerHand = 0;
 		
 		for(int i = 0; i < pHand.size(); i++){
 			
@@ -156,10 +179,21 @@ public class BJGame {
 				
 				handValue += pHand.get(i).getName();
 			}
-			else if(pHand.get(i).getName() > 10){
+			else if(pHand.get(i).getName() == 14){
 				
-				
+				handValue += 11;
+				acePerHand++;
 			}
+			else{
+				
+				handValue += 10;
+			}
+		}
+		
+		while(acePerHand > 0 && handValue > 21){
+			
+			handValue -= 10;
+			acePerHand--;
 		}
 		
 		return handValue;

@@ -52,6 +52,9 @@ public class Control  extends Application{
 	public static Player currentPlayer = null;
 	public static Dealer currentDealer = null;
 	
+	public int currentPlayerCard = 0;
+	public int currentDealerCard = 0;
+	
 	private File playerInfoFile = new File(".\\src\\Player_info.dat");
 	
 	public void start(Stage pStage){
@@ -162,6 +165,89 @@ public class Control  extends Application{
 				
 				if(e.getSource() == viewBlackJack.btnHit){
 					
+					if(viewBlackJack.playerCard3.getImage() == null){
+						
+						bjGame.hitCardPlayer();
+						viewBlackJack.playerCard3.setImage(bjGame.playerHand.get(currentPlayerCard).getImage());
+					}
+					else if(viewBlackJack.playerCard4.getImage() == null){
+						
+						bjGame.hitCardPlayer();
+						viewBlackJack.playerCard4.setImage(bjGame.playerHand.get(currentPlayerCard).getImage());
+					}
+					else if(viewBlackJack.playerCard5.getImage() == null){
+						
+						bjGame.hitCardPlayer();
+						viewBlackJack.playerCard5.setImage(bjGame.playerHand.get(currentPlayerCard).getImage());
+					}
+					else if(viewBlackJack.playerCard6.getImage() == null){
+						
+						bjGame.hitCardPlayer();
+						viewBlackJack.playerCard6.setImage(bjGame.playerHand.get(currentPlayerCard).getImage());
+					}
+					else if(viewBlackJack.playerCard7.getImage() == null){
+						
+						bjGame.hitCardPlayer();
+						viewBlackJack.playerCard7.setImage(bjGame.playerHand.get(currentPlayerCard).getImage());
+					}
+					else if(viewBlackJack.playerCard8.getImage() == null){
+						
+						bjGame.hitCardPlayer();
+						viewBlackJack.playerCard8.setImage(bjGame.playerHand.get(currentPlayerCard).getImage());
+					}
+					else if(viewBlackJack.playerCard9.getImage() == null){
+						
+						bjGame.hitCardPlayer();
+						viewBlackJack.playerCard9.setImage(bjGame.playerHand.get(currentPlayerCard).getImage());
+					}
+					else if(viewBlackJack.playerCard10.getImage() == null){
+						
+						bjGame.hitCardPlayer();
+						viewBlackJack.playerCard10.setImage(bjGame.playerHand.get(currentPlayerCard).getImage());
+					}
+					else if(viewBlackJack.playerCard11.getImage() == null){
+						
+						bjGame.hitCardPlayer();
+						viewBlackJack.playerCard11.setImage(bjGame.playerHand.get(currentPlayerCard).getImage());
+					}
+					currentPlayerCard++;
+					
+					if(bjGame.checkWin()){
+						
+						currentPlayer.setCash(bjGame.getBet()*2);
+						
+						Alert alert = new Alert(AlertType.CONFIRMATION);
+						alert.setTitle("Black Jack");
+						alert.setContentText("You won " + bjGame.getBet()*2 + "$ !");
+						
+						Optional<ButtonType> result = alert.showAndWait();
+						
+						if(result.get() == ButtonType.OK){
+							
+							manageBlackJack();
+							currentPlayerCard = 0;
+							currentDealerCard = 0;
+						}
+					}
+					
+					else if(!bjGame.checkWin()){
+						
+						currentPlayer.setCash(currentPlayer.getCash() - bjGame.getBet());
+						
+						Alert alert = new Alert(AlertType.WARNING);
+						alert.setTitle("Black Jack");
+						alert.setContentText("You busted and lost " + bjGame.getBet() + "$ !");
+						
+						Optional<ButtonType> result = alert.showAndWait();
+						
+						if(result.get() == ButtonType.OK){
+							
+							manageBlackJack();
+							currentPlayerCard = 0;
+							currentDealerCard = 0;
+						}
+					}
+					
 				}
 				
 				else if(e.getSource() == viewBlackJack.btnStand){
@@ -171,17 +257,53 @@ public class Control  extends Application{
 				else if(e.getSource() == viewBlackJack.btnDraw){
 					
 					//Draw 2 cards for both dealer and player
-					bjGame.drawCard();
-					viewBlackJack.playerCard1.setImage(bjGame.playerHand.get(0).getImage());
-					viewBlackJack.playerCard2.setImage(bjGame.playerHand.get(1).getImage());
-					viewBlackJack.dealerCard1.setImage(bjGame.dealerHand.get(0).getImage());
+					bjGame.hitCardPlayer();
+					bjGame.hitCardDealer();
+					bjGame.hitCardPlayer();
+					bjGame.hitCardDealer();
+					
+					//Show player cards on interface
+					viewBlackJack.playerCard1.setImage(bjGame.playerHand.get(currentPlayerCard).getImage());
+					currentPlayerCard++;
+					viewBlackJack.playerCard2.setImage(bjGame.playerHand.get(currentPlayerCard).getImage());
+					currentPlayerCard++;
+					
+					//Show dealer cards on interface
+					viewBlackJack.dealerCard1.setImage(bjGame.dealerHand.get(currentDealerCard).getImage());
+					currentDealerCard++;
+					//Back of 2nd dealer card
 					Image backCard = new Image("b1fv.png");
 					viewBlackJack.dealerCard2.setImage(backCard);
 					
-					//Disable draw button, enable Hit and Stand button
+					//Disable draw button,
 					viewBlackJack.btnDraw.setDisable(true);
-					viewBlackJack.btnHit.setDisable(false);
-					viewBlackJack.btnStand.setDisable(false);
+					
+					
+					if(bjGame.checkWin()){
+						
+						currentPlayer.setCash(currentPlayer.getCash() + (bjGame.getBet()*2));
+						
+						Alert alert = new Alert(AlertType.CONFIRMATION);
+						alert.setTitle("Black Jack");
+						alert.setContentText("You won " + bjGame.getBet()*2 + "$ !");
+						
+						Optional<ButtonType> result = alert.showAndWait();
+						
+						if(result.get() == ButtonType.OK){
+							
+							manageBlackJack();
+							currentPlayerCard = 0;
+							currentDealerCard = 0;
+						}
+						
+					}
+					else{
+						
+						//Enable stand and hit buttons
+						viewBlackJack.btnHit.setDisable(false);
+						viewBlackJack.btnStand.setDisable(false);
+						
+					}
 					
 					System.out.println(bjGame.countHand(bjGame.playerHand));
 				}
@@ -192,6 +314,7 @@ public class Control  extends Application{
 					viewBlackJack.btnBet.setDisable(true);
 					viewBlackJack.txtOptions.setText("Your current bet : " + bjGame.getBet());
 					viewBlackJack.btnDraw.setDisable(false);
+					
 				}
 			}
 		}
@@ -244,7 +367,6 @@ public class Control  extends Application{
 		viewWelcome.titleWelcome.setText("Welcome " + currentPlayer.getName() + "!");
 		viewWelcome.titleWelcome2.setText("Enjoy your stay and make some money!");
 		viewWelcome.playerStats.setText("    " + currentPlayer.getName() + "\n    Your cash : " + currentPlayer.getCash() + "$");
-		System.out.println(currentPlayer.getImg());
 		
 		Image pImg = null;
 		if (currentPlayer.getImg().equals(Player.DEFAULT_IMG_URL)){
@@ -688,7 +810,7 @@ public class Control  extends Application{
 		viewBlackJack.playerImg.setImage(pImg);
 		viewBlackJack.playerStats.setText("    " + currentPlayer.getName() + "\n    Your cash : " + currentPlayer.getCash() + "$");
 		viewBlackJack.txtDealerName.setText(currentDealer.getName());
-		viewBlackJack.txtOptions.setText("Welcome to BlackJack! Minimum bet is 10 and maximum bet is 200.");
+		viewBlackJack.txtOptions.setText("Minimum bet is 10 and maximum bet is 200.");
 		viewBlackJack.btnBet.setDisable(false);
 		
 		stage.setTitle("BlackJack");

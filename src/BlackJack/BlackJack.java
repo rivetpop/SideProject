@@ -107,6 +107,7 @@ public class BlackJack extends GameInterface {
 			txtDealerName.getStyleClass().add("text");
 			
 			dealerCards = new HBox();
+			dealerCards.setPadding(new Insets(50, 0, 0, 0));
 			dealerCards.setAlignment(Pos.CENTER);
 			dealerCard1 = new ImageView();
 			dealerCard2 = new ImageView();
