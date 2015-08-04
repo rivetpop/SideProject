@@ -42,8 +42,10 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Ellipse;
+import javafx.scene.shape.Line;
 import javafx.scene.shape.Polygon;
 import javafx.scene.shape.Rectangle;
+import javafx.scene.shape.Sphere;
 import javafx.scene.shape.StrokeType;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
@@ -58,11 +60,16 @@ public class Roulette extends GameInterface
 	private Pane root  = null;
 	private Group buttonsGroup = null;
 	private VBox msgZone = null;
-	private Label msg = null;
 	
 	public Button spinTheWheelButton = null;
 	public Button removeLastBetButton = null;
 	public Button removeAllBetsButton = null;
+	
+	//A stackPane made of a sphere (the ball) and a center point to check collision with the wheel's zones
+	private StackPane rouletteBallStack = null;
+	
+	//Center point of the ball (see setBall() function)
+	private Line ballCenter = null;
 	
 	//Constants for the layouts
 		//Constants
@@ -70,20 +77,12 @@ public class Roulette extends GameInterface
 			static final int TABLE_MAIN_CELL_HEIGHT = 55;
 			static final int TABLE_MAIN_CELL_GAP = 2;
 	
-	//Images
-	private Image roulette_img = new Image("Roulette.png",500D,0, true, false);
+	//ImageView for the roulette
 	private ImageView roulette_imgView = null;
 	
 	//ArrayList grouping the numbers by color
 	static final ArrayList blackNumbersList = new ArrayList(Arrays.asList(2,6,8,10,11,13,15,17,20,24,26,28,29,31,33,35));
 	static final ArrayList redNumbersList = new ArrayList(Arrays.asList(1,3,5,7,9,12,14,16,21,23,25,27,30,32,34,36));
-	
-	/*
-	//Table image
-	private Image table_img = new Image("Roulette_table.png",600D,0, true, false);
-	private ImageView table_imgView = null;
-	private GameInterface gameInterface;*/
-	
 	
 	//Table Layout
 		//Pane containing the different table zones
@@ -105,18 +104,18 @@ public class Roulette extends GameInterface
 		
 		createMenu();
 		createPlayerInfo();
-		setImages();
+		setWheel();
+		setBall();
 		setTable();
 		setButtons();
-		setMessage("Click on the table to place a bet!");
-		setMessageZone();
+		setMessageZone("Click on the table to place a bet!");
 		
-		root.getChildren().addAll(msgZone, super.playerInfo, super.upperZone, roulette_imgView, tableLayout, buttonsGroup);
+		root.getChildren().addAll(msgZone, super.playerInfo, super.upperZone, roulette_imgView, rouletteBallStack, tableLayout, buttonsGroup);
 		
 		super.playerInfo.setTranslateX(500);
 		super.playerInfo.setTranslateY(15);
 		
-		buttonsGroup.setTranslateX(420);
+		buttonsGroup.setTranslateX(430);
 		buttonsGroup.setTranslateY(370);
 		
 		msgZone.setTranslateX(475);
@@ -126,15 +125,33 @@ public class Roulette extends GameInterface
 		scene.getStylesheets().add(getClass().getResource("style.css").toExternalForm());
 	}
 	
-	private void setImages()
+	private void setWheel()
 	{
-		roulette_imgView = new ImageView(roulette_img);
-		roulette_imgView.setTranslateX(-10);
-		roulette_imgView.setTranslateY(10);
-		
-		/*table_imgView = new ImageView(table_img);
-		table_imgView.setTranslateX(100);
-		table_imgView.setTranslateY(500);*/
+		//Wheel (image)
+			Image roulette_img = new Image("RouletteWheel.png",450D,0, true, true);
+			roulette_imgView = new ImageView(roulette_img);
+			roulette_imgView.setTranslateX(20);
+			roulette_imgView.setTranslateY(30);
+	}
+	
+	private void setBall()
+	{
+		//Ball (Sphere)
+			Sphere rouletteBall = new Sphere(10);
+	
+		//Center point, made of a 1 pixel line
+			ballCenter = new Line(0.0, 0.0, 5.0, 0.0);
+			ballCenter.prefWidth(1.0);
+			ballCenter.setTranslateX(0.5);
+			ballCenter.setTranslateY(0.5);
+			ballCenter.setStrokeWidth(1);
+			http://stackoverflow.com/questions/9779693/javafx-graphics-blurred-or-anti-aliased-no-effects-used
+			
+		//A stackpane to automatically center the ballCenter in the middle of the ball
+			rouletteBallStack = new StackPane();
+			rouletteBallStack.getChildren().addAll(rouletteBall, ballCenter);
+			rouletteBallStack.setTranslateX(250);
+			rouletteBallStack.setTranslateY(35);
 	}
 	
 	private void setTable()
@@ -448,8 +465,14 @@ public class Roulette extends GameInterface
 		buttonsGroup = new Group(spinTheWheelButton, removeLastBetButton, removeAllBetsButton);
 	}
 	
-	private void setMessageZone()
+	private void setMessageZone(String message)
 	{
+		Label msg = new Label(message);
+		msg.setStyle("-fx-font-size: 20pt;");
+		msg.setMaxWidth(300);
+		msg.setWrapText(true);
+		msg.setTextAlignment(TextAlignment.CENTER);
+		
 		msgZone = new VBox();
 		
 		msgZone.getChildren().add(msg);
@@ -464,52 +487,75 @@ public class Roulette extends GameInterface
 		msgZone.setPrefSize(msgZoneSizeX, msgZoneSizeY);
 	}
 	
-	private void setMessage(String message)
-	{
-		msg = new Label(message);
-		msg.setStyle("-fx-font-size: 20pt;");
-		msg.setMaxWidth(300);
-		msg.setWrapText(true);
-		msg.setTextAlignment(TextAlignment.CENTER);
-	}
-	
 	public void spinTheWheel()
 	{
-		RotateTransition wheelRotation1 = new RotateTransition(Duration.millis(3000), roulette_imgView);
-		
-		//Rotations
-		int decisiveLastWheelRotationAngle = (int)(Math.random()*360);
-		
-		wheelRotation1.setByAngle(3600+decisiveLastWheelRotationAngle);
-		
-		//SequentialTransition
-		SequentialTransition seqTransition = new SequentialTransition();
-		seqTransition.getChildren().addAll(wheelRotation1);
-		
-		seqTransition.play();
-		
-		/*
-		final KeyValue keyValue = new KeyValue(roulette_imgView.rotateProperty(), 360);
-		final KeyFrame keyFrame = new KeyFrame(Duration.millis(3000), keyValue);
-		final KeyValue keyValue2 = new KeyValue(roulette_imgView.rotateProperty(), 360);
-		final KeyFrame keyFrame2 = new KeyFrame(Duration.millis(1000), keyValue2);
-		
-		//Timeline
-		final Timeline timeLine = new Timeline();
-		timeLine.getKeyFrames().add(keyFrame);
-		
-		final Timeline timeLine2 = new Timeline();
-		timeLine2.getKeyFrames().add(keyFrame2);
-		
-		timeLine.play();
-		//timeLine2.play();*/
-		
+		//Wheel Rotation	
+			RotateTransition wheelRotation1 = new RotateTransition(Duration.millis(8000), roulette_imgView);
+			
+			//Rotations
+			int decisiveLastWheelRotationAngle = (int)(Math.random()*360);
+			
+			wheelRotation1.setByAngle(900+decisiveLastWheelRotationAngle);
+			
+			//SequentialTransition
+			SequentialTransition seqTransition = new SequentialTransition();
+			seqTransition.getChildren().addAll(wheelRotation1);
+			
+			seqTransition.play();
+			
+			/*
+			final KeyValue keyValue = new KeyValue(roulette_imgView.rotateProperty(), 360);
+			final KeyFrame keyFrame = new KeyFrame(Duration.millis(3000), keyValue);
+			final KeyValue keyValue2 = new KeyValue(roulette_imgView.rotateProperty(), 360);
+			final KeyFrame keyFrame2 = new KeyFrame(Duration.millis(1000), keyValue2);
+			
+			//Timeline
+			final Timeline timeLine = new Timeline();
+			timeLine.getKeyFrames().add(keyFrame);
+			
+			final Timeline timeLine2 = new Timeline();
+			timeLine2.getKeyFrames().add(keyFrame2);
+			
+			timeLine.play();
+			//timeLine2.play();*/
 	}
 	
-	/*public static void main(String[] args)
+	/*public void checkBallLocation()
 	{
-		Number num0 = new Number(0, Number.COLOR_GREEN);
-		Number num1 = new Number(1, Number.COLOR_RED);
-		Number num2 = new Number(2, Number.COLOR_BLACK);
+		//Faire tourner quelques tours, faire entrer dans la zone interne et calculer quelle zone le point central de la sphere touche
+		------from http://stackoverflow.com/questions/15013913/checking-collision-of-shapes-with-javafx------
+		
+		private void checkBounds(Rectangle block) {
+	        for (Rectangle static_bloc : rectangleArrayList)
+	            if (static_bloc != block) {
+	                if (block.getBoundsInParent().intersects(static_bloc.getBoundsInParent())) {
+	                    block.setFill(Color.BLUE);        //collision
+	                } else {
+	                    block.setFill(Color.GREEN);    //no collision
+	                }
+	            } else {
+	                block.setFill(Color.GREEN);    //no collision -same block
+	            }
+	    }
+	    
+	    Erreur corrigée
+	    {
+		    boolean collisionDetected = false;
+			  for (Shape static_bloc : nodes) {
+			    if (static_bloc != block) {
+			      static_bloc.setFill(Color.GREEN);
+			
+			      if (block.getBoundsInParent().intersects(static_bloc.getBoundsInParent())) {
+			        collisionDetected = true;
+			      }
+			    }
+			  }
+			
+			  if (collisionDetected) {
+			    block.setFill(Color.BLUE);
+			  } else {
+			    block.setFill(Color.GREEN);
+  		}
+	    
 	}*/
 }
