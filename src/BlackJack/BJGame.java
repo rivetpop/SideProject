@@ -45,7 +45,6 @@ public class BJGame {
 		dealer = pDealer;
 		player = pPlayer;
 		createDeck();
-		System.out.println(formatDeck(deck));
 	}
 	
 	public int getBet(){
@@ -152,20 +151,23 @@ public class BJGame {
 	}
 	
 	
-	public boolean checkWin(){
+	public int checkWin(ArrayList<Card> pHand){
 		
-		//if i = 0 means hand value under 21
-		//if i = 1 means hand value equal 21
-		//if i = 2 means hand value over 21
-		boolean ok = false;
+		//Under 21, i = 0
+		//Equal 21, i = 1
+		//Over 21, i = 2
+		int i = 0;
 		
-		if(countHand(playerHand) == 21){
+		if(countHand(pHand) == 21){
 			
-			ok = true;
+			i = 1;
+		}
+		else if(countHand(pHand) > 21){
+			
+			i = 2;
 		}
 		
-		
-		return ok;
+		return i;
 	}
 	
 	public int countHand(ArrayList<Card> pHand){

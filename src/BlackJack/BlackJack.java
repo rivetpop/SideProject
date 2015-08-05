@@ -24,6 +24,8 @@ public class BlackJack extends GameInterface {
 		protected BorderPane centerZone = null;
 		//public Text txtPlayerName = null;
 		public Text txtDealerName = null;
+		public Text playerHandTotal = null;
+		public Text dealerHandTotal = null;
 		public Text txtOptions = null;
 		
 		protected VBox playerZone = null;
@@ -124,16 +126,22 @@ public class BlackJack extends GameInterface {
 											 dealerCard7, dealerCard8, dealerCard9,
 											 dealerCard10);
 			
+			playerHandTotal = new Text();
+			playerHandTotal.getStyleClass().add("text");
+			
+			dealerHandTotal = new Text();
+			dealerHandTotal.getStyleClass().add("text");
+			
 			txtOptions = new Text();
 			txtOptions.getStyleClass().add("text");
 			
 			dealerZone = new VBox();
 			dealerZone.setAlignment(Pos.CENTER);
-			dealerZone.getChildren().addAll(txtDealerName, dealerCards);
+			dealerZone.getChildren().addAll(txtDealerName, dealerCards, dealerHandTotal);
 			
 			playerZone = new VBox();
 			playerZone.setAlignment(Pos.CENTER);
-			playerZone.getChildren().addAll(playerCards, super.playerInfo);
+			playerZone.getChildren().addAll(playerHandTotal, playerCards, super.playerInfo);
 			
 			
 			centerZone = new BorderPane();

@@ -153,6 +153,8 @@ public class Control  extends Application{
 				if(e.getSource() == viewWelcome.blackJackButton){
 					
 					manageBlackJack();
+					currentPlayerCard = 0;
+					currentDealerCard = 0;
 				}
 				
 				else if(e.getSource() == viewWelcome.rouletteButton){
@@ -210,48 +212,124 @@ public class Control  extends Application{
 						bjGame.hitCardPlayer();
 						viewBlackJack.playerCard11.setImage(bjGame.playerHand.get(currentPlayerCard).getImage());
 					}
-					currentPlayerCard++;
 					
-					if(bjGame.checkWin()){
-						
-						currentPlayer.setCash(bjGame.getBet()*2);
-						
-						Alert alert = new Alert(AlertType.CONFIRMATION);
-						alert.setTitle("Black Jack");
-						alert.setContentText("You won " + bjGame.getBet()*2 + "$ !");
-						
-						Optional<ButtonType> result = alert.showAndWait();
-						
-						if(result.get() == ButtonType.OK){
-							
-							manageBlackJack();
-							currentPlayerCard = 0;
-							currentDealerCard = 0;
-						}
-					}
-					
-					else if(!bjGame.checkWin()){
+					//if player hand bust 21
+					if(bjGame.checkWin(bjGame.playerHand) == 2){
 						
 						currentPlayer.setCash(currentPlayer.getCash() - bjGame.getBet());
 						
-						Alert alert = new Alert(AlertType.WARNING);
-						alert.setTitle("Black Jack");
-						alert.setContentText("You busted and lost " + bjGame.getBet() + "$ !");
+						viewBlackJack.txtOptions.setText("You busted !");
+						viewBlackJack.btnBet.setDisable(false);
+						viewBlackJack.btnHit.setDisable(true);
+						viewBlackJack.btnStand.setDisable(true);
 						
-						Optional<ButtonType> result = alert.showAndWait();
-						
-						if(result.get() == ButtonType.OK){
-							
-							manageBlackJack();
-							currentPlayerCard = 0;
-							currentDealerCard = 0;
-						}
 					}
 					
+					viewBlackJack.playerHandTotal.setText("Value: " + bjGame.countHand(bjGame.playerHand));
+					currentPlayerCard++;
 				}
 				
 				else if(e.getSource() == viewBlackJack.btnStand){
 					
+					viewBlackJack.dealerCard2.setImage(bjGame.dealerHand.get(currentDealerCard).getImage());
+					currentDealerCard++;
+					
+					//while dealer hand under 17 , draw card
+					while(bjGame.countHand(bjGame.dealerHand) < 17){
+						
+						if(viewBlackJack.dealerCard3.getImage() == null){
+							
+							bjGame.hitCardDealer();
+							viewBlackJack.dealerCard3.setImage(bjGame.dealerHand.get(currentDealerCard).getImage());
+						}
+						
+						else if(viewBlackJack.dealerCard4.getImage() == null){
+							
+							bjGame.hitCardDealer();
+							viewBlackJack.dealerCard4.setImage(bjGame.dealerHand.get(currentDealerCard).getImage());
+						}
+						
+						else if(viewBlackJack.dealerCard5.getImage() == null){
+							
+							bjGame.hitCardDealer();
+							viewBlackJack.dealerCard5.setImage(bjGame.dealerHand.get(currentDealerCard).getImage());
+						}
+						
+						else if(viewBlackJack.dealerCard6.getImage() == null){
+							
+							bjGame.hitCardDealer();
+							viewBlackJack.dealerCard6.setImage(bjGame.dealerHand.get(currentDealerCard).getImage());
+						}
+						
+						else if(viewBlackJack.dealerCard7.getImage() == null){
+							
+							bjGame.hitCardDealer();
+							viewBlackJack.dealerCard7.setImage(bjGame.dealerHand.get(currentDealerCard).getImage());
+						}
+						
+						else if(viewBlackJack.dealerCard8.getImage() == null){
+							
+							bjGame.hitCardDealer();
+							viewBlackJack.dealerCard8.setImage(bjGame.dealerHand.get(currentDealerCard).getImage());
+						}
+						
+						else if(viewBlackJack.dealerCard9.getImage() == null){
+							
+							bjGame.hitCardDealer();
+							viewBlackJack.dealerCard9.setImage(bjGame.dealerHand.get(currentDealerCard).getImage());
+						}
+						
+						else if(viewBlackJack.dealerCard10.getImage() == null){
+							
+							bjGame.hitCardDealer();
+							viewBlackJack.dealerCard10.setImage(bjGame.dealerHand.get(currentDealerCard).getImage());
+						}
+						
+						viewBlackJack.dealerHandTotal.setText("Value: " + bjGame.countHand(bjGame.dealerHand));
+						currentDealerCard++;
+					}
+					
+					//if dealer hand bust 21 , player gain bet
+					if(bjGame.checkWin(bjGame.dealerHand) == 2){
+						
+						currentPlayer.setCash(currentPlayer.getCash() + bjGame.getBet() * 2);
+						
+						viewBlackJack.txtOptions.setText("You win " + bjGame.getBet() * 2 + " !");
+						viewBlackJack.btnBet.setDisable(false);
+						viewBlackJack.btnHit.setDisable(true);
+						viewBlackJack.btnStand.setDisable(true);
+					}
+					
+					//if player hand stronger than dealer hand , player gain bet
+					else if(bjGame.countHand(bjGame.playerHand) > bjGame.countHand(bjGame.dealerHand)){
+						
+						currentPlayer.setCash(currentPlayer.getCash() + bjGame.getBet() * 2);
+						
+						viewBlackJack.txtOptions.setText("You win " + bjGame.getBet() * 2 + " !");
+						viewBlackJack.btnBet.setDisable(false);
+						viewBlackJack.btnHit.setDisable(true);
+						viewBlackJack.btnStand.setDisable(true);
+					}
+					
+					//if player and dealer hands are same value
+					else if(bjGame.countHand(bjGame.playerHand) == bjGame.countHand(bjGame.dealerHand)){
+						
+						viewBlackJack.txtOptions.setText("Tie !");
+						viewBlackJack.btnBet.setDisable(false);
+						viewBlackJack.btnHit.setDisable(true);
+						viewBlackJack.btnStand.setDisable(true);
+					}
+					
+					//if player hand lower than dealer hand, player lose bet
+					else if(bjGame.countHand(bjGame.playerHand) < bjGame.countHand(bjGame.dealerHand)){
+					
+						currentPlayer.setCash(currentPlayer.getCash() - bjGame.getBet());
+						
+						viewBlackJack.txtOptions.setText("You lost " + bjGame.getBet() + " !");
+						viewBlackJack.btnBet.setDisable(false);
+						viewBlackJack.btnHit.setDisable(true);
+						viewBlackJack.btnStand.setDisable(true);
+					}
 				}
 				
 				else if(e.getSource() == viewBlackJack.btnDraw){
@@ -267,6 +345,7 @@ public class Control  extends Application{
 					currentPlayerCard++;
 					viewBlackJack.playerCard2.setImage(bjGame.playerHand.get(currentPlayerCard).getImage());
 					currentPlayerCard++;
+					viewBlackJack.playerHandTotal.setText("Value: " + bjGame.countHand(bjGame.playerHand));
 					
 					//Show dealer cards on interface
 					viewBlackJack.dealerCard1.setImage(bjGame.dealerHand.get(currentDealerCard).getImage());
@@ -278,38 +357,34 @@ public class Control  extends Application{
 					//Disable draw button,
 					viewBlackJack.btnDraw.setDisable(true);
 					
-					
-					if(bjGame.checkWin()){
+					System.out.println(bjGame.countHand(bjGame.playerHand));
+					if(bjGame.checkWin(bjGame.playerHand) == 1){
 						
-						currentPlayer.setCash(currentPlayer.getCash() + (bjGame.getBet()*2));
-						
-						Alert alert = new Alert(AlertType.CONFIRMATION);
-						alert.setTitle("Black Jack");
-						alert.setContentText("You won " + bjGame.getBet()*2 + "$ !");
-						
-						Optional<ButtonType> result = alert.showAndWait();
-						
-						if(result.get() == ButtonType.OK){
+						//Enable stand button only
+						viewBlackJack.btnStand.setDisable(false);
 							
-							manageBlackJack();
-							currentPlayerCard = 0;
-							currentDealerCard = 0;
-						}
-						
 					}
+						
 					else{
 						
 						//Enable stand and hit buttons
 						viewBlackJack.btnHit.setDisable(false);
 						viewBlackJack.btnStand.setDisable(false);
 						
-					}
+					}	
 					
-					System.out.println(bjGame.countHand(bjGame.playerHand));
 				}
 				
 				else if(e.getSource() == viewBlackJack.btnBet){
 					
+					if(bjGame.playerHand != null){
+						
+						//Rollback display and current cards 
+						manageBlackJack();
+						currentPlayerCard = 0;
+						currentDealerCard = 0;
+					}
+					//Player place bet for current round
 					bjGame.placeBet();
 					viewBlackJack.btnBet.setDisable(true);
 					viewBlackJack.txtOptions.setText("Your current bet : " + bjGame.getBet());
