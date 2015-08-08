@@ -26,6 +26,8 @@ import javafx.scene.control.MenuBar;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.TextArea;
 import javafx.scene.effect.BlendMode;
+import javafx.scene.effect.Bloom;
+import javafx.scene.effect.Lighting;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.Background;
@@ -41,11 +43,18 @@ import javafx.scene.layout.RowConstraints;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
+import javafx.scene.shape.ArcTo;
+import javafx.scene.shape.Circle;
 import javafx.scene.shape.Ellipse;
 import javafx.scene.shape.Line;
+import javafx.scene.shape.LineTo;
+import javafx.scene.shape.MoveTo;
+import javafx.scene.shape.Path;
 import javafx.scene.shape.Polygon;
 import javafx.scene.shape.Rectangle;
+import javafx.scene.shape.Shape;
 import javafx.scene.shape.Sphere;
+import javafx.scene.shape.StrokeLineCap;
 import javafx.scene.shape.StrokeType;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
@@ -53,6 +62,7 @@ import javafx.scene.text.Text;
 import javafx.scene.text.TextAlignment;
 import javafx.scene.text.TextBoundsType;
 import javafx.util.Duration;
+import javafx.scene.effect.Light;
 
 public class Roulette extends GameInterface
 {
@@ -69,20 +79,27 @@ public class Roulette extends GameInterface
 	private StackPane rouletteBallStack = null;
 	
 	//Center point of the ball (see setBall() function)
-	private Line ballCenter = null;
+	private Rectangle ballCenter = null;
 	
-	//Constants for the layouts
-		//Constants
-			static final int TABLE_MAIN_CELL_WIDTH = 40;
-			static final int TABLE_MAIN_CELL_HEIGHT = 55;
-			static final int TABLE_MAIN_CELL_GAP = 2;
+	//Roulette ball
+	private Circle rouletteBall = null;
 	
-	//ImageView for the roulette
+	//Roulette wheel
 	private ImageView roulette_imgView = null;
+	private Pane rouletteWheel = null;
+	static final int INNERCIRCLERADIUS = 120;//Used to calculate the shape of the pockets
+	public static final int OUTERCIRCLERADIUS = 215;
+	static final int OUTERCIRCLESTROKE = 30;
+		
+	//Constants for the layouts
+	static final int TABLE_MAIN_CELL_WIDTH = 40;
+	static final int TABLE_MAIN_CELL_HEIGHT = 55;
+	static final int TABLE_MAIN_CELL_GAP = 2;
+			
 	
 	//ArrayList grouping the numbers by color
-	static final ArrayList blackNumbersList = new ArrayList(Arrays.asList(2,6,8,10,11,13,15,17,20,24,26,28,29,31,33,35));
-	static final ArrayList redNumbersList = new ArrayList(Arrays.asList(1,3,5,7,9,12,14,16,21,23,25,27,30,32,34,36));
+		static final ArrayList blackNumbersList = new ArrayList(Arrays.asList(2,6,8,10,11,13,15,17,20,24,26,28,29,31,33,35));
+		static final ArrayList redNumbersList = new ArrayList(Arrays.asList(1,3,5,7,9,12,14,16,21,23,25,27,30,32,34,36));
 	
 	//Table Layout
 		//Pane containing the different table zones
@@ -109,8 +126,15 @@ public class Roulette extends GameInterface
 		setTable();
 		setButtons();
 		setMessageZone("Click on the table to place a bet!");
+		checkBallLocation();
 		
-		root.getChildren().addAll(msgZone, super.playerInfo, super.upperZone, roulette_imgView, rouletteBallStack, tableLayout, buttonsGroup);
+		Line test = new Line (0.0, 0.0, 0.0, 125.0);
+		test.setStrokeWidth(5);
+		test.setStroke(Color.BLUE);
+		test.setTranslateX(250);
+		test.setTranslateY(100);
+		
+		root.getChildren().addAll(msgZone, super.playerInfo, super.upperZone, rouletteBallStack, tableLayout, buttonsGroup, rouletteWheel, test);
 		
 		super.playerInfo.setTranslateX(500);
 		super.playerInfo.setTranslateY(15);
@@ -120,6 +144,10 @@ public class Roulette extends GameInterface
 		
 		msgZone.setTranslateX(475);
 		msgZone.setTranslateY(130);
+		
+		rouletteWheel.setTranslateX(250);
+		rouletteWheel.setTranslateY(250);
+		rouletteWheel.setOpacity(0.5);
 		
 		root.setBackground(new Background(new BackgroundFill(Color.GREEN, CornerRadii.EMPTY, Insets.EMPTY)));
 		scene.getStylesheets().add(getClass().getResource("style.css").toExternalForm());
@@ -132,26 +160,92 @@ public class Roulette extends GameInterface
 			roulette_imgView = new ImageView(roulette_img);
 			roulette_imgView.setTranslateX(20);
 			roulette_imgView.setTranslateY(30);
+			
+		//Wheel (made of Inner Circle, numbered and colored pockets(see Pocket class), and an outer circle 
+			//Inner circle
+				Circle innerCircle = new Circle(INNERCIRCLERADIUS);
+				innerCircle.setFill(Color.GOLDENROD);
+				Light.Point light = new Light.Point();
+				light.setX(150);
+				 light.setY(150);
+				 light.setZ(150);
+				Lighting innerWheelLighting = new Lighting();
+				innerWheelLighting.setLight(light);
+				
+				innerWheelLighting.setSurfaceScale(5.0);
+				innerCircle.setEffect(innerWheelLighting);
+				
+			//Outer circle
+				Circle outerCircle = new Circle(OUTERCIRCLERADIUS);
+				outerCircle.setOpacity(1);
+				outerCircle.setStrokeWidth(OUTERCIRCLESTROKE);
+				outerCircle.setStroke(Color.DARKRED);
+				outerCircle.setStyle("fx-background-color: linear-gradient(#686868 0%, #232723 25%, #373837 75%, #757575 100%), linear-gradient(#020b02, #3a3a3a), linear-gradient(#9d9e9d 0%, #6b6a6b 20%, #343534 80%, #242424 100%), linear-gradient(#8a8a8a 0%, #6b6a6b 20%, #343534 80%, #262626 100%), linear-gradient(#777777 0%, #606060 50%, #505250 51%, #2a2b2a 100%)");
+				
+			//Pockets objects
+				Path pocket1Path = createPocketPath(1, Color.RED);
+				
+			
+		rouletteWheel = new Pane();
+		rouletteWheel.getChildren().addAll(outerCircle, innerCircle);
+	}
+	
+	private Path createPocketPath(int number, Color color)
+	{
+		Path path = new Path();
+		
+		MoveTo moveTo = new MoveTo();
+		moveTo.setX(0.0);
+		moveTo.setY(0.0);
+		
+		double CircleAngle_Rad = 2*Math.PI; //The angle of a circle, in radians
+		double angle = CircleAngle_Rad/38.0/2.0; //Full circle angle (2*PI) divised by the number of roulette pockets(38), divised by 2 (to make trigonometric calculations by using right triangles)
+		
+		ArcTo arcTo = new ArcTo();
+		arcTo.setX(2*(Math.sin(angle)*INNERCIRCLERADIUS)); //x calculation from moveTo
+		arcTo.setY(0);
+		arcTo.setRadiusX(INNERCIRCLERADIUS);
+		arcTo.setRadiusY(INNERCIRCLERADIUS);
+		arcTo.setSweepFlag(true);
+		
+		LineTo lineTo = new LineTo();
+		lineTo.setX(arcTo.getX() + (OUTERCIRCLERADIUS - INNERCIRCLERADIUS)*(Math.sin(angle)));
+		lineTo.setY(arcTo.getY() - (OUTERCIRCLERADIUS - INNERCIRCLERADIUS)*(Math.cos(angle)));
+		
+		ArcTo arcTo2 = new ArcTo();
+		arcTo2.setX(lineTo.getX() - 2*(Math.sin(angle)*OUTERCIRCLERADIUS)); //x calculation from moveTo
+		arcTo2.setY(lineTo.getY());
+		arcTo2.setRadiusX(OUTERCIRCLERADIUS);
+		arcTo2.setRadiusY(OUTERCIRCLERADIUS);
+		
+		LineTo lineTo2 = new LineTo();
+		lineTo2.setX(0);
+		lineTo2.setY(0);
+		
+		path.getElements().addAll(moveTo, arcTo, lineTo, arcTo2, lineTo2);
+		path.setFill(color);
+		path.setStroke(Color.WHITE);
+		path.setStrokeWidth(2);
+		
+		Label numberLabel = new Label();
+		numberLabel.setText(Integer.toString(number));
+		
+		return path;
 	}
 	
 	private void setBall()
 	{
-		//Ball (Sphere)
-			Sphere rouletteBall = new Sphere(10);
+		//Ball (Circle)
+		rouletteBall = new Circle(10, Color.WHITESMOKE);
 	
-		//Center point, made of a 1 pixel line
-			ballCenter = new Line(0.0, 0.0, 5.0, 0.0);
-			ballCenter.prefWidth(1.0);
-			ballCenter.setTranslateX(0.5);
-			ballCenter.setTranslateY(0.5);
-			ballCenter.setStrokeWidth(1);
-			http://stackoverflow.com/questions/9779693/javafx-graphics-blurred-or-anti-aliased-no-effects-used
-			
+		//Center point, made of a 1 pixel rectangle
+		ballCenter = new Rectangle(1, 1, Color.RED);
+				
 		//A stackpane to automatically center the ballCenter in the middle of the ball
-			rouletteBallStack = new StackPane();
-			rouletteBallStack.getChildren().addAll(rouletteBall, ballCenter);
-			rouletteBallStack.setTranslateX(250);
-			rouletteBallStack.setTranslateY(35);
+		rouletteBallStack = new StackPane();
+		rouletteBallStack.getChildren().addAll( rouletteBall, ballCenter);
+		rouletteBallStack.setTranslateX(250);
+		rouletteBallStack.setTranslateY(20);
 	}
 	
 	private void setTable()
@@ -206,13 +300,13 @@ public class Roulette extends GameInterface
 			tableLeftZone.getChildren().addAll(stack_00zone,stack_0zone);
 			stack_0zone.setTranslateY(-(int)1.5*TABLE_MAIN_CELL_GAP);//O bet zone translation to fill a gap between it and the 00 zone
 		
+			
 		//Create center betting zones. 
 			
 			/*TableCenterZone - Top (individual number betting zone) :The items contained in 
 			 * this zone are made of a Text, inside an Ellipse(red or black),inside a Rectangle. 
 			 * The rectangle's purpose is to fill the grid cell as a colored 
 				background.*/
-			
 			
 				tableCenterZone = new GridPane();
 				
@@ -425,19 +519,19 @@ public class Roulette extends GameInterface
 			tableLeftZone.setTranslateX(leftZoneTranslateValue);
 		
 		//Set the position of the tableLayout Pane
-			tableLayout.setTranslateX(150);
-			tableLayout.setTranslateY(520);
+		tableLayout.setTranslateX(150);
+		tableLayout.setTranslateY(520);
 			
 		//Set the border of the table. Made of a white background with gaps between the cells.
-			tableCenterZone.setBackground(new Background(new BackgroundFill(Color.WHITE, CornerRadii.EMPTY, Insets.EMPTY)));
-			tableCenterZone.setVgap(TABLE_MAIN_CELL_GAP);
-			tableCenterZone.setHgap(TABLE_MAIN_CELL_GAP);
-			tableCenterZone.setPadding(new Insets(TABLE_MAIN_CELL_GAP));
-			
-			tableRightZone.setBackground(new Background(new BackgroundFill(Color.WHITE, CornerRadii.EMPTY, Insets.EMPTY)));
-			tableRightZone.setVgap(TABLE_MAIN_CELL_GAP);
-			tableRightZone.setHgap(TABLE_MAIN_CELL_GAP);
-			tableRightZone.setPadding(new Insets(TABLE_MAIN_CELL_GAP, TABLE_MAIN_CELL_GAP, TABLE_MAIN_CELL_GAP, 0));
+		tableCenterZone.setBackground(new Background(new BackgroundFill(Color.WHITE, CornerRadii.EMPTY, Insets.EMPTY)));
+		tableCenterZone.setVgap(TABLE_MAIN_CELL_GAP);
+		tableCenterZone.setHgap(TABLE_MAIN_CELL_GAP);
+		tableCenterZone.setPadding(new Insets(TABLE_MAIN_CELL_GAP));
+		
+		tableRightZone.setBackground(new Background(new BackgroundFill(Color.WHITE, CornerRadii.EMPTY, Insets.EMPTY)));
+		tableRightZone.setVgap(TABLE_MAIN_CELL_GAP);
+		tableRightZone.setHgap(TABLE_MAIN_CELL_GAP);
+		tableRightZone.setPadding(new Insets(TABLE_MAIN_CELL_GAP, TABLE_MAIN_CELL_GAP, TABLE_MAIN_CELL_GAP, 0));
 	}
 	
 	private void setButtons()
@@ -520,42 +614,16 @@ public class Roulette extends GameInterface
 			//timeLine2.play();*/
 	}
 	
-	/*public void checkBallLocation()
+	public void checkBallLocation()
 	{
-		//Faire tourner quelques tours, faire entrer dans la zone interne et calculer quelle zone le point central de la sphere touche
-		------from http://stackoverflow.com/questions/15013913/checking-collision-of-shapes-with-javafx------
-		
-		private void checkBounds(Rectangle block) {
-	        for (Rectangle static_bloc : rectangleArrayList)
-	            if (static_bloc != block) {
-	                if (block.getBoundsInParent().intersects(static_bloc.getBoundsInParent())) {
-	                    block.setFill(Color.BLUE);        //collision
-	                } else {
-	                    block.setFill(Color.GREEN);    //no collision
-	                }
-	            } else {
-	                block.setFill(Color.GREEN);    //no collision -same block
-	            }
-	    }
-	    
-	    Erreur corrigée
-	    {
-		    boolean collisionDetected = false;
-			  for (Shape static_bloc : nodes) {
-			    if (static_bloc != block) {
-			      static_bloc.setFill(Color.GREEN);
-			
-			      if (block.getBoundsInParent().intersects(static_bloc.getBoundsInParent())) {
-			        collisionDetected = true;
-			      }
-			    }
-			  }
-			
-			  if (collisionDetected) {
-			    block.setFill(Color.BLUE);
-			  } else {
-			    block.setFill(Color.GREEN);
-  		}
-	    
-	}*/
+		  /*  boolean ballCollision = false;
+		    Shape shapeTemp = null;
+		    shapeTemp = (Shape.intersect(ballCenter, rouletteBall));
+		    
+		   if (shapeTemp.getBoundsInLocal().getWidth() != -1) 
+		    {
+		    	ballCollision = true;
+		    }
+	     */  
+	}
 }
