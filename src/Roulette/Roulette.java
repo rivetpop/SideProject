@@ -46,6 +46,7 @@ import javafx.scene.paint.Color;
 import javafx.scene.shape.ArcTo;
 import javafx.scene.shape.Circle;
 import javafx.scene.shape.Ellipse;
+import javafx.scene.shape.FillRule;
 import javafx.scene.shape.Line;
 import javafx.scene.shape.LineTo;
 import javafx.scene.shape.MoveTo;
@@ -88,8 +89,91 @@ public class Roulette extends GameInterface
 	private ImageView roulette_imgView = null;
 	private Pane rouletteWheel = null;
 	static final int INNERCIRCLERADIUS = 120;//Used to calculate the shape of the pockets
-	public static final int OUTERCIRCLERADIUS = 215;
+	public static final int OUTERCIRCLERADIUS = 180;//Used to calculate the shape of the pockets
 	static final int OUTERCIRCLESTROKE = 30;
+	
+		//Pane containing all the pockets pane
+		private Pane pocketsPane = null;
+	
+		//Graphic wheel pockets (each made of a path and a label in a pane (see function createPocketPath())
+		//The paths are made global variable because they are needed for collision(intersect) test with the ball
+		Path pocket00Path = null;
+		Path pocket0Path = null;
+		Path pocket1Path = null;
+		Path pocket2Path = null;
+		Path pocket3Path = null;
+		Path pocket4Path = null;
+		Path pocket5Path = null;
+		Path pocket6Path = null;
+		Path pocket7Path = null;
+		Path pocket8Path = null;
+		Path pocket9Path = null;
+		Path pocket10Path = null;
+		Path pocket11Path = null;
+		Path pocket12Path = null;
+		Path pocket13Path = null;
+		Path pocket14Path = null;
+		Path pocket15Path = null;
+		Path pocket16Path = null;
+		Path pocket17Path = null;
+		Path pocket18Path = null;
+		Path pocket19Path = null;
+		Path pocket20Path = null;
+		Path pocket21Path = null;
+		Path pocket22Path = null;
+		Path pocket23Path = null;
+		Path pocket24Path = null;
+		Path pocket25Path = null;
+		Path pocket26Path = null;
+		Path pocket27Path = null;
+		Path pocket28Path = null;
+		Path pocket29Path = null;
+		Path pocket30Path = null;
+		Path pocket31Path = null;
+		Path pocket32Path = null;
+		Path pocket33Path = null;
+		Path pocket34Path = null;
+		Path pocket35Path = null;
+		Path pocket36Path = null;
+		
+		StackPane pocket00Pane = null;
+		StackPane pocket0Pane = null;
+		StackPane pocket1Pane = null;
+		StackPane pocket2Pane = null;
+		StackPane pocket3Pane = null;
+		StackPane pocket4Pane = null;
+		StackPane pocket5Pane = null;
+		StackPane pocket6Pane = null;
+		StackPane pocket7Pane = null;
+		StackPane pocket8Pane = null;
+		StackPane pocket9Pane = null;
+		StackPane pocket10Pane = null;
+		StackPane pocket11Pane = null;
+		StackPane pocket12Pane = null;
+		StackPane pocket13Pane = null;
+		StackPane pocket14Pane = null;
+		StackPane pocket15Pane = null;
+		StackPane pocket16Pane = null;
+		StackPane pocket17Pane = null;
+		StackPane pocket18Pane = null;
+		StackPane pocket19Pane = null;
+		StackPane pocket20Pane = null;
+		StackPane pocket21Pane = null;
+		StackPane pocket22Pane = null;
+		StackPane pocket23Pane = null;
+		StackPane pocket24Pane = null;
+		StackPane pocket25Pane = null;
+		StackPane pocket26Pane = null;
+		StackPane pocket27Pane = null;
+		StackPane pocket28Pane = null;
+		StackPane pocket29Pane = null;
+		StackPane pocket30Pane = null;
+		StackPane pocket31Pane = null;
+		StackPane pocket32Pane = null;
+		StackPane pocket33Pane = null;
+		StackPane pocket34Pane = null;
+		StackPane pocket35Pane = null;
+		StackPane pocket36Pane = null;		
 		
 	//Constants for the layouts
 	static final int TABLE_MAIN_CELL_WIDTH = 40;
@@ -98,8 +182,8 @@ public class Roulette extends GameInterface
 			
 	
 	//ArrayList grouping the numbers by color
-		static final ArrayList blackNumbersList = new ArrayList(Arrays.asList(2,6,8,10,11,13,15,17,20,24,26,28,29,31,33,35));
-		static final ArrayList redNumbersList = new ArrayList(Arrays.asList(1,3,5,7,9,12,14,16,21,23,25,27,30,32,34,36));
+		static final ArrayList blackNumbersList = new ArrayList(Arrays.asList(2,4,6,8,10,11,13,15,17,20,22,24,26,28,29,31,33,35));
+		static final ArrayList redNumbersList = new ArrayList(Arrays.asList(1,3,5,7,9,12,14,16,18,19,21,23,25,27,30,32,34,36));
 	
 	//Table Layout
 		//Pane containing the different table zones
@@ -119,6 +203,7 @@ public class Roulette extends GameInterface
 		root = new Pane();
 		scene = new Scene(root, 800,800);
 		
+		LogicalRoulette.createPocketObjects();//create the pockets objects, used in setWheel()
 		createMenu();
 		createPlayerInfo();
 		setWheel();
@@ -128,13 +213,13 @@ public class Roulette extends GameInterface
 		setMessageZone("Click on the table to place a bet!");
 		checkBallLocation();
 		
-		Line test = new Line (0.0, 0.0, 0.0, 125.0);
+		/*Line test = new Line (0.0, 0.0, 0.0, 125.0);
 		test.setStrokeWidth(5);
 		test.setStroke(Color.BLUE);
 		test.setTranslateX(250);
-		test.setTranslateY(100);
+		test.setTranslateY(100);*/
 		
-		root.getChildren().addAll(msgZone, super.playerInfo, super.upperZone, rouletteBallStack, tableLayout, buttonsGroup, rouletteWheel, test);
+		root.getChildren().addAll(msgZone, super.playerInfo, super.upperZone, rouletteBallStack, tableLayout, buttonsGroup, rouletteWheel, pocketsPane);
 		
 		super.playerInfo.setTranslateX(500);
 		super.playerInfo.setTranslateY(15);
@@ -147,7 +232,7 @@ public class Roulette extends GameInterface
 		
 		rouletteWheel.setTranslateX(250);
 		rouletteWheel.setTranslateY(250);
-		rouletteWheel.setOpacity(0.5);
+		//rouletteWheel.setOpacity(0.5);
 		
 		root.setBackground(new Background(new BackgroundFill(Color.GREEN, CornerRadii.EMPTY, Insets.EMPTY)));
 		scene.getStylesheets().add(getClass().getResource("style.css").toExternalForm());
@@ -173,64 +258,95 @@ public class Roulette extends GameInterface
 				innerWheelLighting.setLight(light);
 				
 				innerWheelLighting.setSurfaceScale(5.0);
-				innerCircle.setEffect(innerWheelLighting);
+				//innerCircle.setEffect(innerWheelLighting);
 				
 			//Outer circle
 				Circle outerCircle = new Circle(OUTERCIRCLERADIUS);
 				outerCircle.setOpacity(1);
 				outerCircle.setStrokeWidth(OUTERCIRCLESTROKE);
+				outerCircle.setStrokeType(StrokeType.OUTSIDE);
 				outerCircle.setStroke(Color.DARKRED);
 				outerCircle.setStyle("fx-background-color: linear-gradient(#686868 0%, #232723 25%, #373837 75%, #757575 100%), linear-gradient(#020b02, #3a3a3a), linear-gradient(#9d9e9d 0%, #6b6a6b 20%, #343534 80%, #242424 100%), linear-gradient(#8a8a8a 0%, #6b6a6b 20%, #343534 80%, #262626 100%), linear-gradient(#777777 0%, #606060 50%, #505250 51%, #2a2b2a 100%)");
 				
-			//Pockets objects
-				Path pocket1Path = createPocketPath(1, Color.RED);
+			//Graphic Pockets
+				 /*pocket00Pane = createPocketPane(00, Color.GREEN);
+				 pocket0Pane = createPocketPane(0, Color.GREEN);
+				 pocket1Pane = createPocketPane(1, Color.RED);
+				 pocket2Pane = createPocketPane(2, Color.BLACK);
+				 pocket3Pane = createPocketPane(3, Color.RED);
+				 pocket4Pane = createPocketPane(4, Color.BLACK);
+				 pocket5Pane = createPocketPane(5, Color.RED);		
+				 pocket6Pane = createPocketPane(6, Color.BLACK);		
+				 pocket7Pane = createPocketPane(7, Color.RED);
+				 pocket8Pane = createPocketPane(8, Color.BLACK);
+				 pocket9Pane = createPocketPane(9, Color.RED);
+				 pocket10Pane = createPocketPane(10, Color.BLACK);
+				 pocket11Pane = createPocketPane(11, Color.BLACK);
+				 pocket12Pane = createPocketPane(12, Color.RED);
+				 pocket13Pane = createPocketPane(13, Color.BLACK);
+				 pocket14Pane = createPocketPane(14, Color.RED);
+				 pocket15Pane = createPocketPane(15, Color.BLACK);
+				 pocket16Pane = createPocketPane(16, Color.RED);
+				 pocket17Pane = createPocketPane(17, Color.BLACK);
+				 pocket18Pane = createPocketPane(18, Color.RED);
+				 pocket19Pane = createPocketPane(19, Color.RED);
+				 pocket20Pane = createPocketPane(20, Color.BLACK);
+				 pocket21Pane = createPocketPane(21, Color.RED);
+				 pocket22Pane = createPocketPane(22, Color.BLACK);
+				 pocket23Pane = createPocketPane(23, Color.RED);
+				 pocket24Pane = createPocketPane(24, Color.BLACK);
+				 pocket25Pane = createPocketPane(25, Color.RED);
+				 pocket26Pane = createPocketPane(26, Color.BLACK);
+				 pocket27Pane = createPocketPane(27, Color.RED);
+				 pocket28Pane = createPocketPane(28, Color.BLACK);
+				 pocket29Pane = createPocketPane(29, Color.BLACK);
+				 pocket30Pane = createPocketPane(30, Color.RED);
+				 pocket31Pane = createPocketPane(31, Color.BLACK);
+				 pocket32Pane = createPocketPane(32, Color.RED);
+				 pocket33Pane = createPocketPane(33, Color.BLACK);
+				 pocket34Pane = createPocketPane(34, Color.RED);
+				 pocket35Pane = createPocketPane(35, Color.BLACK);
+				 pocket36Pane = createPocketPane(36, Color.RED);*/
 				
-			
+				//Paths
+				pocket00Path = LogicalRoulette.pocket00.getPath();
+				pocket00Path.setFill(Color.GREEN);
+				
+				pocket27Path = LogicalRoulette.pocket27.getPath();
+				pocket27Path.setFill(Color.RED);
+				
+				//Labels
+				Label pocket00Label = new Label();
+				pocket00Label.setText("00");
+				pocket00Label.setTextFill(Color.WHITE);
+				pocket00Label.setTranslateY(-0.3*(OUTERCIRCLERADIUS-INNERCIRCLERADIUS));
+					
+				Label pocket27Label = new Label();
+				pocket27Label.setText("27");
+				pocket27Label.setTextFill(Color.WHITE);
+				pocket27Label.setTranslateY(-0.3*(OUTERCIRCLERADIUS-INNERCIRCLERADIUS));
+				
+				//Individual pockets Panes
+				pocket00Pane = new StackPane();
+				pocket00Pane.getChildren().addAll(pocket00Path, pocket00Label);
+				pocket00Pane.setTranslateX(235);
+				pocket00Pane.setTranslateY(70);
+				
+				pocket27Pane = new StackPane();
+				pocket27Pane.getChildren().addAll(pocket27Path, pocket27Label);
+				pocket27Pane.setTranslateX(235);
+				pocket27Pane.setTranslateY(70);
+				pocket27Pane.setRotate(INNERCIRCLERADIUS/38);
+				
+				//Pockets main pane
+				pocketsPane = new Pane();
+				pocketsPane.getChildren().addAll(pocket00Pane, pocket27Pane);
+				//pocketsPane.setTranslateX(235);
+				//pocketsPane.setTranslateY(70);
+				
+		
 		rouletteWheel = new Pane();
-		rouletteWheel.getChildren().addAll(outerCircle, innerCircle);
-	}
-	
-	private Path createPocketPath(int number, Color color)
-	{
-		Path path = new Path();
-		
-		MoveTo moveTo = new MoveTo();
-		moveTo.setX(0.0);
-		moveTo.setY(0.0);
-		
-		double CircleAngle_Rad = 2*Math.PI; //The angle of a circle, in radians
-		double angle = CircleAngle_Rad/38.0/2.0; //Full circle angle (2*PI) divised by the number of roulette pockets(38), divised by 2 (to make trigonometric calculations by using right triangles)
-		
-		ArcTo arcTo = new ArcTo();
-		arcTo.setX(2*(Math.sin(angle)*INNERCIRCLERADIUS)); //x calculation from moveTo
-		arcTo.setY(0);
-		arcTo.setRadiusX(INNERCIRCLERADIUS);
-		arcTo.setRadiusY(INNERCIRCLERADIUS);
-		arcTo.setSweepFlag(true);
-		
-		LineTo lineTo = new LineTo();
-		lineTo.setX(arcTo.getX() + (OUTERCIRCLERADIUS - INNERCIRCLERADIUS)*(Math.sin(angle)));
-		lineTo.setY(arcTo.getY() - (OUTERCIRCLERADIUS - INNERCIRCLERADIUS)*(Math.cos(angle)));
-		
-		ArcTo arcTo2 = new ArcTo();
-		arcTo2.setX(lineTo.getX() - 2*(Math.sin(angle)*OUTERCIRCLERADIUS)); //x calculation from moveTo
-		arcTo2.setY(lineTo.getY());
-		arcTo2.setRadiusX(OUTERCIRCLERADIUS);
-		arcTo2.setRadiusY(OUTERCIRCLERADIUS);
-		
-		LineTo lineTo2 = new LineTo();
-		lineTo2.setX(0);
-		lineTo2.setY(0);
-		
-		path.getElements().addAll(moveTo, arcTo, lineTo, arcTo2, lineTo2);
-		path.setFill(color);
-		path.setStroke(Color.WHITE);
-		path.setStrokeWidth(2);
-		
-		Label numberLabel = new Label();
-		numberLabel.setText(Integer.toString(number));
-		
-		return path;
+		rouletteWheel.getChildren().addAll(outerCircle, innerCircle);//**********AJOUTER LE PANE DES POCKETS
 	}
 	
 	private void setBall()
