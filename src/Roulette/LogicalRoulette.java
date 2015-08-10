@@ -6,6 +6,7 @@ import javafx.scene.shape.ArcTo;
 import javafx.scene.shape.LineTo;
 import javafx.scene.shape.MoveTo;
 import javafx.scene.shape.Path;
+import javafx.scene.shape.StrokeLineCap;
 import javafx.scene.shape.StrokeType;
 
 public class LogicalRoulette 
@@ -13,8 +14,8 @@ public class LogicalRoulette
 	Roulette rouletteView = new Roulette();
 	Pocket pock1 = null;
 	
-	static int INNERCIRCLERADIUS = Roulette.INNERCIRCLERADIUS;
-	static int OUTERCIRCLERADIUS = Roulette.OUTERCIRCLERADIUS;
+	static double INNERCIRCLERADIUS = Roulette.INNERCIRCLERADIUS;
+	static double OUTERCIRCLERADIUS = Roulette.OUTERCIRCLERADIUS;
 	
 	static Pocket pocket00 = null;
 	static Pocket pocket0 = null;
@@ -170,7 +171,7 @@ public class LogicalRoulette
 			path.getElements().addAll(moveTo, arcTo, lineTo, arcTo2, lineTo2);
 			path.setStroke(Color.WHITE);
 			path.setStrokeWidth(2);
-			path.setStrokeType(StrokeType.INSIDE);
+			path.setStrokeLineCap(StrokeLineCap.BUTT);
 			
 			return path;
 	}

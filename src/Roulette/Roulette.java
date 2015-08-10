@@ -43,6 +43,7 @@ import javafx.scene.layout.RowConstraints;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
+import javafx.scene.paint.Paint;
 import javafx.scene.shape.ArcTo;
 import javafx.scene.shape.Circle;
 import javafx.scene.shape.Ellipse;
@@ -62,6 +63,7 @@ import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextAlignment;
 import javafx.scene.text.TextBoundsType;
+import javafx.scene.transform.Rotate;
 import javafx.util.Duration;
 import javafx.scene.effect.Light;
 
@@ -86,11 +88,12 @@ public class Roulette extends GameInterface
 	private Circle rouletteBall = null;
 	
 	//Roulette wheel
-	private ImageView roulette_imgView = null;
-	private Pane rouletteWheel = null;
-	static final int INNERCIRCLERADIUS = 120;//Used to calculate the shape of the pockets
-	public static final int OUTERCIRCLERADIUS = 180;//Used to calculate the shape of the pockets
-	static final int OUTERCIRCLESTROKE = 30;
+	private StackPane rouletteWheel = null;
+	static final double INNERCIRCLERADIUS = 120.0;//Used to calculate the shape of the pockets, among others
+	public static final double OUTERCIRCLERADIUS = 180.0;//Used to calculate the shape of the pockets, among others
+	final double OUTERCIRCLESTROKE = 50.0;//Used to calculate the ball path, among others
+	int rouletteWheelXTranslation = 10;
+	int rouletteWheelYTranslation = 10;
 	
 		//Pane containing all the pockets pane
 		private Pane pocketsPane = null;
@@ -219,7 +222,7 @@ public class Roulette extends GameInterface
 		test.setTranslateX(250);
 		test.setTranslateY(100);*/
 		
-		root.getChildren().addAll(msgZone, super.playerInfo, super.upperZone, rouletteBallStack, tableLayout, buttonsGroup, rouletteWheel, pocketsPane);
+		root.getChildren().addAll(rouletteWheel, rouletteBallStack, msgZone, super.playerInfo, super.upperZone, tableLayout, buttonsGroup);
 		
 		super.playerInfo.setTranslateX(500);
 		super.playerInfo.setTranslateY(15);
@@ -230,8 +233,8 @@ public class Roulette extends GameInterface
 		msgZone.setTranslateX(475);
 		msgZone.setTranslateY(130);
 		
-		rouletteWheel.setTranslateX(250);
-		rouletteWheel.setTranslateY(250);
+		rouletteWheel.setTranslateX(rouletteWheelXTranslation);
+		rouletteWheel.setTranslateY(rouletteWheelYTranslation);
 		//rouletteWheel.setOpacity(0.5);
 		
 		root.setBackground(new Background(new BackgroundFill(Color.GREEN, CornerRadii.EMPTY, Insets.EMPTY)));
@@ -240,11 +243,7 @@ public class Roulette extends GameInterface
 	
 	private void setWheel()
 	{
-		//Wheel (image)
-			Image roulette_img = new Image("RouletteWheel.png",450D,0, true, true);
-			roulette_imgView = new ImageView(roulette_img);
-			roulette_imgView.setTranslateX(20);
-			roulette_imgView.setTranslateY(30);
+		final double OUTERMOSTCIRCLERADIUS = OUTERCIRCLERADIUS+OUTERCIRCLESTROKE;
 			
 		//Wheel (made of Inner Circle, numbered and colored pockets(see Pocket class), and an outer circle 
 			//Inner circle
@@ -258,95 +257,506 @@ public class Roulette extends GameInterface
 				innerWheelLighting.setLight(light);
 				
 				innerWheelLighting.setSurfaceScale(5.0);
-				//innerCircle.setEffect(innerWheelLighting);
+				innerCircle.setEffect(innerWheelLighting);
 				
 			//Outer circle
 				Circle outerCircle = new Circle(OUTERCIRCLERADIUS);
-				outerCircle.setOpacity(1);
+				outerCircle.setFill(Color.DARKRED);
 				outerCircle.setStrokeWidth(OUTERCIRCLESTROKE);
 				outerCircle.setStrokeType(StrokeType.OUTSIDE);
 				outerCircle.setStroke(Color.DARKRED);
-				outerCircle.setStyle("fx-background-color: linear-gradient(#686868 0%, #232723 25%, #373837 75%, #757575 100%), linear-gradient(#020b02, #3a3a3a), linear-gradient(#9d9e9d 0%, #6b6a6b 20%, #343534 80%, #242424 100%), linear-gradient(#8a8a8a 0%, #6b6a6b 20%, #343534 80%, #262626 100%), linear-gradient(#777777 0%, #606060 50%, #505250 51%, #2a2b2a 100%)");
+				
+				outerCircle.setEffect(innerWheelLighting);
+				
+			//Outermost circle
+				Circle outerMostCircle = new Circle(OUTERMOSTCIRCLERADIUS);
+				outerMostCircle.setFill(Color.TRANSPARENT);
+				outerMostCircle.setStroke(Color.BLACK);
+				outerMostCircle.setStrokeWidth(10);
+				outerMostCircle.setStrokeType(StrokeType.OUTSIDE);
+				outerMostCircle.setEffect(innerWheelLighting);
+				
+			//Mid pocket circle - The circle going through the pocket, separating the sockets from the number's zone
+				Circle pocketsCircle = new Circle(INNERCIRCLERADIUS+(OUTERCIRCLERADIUS-INNERCIRCLERADIUS)/2);
+				pocketsCircle.setFill(Color.TRANSPARENT);
+				pocketsCircle.setStroke(Color.WHITE);
+				pocketsCircle.setStrokeWidth(2);
+				
 				
 			//Graphic Pockets
-				 /*pocket00Pane = createPocketPane(00, Color.GREEN);
-				 pocket0Pane = createPocketPane(0, Color.GREEN);
-				 pocket1Pane = createPocketPane(1, Color.RED);
-				 pocket2Pane = createPocketPane(2, Color.BLACK);
-				 pocket3Pane = createPocketPane(3, Color.RED);
-				 pocket4Pane = createPocketPane(4, Color.BLACK);
-				 pocket5Pane = createPocketPane(5, Color.RED);		
-				 pocket6Pane = createPocketPane(6, Color.BLACK);		
-				 pocket7Pane = createPocketPane(7, Color.RED);
-				 pocket8Pane = createPocketPane(8, Color.BLACK);
-				 pocket9Pane = createPocketPane(9, Color.RED);
-				 pocket10Pane = createPocketPane(10, Color.BLACK);
-				 pocket11Pane = createPocketPane(11, Color.BLACK);
-				 pocket12Pane = createPocketPane(12, Color.RED);
-				 pocket13Pane = createPocketPane(13, Color.BLACK);
-				 pocket14Pane = createPocketPane(14, Color.RED);
-				 pocket15Pane = createPocketPane(15, Color.BLACK);
-				 pocket16Pane = createPocketPane(16, Color.RED);
-				 pocket17Pane = createPocketPane(17, Color.BLACK);
-				 pocket18Pane = createPocketPane(18, Color.RED);
-				 pocket19Pane = createPocketPane(19, Color.RED);
-				 pocket20Pane = createPocketPane(20, Color.BLACK);
-				 pocket21Pane = createPocketPane(21, Color.RED);
-				 pocket22Pane = createPocketPane(22, Color.BLACK);
-				 pocket23Pane = createPocketPane(23, Color.RED);
-				 pocket24Pane = createPocketPane(24, Color.BLACK);
-				 pocket25Pane = createPocketPane(25, Color.RED);
-				 pocket26Pane = createPocketPane(26, Color.BLACK);
-				 pocket27Pane = createPocketPane(27, Color.RED);
-				 pocket28Pane = createPocketPane(28, Color.BLACK);
-				 pocket29Pane = createPocketPane(29, Color.BLACK);
-				 pocket30Pane = createPocketPane(30, Color.RED);
-				 pocket31Pane = createPocketPane(31, Color.BLACK);
-				 pocket32Pane = createPocketPane(32, Color.RED);
-				 pocket33Pane = createPocketPane(33, Color.BLACK);
-				 pocket34Pane = createPocketPane(34, Color.RED);
-				 pocket35Pane = createPocketPane(35, Color.BLACK);
-				 pocket36Pane = createPocketPane(36, Color.RED);*/
-				
 				//Paths
-				pocket00Path = LogicalRoulette.pocket00.getPath();
-				pocket00Path.setFill(Color.GREEN);
-				
-				pocket27Path = LogicalRoulette.pocket27.getPath();
-				pocket27Path.setFill(Color.RED);
+					pocket00Path = LogicalRoulette.pocket00.getPath();
+					pocket00Path.setFill(Color.GREEN);
+					
+					pocket27Path = LogicalRoulette.pocket27.getPath();
+					pocket27Path.setFill(Color.RED);
+					
+					pocket10Path = LogicalRoulette.pocket10.getPath();
+					pocket10Path.setFill(Color.BLACK);
+					
+					pocket25Path = LogicalRoulette.pocket25.getPath();
+					pocket25Path.setFill(Color.RED);
+					
+					pocket29Path = LogicalRoulette.pocket29.getPath();
+					pocket29Path.setFill(Color.BLACK);
+	
+					pocket12Path = LogicalRoulette.pocket12.getPath();
+					pocket12Path.setFill(Color.RED);
+					
+					pocket8Path = LogicalRoulette.pocket8.getPath();
+					pocket8Path.setFill(Color.BLACK);
+					
+					pocket19Path = LogicalRoulette.pocket19.getPath();
+					pocket19Path.setFill(Color.RED);
+					
+					pocket31Path = LogicalRoulette.pocket31.getPath();
+					pocket31Path.setFill(Color.BLACK);
+					
+					pocket18Path = LogicalRoulette.pocket18.getPath();
+					pocket18Path.setFill(Color.RED);
+					
+					pocket6Path = LogicalRoulette.pocket6.getPath();
+					pocket6Path.setFill(Color.BLACK);
+					
+					pocket21Path = LogicalRoulette.pocket21.getPath();
+					pocket21Path.setFill(Color.RED);
+					
+					pocket33Path = LogicalRoulette.pocket33.getPath();
+					pocket33Path.setFill(Color.BLACK);
+					
+					pocket16Path = LogicalRoulette.pocket16.getPath();
+					pocket16Path.setFill(Color.RED);
+					
+					pocket4Path = LogicalRoulette.pocket4.getPath();
+					pocket4Path.setFill(Color.BLACK);
+					
+					pocket23Path = LogicalRoulette.pocket23.getPath();
+					pocket23Path.setFill(Color.RED);
+					
+					pocket35Path = LogicalRoulette.pocket35.getPath();
+					pocket35Path.setFill(Color.BLACK);
+					
+					pocket14Path = LogicalRoulette.pocket14.getPath();
+					pocket14Path.setFill(Color.RED);
+					
+					pocket2Path = LogicalRoulette.pocket2.getPath();
+					pocket2Path.setFill(Color.BLACK);
+					
+					pocket0Path = LogicalRoulette.pocket0.getPath();
+					pocket0Path.setFill(Color.GREEN);
+					
+					pocket28Path = LogicalRoulette.pocket28.getPath();
+					pocket28Path.setFill(Color.BLACK);
+					
+					pocket9Path = LogicalRoulette.pocket9.getPath();
+					pocket9Path.setFill(Color.RED);
+					
+					pocket26Path = LogicalRoulette.pocket26.getPath();
+					pocket26Path.setFill(Color.BLACK);
+					
+					pocket30Path = LogicalRoulette.pocket30.getPath();
+					pocket30Path.setFill(Color.RED);
+					
+					pocket11Path = LogicalRoulette.pocket11.getPath();
+					pocket11Path.setFill(Color.BLACK);
+					
+					pocket7Path = LogicalRoulette.pocket7.getPath();
+					pocket7Path.setFill(Color.RED);
+					
+					pocket20Path = LogicalRoulette.pocket20.getPath();
+					pocket20Path.setFill(Color.BLACK);
+					
+					pocket32Path = LogicalRoulette.pocket32.getPath();
+					pocket32Path.setFill(Color.RED);
+					
+					pocket17Path = LogicalRoulette.pocket17.getPath();
+					pocket17Path.setFill(Color.BLACK);
+					
+					pocket5Path = LogicalRoulette.pocket5.getPath();
+					pocket5Path.setFill(Color.RED);
+					
+					pocket22Path = LogicalRoulette.pocket22.getPath();
+					pocket22Path.setFill(Color.BLACK);
+					
+					pocket34Path = LogicalRoulette.pocket34.getPath();
+					pocket34Path.setFill(Color.RED);
+					
+					pocket15Path = LogicalRoulette.pocket15.getPath();
+					pocket15Path.setFill(Color.BLACK);
+					
+					pocket3Path = LogicalRoulette.pocket3.getPath();
+					pocket3Path.setFill(Color.RED);
+					
+					pocket24Path = LogicalRoulette.pocket24.getPath();
+					pocket24Path.setFill(Color.BLACK);
+					
+					pocket36Path = LogicalRoulette.pocket36.getPath();
+					pocket36Path.setFill(Color.RED);
+					
+					pocket13Path = LogicalRoulette.pocket13.getPath();
+					pocket13Path.setFill(Color.BLACK);
+					
+					pocket1Path = LogicalRoulette.pocket1.getPath();
+					pocket1Path.setFill(Color.RED);
 				
 				//Labels
-				Label pocket00Label = new Label();
-				pocket00Label.setText("00");
-				pocket00Label.setTextFill(Color.WHITE);
-				pocket00Label.setTranslateY(-0.3*(OUTERCIRCLERADIUS-INNERCIRCLERADIUS));
+					Label pocket00Label = new Label();
+					pocket00Label.setText("00");
+					pocket00Label.setTextFill(Color.WHITE);
+					pocket00Label.setTranslateY(-0.3*(OUTERCIRCLERADIUS-INNERCIRCLERADIUS));
+						
+					Label pocket27Label = new Label();
+					pocket27Label.setText("27");
+					pocket27Label.setTextFill(Color.WHITE);
+					pocket27Label.setTranslateY(-0.3*(OUTERCIRCLERADIUS-INNERCIRCLERADIUS));
 					
-				Label pocket27Label = new Label();
-				pocket27Label.setText("27");
-				pocket27Label.setTextFill(Color.WHITE);
-				pocket27Label.setTranslateY(-0.3*(OUTERCIRCLERADIUS-INNERCIRCLERADIUS));
+					Label pocket10Label = new Label();
+					pocket10Label.setText("10");
+					pocket10Label.setTextFill(Color.WHITE);
+					pocket10Label.setTranslateY(-0.3*(OUTERCIRCLERADIUS-INNERCIRCLERADIUS));
+					
+					Label pocket25Label = new Label();
+					pocket25Label.setText("25");
+					pocket25Label.setTextFill(Color.WHITE);
+					pocket25Label.setTranslateY(-0.3*(OUTERCIRCLERADIUS-INNERCIRCLERADIUS));
+					
+					Label pocket29Label = new Label();
+					pocket29Label.setText("29");
+					pocket29Label.setTextFill(Color.WHITE);
+					pocket29Label.setTranslateY(-0.3*(OUTERCIRCLERADIUS-INNERCIRCLERADIUS));
+					
+					Label pocket12Label = new Label();
+					pocket12Label.setText("12");
+					pocket12Label.setTextFill(Color.WHITE);
+					pocket12Label.setTranslateY(-0.3*(OUTERCIRCLERADIUS-INNERCIRCLERADIUS));
+	
+					Label pocket8Label = new Label();
+					pocket8Label.setText("8");
+					pocket8Label.setTextFill(Color.WHITE);
+					pocket8Label.setTranslateY(-0.3*(OUTERCIRCLERADIUS-INNERCIRCLERADIUS));
+	
+					Label pocket19Label = new Label();
+					pocket19Label.setText("19");
+					pocket19Label.setTextFill(Color.WHITE);
+					pocket19Label.setTranslateY(-0.3*(OUTERCIRCLERADIUS-INNERCIRCLERADIUS));
+	
+					Label pocket31Label = new Label();
+					pocket31Label.setText("31");
+					pocket31Label.setTextFill(Color.WHITE);
+					pocket31Label.setTranslateY(-0.3*(OUTERCIRCLERADIUS-INNERCIRCLERADIUS));
+	
+					Label pocket18Label = new Label();
+					pocket18Label.setText("18");
+					pocket18Label.setTextFill(Color.WHITE);
+					pocket18Label.setTranslateY(-0.3*(OUTERCIRCLERADIUS-INNERCIRCLERADIUS));
+	
+					Label pocket6Label = new Label();
+					pocket6Label.setText("6");
+					pocket6Label.setTextFill(Color.WHITE);
+					pocket6Label.setTranslateY(-0.3*(OUTERCIRCLERADIUS-INNERCIRCLERADIUS));
+	
+					Label pocket21Label = new Label();
+					pocket21Label.setText("21");
+					pocket21Label.setTextFill(Color.WHITE);
+					pocket21Label.setTranslateY(-0.3*(OUTERCIRCLERADIUS-INNERCIRCLERADIUS));
+	
+					Label pocket33Label = new Label();
+					pocket33Label.setText("33");
+					pocket33Label.setTextFill(Color.WHITE);
+					pocket33Label.setTranslateY(-0.3*(OUTERCIRCLERADIUS-INNERCIRCLERADIUS));
+	
+					Label pocket16Label = new Label();
+					pocket16Label.setText("16");
+					pocket16Label.setTextFill(Color.WHITE);
+					pocket16Label.setTranslateY(-0.3*(OUTERCIRCLERADIUS-INNERCIRCLERADIUS));
+	
+					Label pocket4Label = new Label();
+					pocket4Label.setText("4");
+					pocket4Label.setTextFill(Color.WHITE);
+					pocket4Label.setTranslateY(-0.3*(OUTERCIRCLERADIUS-INNERCIRCLERADIUS));
+	
+					Label pocket23Label = new Label();
+					pocket23Label.setText("23");
+					pocket23Label.setTextFill(Color.WHITE);
+					pocket23Label.setTranslateY(-0.3*(OUTERCIRCLERADIUS-INNERCIRCLERADIUS));
+	
+					Label pocket35Label = new Label();
+					pocket35Label.setText("35");
+					pocket35Label.setTextFill(Color.WHITE);
+					pocket35Label.setTranslateY(-0.3*(OUTERCIRCLERADIUS-INNERCIRCLERADIUS));
+	
+					Label pocket14Label = new Label();
+					pocket14Label.setText("14");
+					pocket14Label.setTextFill(Color.WHITE);
+					pocket14Label.setTranslateY(-0.3*(OUTERCIRCLERADIUS-INNERCIRCLERADIUS));
+	
+					Label pocket2Label = new Label();
+					pocket2Label.setText("2");
+					pocket2Label.setTextFill(Color.WHITE);
+					pocket2Label.setTranslateY(-0.3*(OUTERCIRCLERADIUS-INNERCIRCLERADIUS));
+	
+					Label pocket0Label = new Label();
+					pocket0Label.setText("0");
+					pocket0Label.setTextFill(Color.WHITE);
+					pocket0Label.setTranslateY(-0.3*(OUTERCIRCLERADIUS-INNERCIRCLERADIUS));
+	
+					Label pocket28Label = new Label();
+					pocket28Label.setText("28");
+					pocket28Label.setTextFill(Color.WHITE);
+					pocket28Label.setTranslateY(-0.3*(OUTERCIRCLERADIUS-INNERCIRCLERADIUS));
+	
+					Label pocket9Label = new Label();
+					pocket9Label.setText("9");
+					pocket9Label.setTextFill(Color.WHITE);
+					pocket9Label.setTranslateY(-0.3*(OUTERCIRCLERADIUS-INNERCIRCLERADIUS));
+	
+					Label pocket26Label = new Label();
+					pocket26Label.setText("26");
+					pocket26Label.setTextFill(Color.WHITE);
+					pocket26Label.setTranslateY(-0.3*(OUTERCIRCLERADIUS-INNERCIRCLERADIUS));
+	
+					Label pocket30Label = new Label();
+					pocket30Label.setText("30");
+					pocket30Label.setTextFill(Color.WHITE);
+					pocket30Label.setTranslateY(-0.3*(OUTERCIRCLERADIUS-INNERCIRCLERADIUS));
+	
+					Label pocket11Label = new Label();
+					pocket11Label.setText("11");
+					pocket11Label.setTextFill(Color.WHITE);
+					pocket11Label.setTranslateY(-0.3*(OUTERCIRCLERADIUS-INNERCIRCLERADIUS));
+	
+					Label pocket7Label = new Label();
+					pocket7Label.setText("7");
+					pocket7Label.setTextFill(Color.WHITE);
+					pocket7Label.setTranslateY(-0.3*(OUTERCIRCLERADIUS-INNERCIRCLERADIUS));
+	
+					Label pocket20Label = new Label();
+					pocket20Label.setText("20");
+					pocket20Label.setTextFill(Color.WHITE);
+					pocket20Label.setTranslateY(-0.3*(OUTERCIRCLERADIUS-INNERCIRCLERADIUS));
+	
+					Label pocket32Label = new Label();
+					pocket32Label.setText("32");
+					pocket32Label.setTextFill(Color.WHITE);
+					pocket32Label.setTranslateY(-0.3*(OUTERCIRCLERADIUS-INNERCIRCLERADIUS));
+	
+					Label pocket17Label = new Label();
+					pocket17Label.setText("17");
+					pocket17Label.setTextFill(Color.WHITE);
+					pocket17Label.setTranslateY(-0.3*(OUTERCIRCLERADIUS-INNERCIRCLERADIUS));
+	
+					Label pocket5Label = new Label();
+					pocket5Label.setText("5");
+					pocket5Label.setTextFill(Color.WHITE);
+					pocket5Label.setTranslateY(-0.3*(OUTERCIRCLERADIUS-INNERCIRCLERADIUS));
+	
+					Label pocket22Label = new Label();
+					pocket22Label.setText("22");
+					pocket22Label.setTextFill(Color.WHITE);
+					pocket22Label.setTranslateY(-0.3*(OUTERCIRCLERADIUS-INNERCIRCLERADIUS));
+	
+					Label pocket34Label = new Label();
+					pocket34Label.setText("34");
+					pocket34Label.setTextFill(Color.WHITE);
+					pocket34Label.setTranslateY(-0.3*(OUTERCIRCLERADIUS-INNERCIRCLERADIUS));
+	
+					Label pocket15Label = new Label();
+					pocket15Label.setText("15");
+					pocket15Label.setTextFill(Color.WHITE);
+					pocket15Label.setTranslateY(-0.3*(OUTERCIRCLERADIUS-INNERCIRCLERADIUS));
+	
+					Label pocket3Label = new Label();
+					pocket3Label.setText("3");
+					pocket3Label.setTextFill(Color.WHITE);
+					pocket3Label.setTranslateY(-0.3*(OUTERCIRCLERADIUS-INNERCIRCLERADIUS));
+	
+					Label pocket24Label = new Label();
+					pocket24Label.setText("24");
+					pocket24Label.setTextFill(Color.WHITE);
+					pocket24Label.setTranslateY(-0.3*(OUTERCIRCLERADIUS-INNERCIRCLERADIUS));
+	
+					Label pocket36Label = new Label();
+					pocket36Label.setText("36");
+					pocket36Label.setTextFill(Color.WHITE);
+					pocket36Label.setTranslateY(-0.3*(OUTERCIRCLERADIUS-INNERCIRCLERADIUS));
+	
+					Label pocket13Label = new Label();
+					pocket13Label.setText("13");
+					pocket13Label.setTextFill(Color.WHITE);
+					pocket13Label.setTranslateY(-0.3*(OUTERCIRCLERADIUS-INNERCIRCLERADIUS));
+	
+					Label pocket1Label = new Label();
+					pocket1Label.setText("1");
+					pocket1Label.setTextFill(Color.WHITE);
+					pocket1Label.setTranslateY(-0.3*(OUTERCIRCLERADIUS-INNERCIRCLERADIUS));
 				
-				//Individual pockets Panes
-				pocket00Pane = new StackPane();
-				pocket00Pane.getChildren().addAll(pocket00Path, pocket00Label);
-				pocket00Pane.setTranslateX(235);
-				pocket00Pane.setTranslateY(70);
-				
-				pocket27Pane = new StackPane();
-				pocket27Pane.getChildren().addAll(pocket27Path, pocket27Label);
-				pocket27Pane.setTranslateX(235);
-				pocket27Pane.setTranslateY(70);
-				pocket27Pane.setRotate(INNERCIRCLERADIUS/38);
+	
+				//Individual pockets Panes	
+					pocket00Pane = new StackPane();
+					pocket00Pane.getChildren().addAll(pocket00Path, pocket00Label);
+					
+					pocket27Pane = new StackPane();
+					pocket27Pane.getChildren().addAll(pocket27Path, pocket27Label);
+					double rotationPointYTranslate = OUTERCIRCLERADIUS;//Rotation point X coordinate
+					double rotationPointXTranslate = (pocket27Pane.getBoundsInLocal().getWidth())/2;//Rotation point X coordinate
+					Rotate rotate27 = new Rotate(360.0/38.0, rotationPointXTranslate, rotationPointYTranslate);
+					pocket27Pane.getTransforms().add(rotate27);
+	
+					pocket10Pane = new StackPane();
+					pocket10Pane.getChildren().addAll(pocket10Path, pocket10Label);
+					pocket10Pane.getTransforms().add(new Rotate(360.0/38.0*2, rotationPointXTranslate, rotationPointYTranslate));
+
+					pocket25Pane = new StackPane();
+					pocket25Pane.getChildren().addAll(pocket25Path, pocket25Label);
+					pocket25Pane.getTransforms().add(new Rotate(360.0/38.0*3, rotationPointXTranslate, rotationPointYTranslate));
+
+					pocket29Pane = new StackPane();
+					pocket29Pane.getChildren().addAll(pocket29Path, pocket29Label);
+					pocket29Pane.getTransforms().add(new Rotate(360.0/38.0*4, rotationPointXTranslate, rotationPointYTranslate));
+
+					pocket12Pane = new StackPane();
+					pocket12Pane.getChildren().addAll(pocket12Path, pocket12Label);
+					pocket12Pane.getTransforms().add(new Rotate(360.0/38.0*5, rotationPointXTranslate, rotationPointYTranslate));
+
+					pocket8Pane = new StackPane();
+					pocket8Pane.getChildren().addAll(pocket8Path, pocket8Label);
+					pocket8Pane.getTransforms().add(new Rotate(360.0/38.0*6, rotationPointXTranslate, rotationPointYTranslate));
+
+					pocket19Pane = new StackPane();
+					pocket19Pane.getChildren().addAll(pocket19Path, pocket19Label);
+					pocket19Pane.getTransforms().add(new Rotate(360.0/38.0*7, rotationPointXTranslate, rotationPointYTranslate));
+
+					pocket31Pane = new StackPane();
+					pocket31Pane.getChildren().addAll(pocket31Path, pocket31Label);
+					pocket31Pane.getTransforms().add(new Rotate(360.0/38.0*8, rotationPointXTranslate, rotationPointYTranslate));
+
+					pocket18Pane = new StackPane();
+					pocket18Pane.getChildren().addAll(pocket18Path, pocket18Label);
+					pocket18Pane.getTransforms().add(new Rotate(360.0/38.0*9, rotationPointXTranslate, rotationPointYTranslate));
+
+					pocket6Pane = new StackPane();
+					pocket6Pane.getChildren().addAll(pocket6Path, pocket6Label);
+					pocket6Pane.getTransforms().add(new Rotate(360.0/38.0*10, rotationPointXTranslate, rotationPointYTranslate));
+
+					pocket21Pane = new StackPane();
+					pocket21Pane.getChildren().addAll(pocket21Path, pocket21Label);
+					pocket21Pane.getTransforms().add(new Rotate(360.0/38.0*11, rotationPointXTranslate, rotationPointYTranslate));
+
+					pocket33Pane = new StackPane();
+					pocket33Pane.getChildren().addAll(pocket33Path, pocket33Label);
+					pocket33Pane.getTransforms().add(new Rotate(360.0/38.0*12, rotationPointXTranslate, rotationPointYTranslate));
+
+					pocket16Pane = new StackPane();
+					pocket16Pane.getChildren().addAll(pocket16Path, pocket16Label);
+					pocket16Pane.getTransforms().add(new Rotate(360.0/38.0*13, rotationPointXTranslate, rotationPointYTranslate));
+
+					pocket4Pane = new StackPane();
+					pocket4Pane.getChildren().addAll(pocket4Path, pocket4Label);
+					pocket4Pane.getTransforms().add(new Rotate(360.0/38.0*14, rotationPointXTranslate, rotationPointYTranslate));
+
+					pocket23Pane = new StackPane();
+					pocket23Pane.getChildren().addAll(pocket23Path, pocket23Label);
+					pocket23Pane.getTransforms().add(new Rotate(360.0/38.0*15, rotationPointXTranslate, rotationPointYTranslate));
+
+					pocket35Pane = new StackPane();
+					pocket35Pane.getChildren().addAll(pocket35Path, pocket35Label);
+					pocket35Pane.getTransforms().add(new Rotate(360.0/38.0*16, rotationPointXTranslate, rotationPointYTranslate));
+
+					pocket14Pane = new StackPane();
+					pocket14Pane.getChildren().addAll(pocket14Path, pocket14Label);
+					pocket14Pane.getTransforms().add(new Rotate(360.0/38.0*17, rotationPointXTranslate, rotationPointYTranslate));
+
+					pocket2Pane = new StackPane();
+					pocket2Pane.getChildren().addAll(pocket2Path, pocket2Label);
+					pocket2Pane.getTransforms().add(new Rotate(360.0/38.0*18, rotationPointXTranslate, rotationPointYTranslate));
+
+					pocket0Pane = new StackPane();
+					pocket0Pane.getChildren().addAll(pocket0Path, pocket0Label);
+					pocket0Pane.getTransforms().add(new Rotate(360.0/38.0*19, rotationPointXTranslate, rotationPointYTranslate));
+
+					pocket28Pane = new StackPane();
+					pocket28Pane.getChildren().addAll(pocket28Path, pocket28Label);
+					pocket28Pane.getTransforms().add(new Rotate(360.0/38.0*20, rotationPointXTranslate, rotationPointYTranslate));
+
+					pocket9Pane = new StackPane();
+					pocket9Pane.getChildren().addAll(pocket9Path, pocket9Label);
+					pocket9Pane.getTransforms().add(new Rotate(360.0/38.0*21, rotationPointXTranslate, rotationPointYTranslate));
+
+					pocket26Pane = new StackPane();
+					pocket26Pane.getChildren().addAll(pocket26Path, pocket26Label);
+					pocket26Pane.getTransforms().add(new Rotate(360.0/38.0*22, rotationPointXTranslate, rotationPointYTranslate));
+
+					pocket30Pane = new StackPane();
+					pocket30Pane.getChildren().addAll(pocket30Path, pocket30Label);
+					pocket30Pane.getTransforms().add(new Rotate(360.0/38.0*23, rotationPointXTranslate, rotationPointYTranslate));
+
+					pocket11Pane = new StackPane();
+					pocket11Pane.getChildren().addAll(pocket11Path, pocket11Label);
+					pocket11Pane.getTransforms().add(new Rotate(360.0/38.0*24, rotationPointXTranslate, rotationPointYTranslate));
+
+					pocket7Pane = new StackPane();
+					pocket7Pane.getChildren().addAll(pocket7Path, pocket7Label);
+					pocket7Pane.getTransforms().add(new Rotate(360.0/38.0*25, rotationPointXTranslate, rotationPointYTranslate));
+
+					pocket20Pane = new StackPane();
+					pocket20Pane.getChildren().addAll(pocket20Path, pocket20Label);
+					pocket20Pane.getTransforms().add(new Rotate(360.0/38.0*26, rotationPointXTranslate, rotationPointYTranslate));
+
+					pocket32Pane = new StackPane();
+					pocket32Pane.getChildren().addAll(pocket32Path, pocket32Label);
+					pocket32Pane.getTransforms().add(new Rotate(360.0/38.0*27, rotationPointXTranslate, rotationPointYTranslate));
+
+					pocket17Pane = new StackPane();
+					pocket17Pane.getChildren().addAll(pocket17Path, pocket17Label);
+					pocket17Pane.getTransforms().add(new Rotate(360.0/38.0*28, rotationPointXTranslate, rotationPointYTranslate));
+
+					pocket5Pane = new StackPane();
+					pocket5Pane.getChildren().addAll(pocket5Path, pocket5Label);
+					pocket5Pane.getTransforms().add(new Rotate(360.0/38.0*29, rotationPointXTranslate, rotationPointYTranslate));
+
+					pocket22Pane = new StackPane();
+					pocket22Pane.getChildren().addAll(pocket22Path, pocket22Label);
+					pocket22Pane.getTransforms().add(new Rotate(360.0/38.0*30, rotationPointXTranslate, rotationPointYTranslate));
+
+					pocket34Pane = new StackPane();
+					pocket34Pane.getChildren().addAll(pocket34Path, pocket34Label);
+					pocket34Pane.getTransforms().add(new Rotate(360.0/38.0*31, rotationPointXTranslate, rotationPointYTranslate));
+
+					pocket15Pane = new StackPane();
+					pocket15Pane.getChildren().addAll(pocket15Path, pocket15Label);
+					pocket15Pane.getTransforms().add(new Rotate(360.0/38.0*32, rotationPointXTranslate, rotationPointYTranslate));
+
+					pocket3Pane = new StackPane();
+					pocket3Pane.getChildren().addAll(pocket3Path, pocket3Label);
+					pocket3Pane.getTransforms().add(new Rotate(360.0/38.0*33, rotationPointXTranslate, rotationPointYTranslate));
+
+					pocket24Pane = new StackPane();
+					pocket24Pane.getChildren().addAll(pocket24Path, pocket24Label);
+					pocket24Pane.getTransforms().add(new Rotate(360.0/38.0*34, rotationPointXTranslate, rotationPointYTranslate));
+
+					pocket36Pane = new StackPane();
+					pocket36Pane.getChildren().addAll(pocket36Path, pocket36Label);
+					pocket36Pane.getTransforms().add(new Rotate(360.0/38.0*35, rotationPointXTranslate, rotationPointYTranslate));
+
+					pocket13Pane = new StackPane();
+					pocket13Pane.getChildren().addAll(pocket13Path, pocket13Label);
+					pocket13Pane.getTransforms().add(new Rotate(360.0/38.0*36, rotationPointXTranslate, rotationPointYTranslate));
+
+					pocket1Pane = new StackPane();
+					pocket1Pane.getChildren().addAll(pocket1Path, pocket1Label);
+					Rotate rotate1 = new Rotate(360.0/38.0*37, rotationPointXTranslate, rotationPointYTranslate);
+					pocket1Pane.getTransforms().add(rotate1);
 				
 				//Pockets main pane
 				pocketsPane = new Pane();
-				pocketsPane.getChildren().addAll(pocket00Pane, pocket27Pane);
-				//pocketsPane.setTranslateX(235);
-				//pocketsPane.setTranslateY(70);
-				
+				pocketsPane.getChildren().addAll(pocket00Pane, pocket0Pane, pocket1Pane, pocket2Pane, pocket3Pane, pocket4Pane, pocket5Pane, pocket6Pane, pocket7Pane, pocket8Pane, pocket9Pane, pocket10Pane, pocket11Pane, pocket12Pane, pocket13Pane, pocket14Pane, pocket15Pane, pocket16Pane, pocket17Pane, pocket18Pane, pocket19Pane, pocket20Pane, pocket21Pane, pocket22Pane, pocket23Pane, pocket24Pane, pocket25Pane, pocket26Pane, pocket27Pane, pocket28Pane, pocket29Pane, pocket30Pane, pocket31Pane, pocket32Pane, pocket33Pane, pocket34Pane, pocket35Pane, pocket36Pane);
+				pocketsPane.setTranslateX(223.5);
+				pocketsPane.setTranslateY(60);
 		
-		rouletteWheel = new Pane();
-		rouletteWheel.getChildren().addAll(outerCircle, innerCircle);//**********AJOUTER LE PANE DES POCKETS
+				
+		//RouletteWheel
+		rouletteWheel = new StackPane();
+		rouletteWheel.getChildren().addAll(outerMostCircle, outerCircle, innerCircle, pocketsPane, pocketsCircle);//**********AJOUTER LE PANE DES POCKETS
 	}
 	
 	private void setBall()
@@ -700,7 +1110,7 @@ public class Roulette extends GameInterface
 	public void spinTheWheel()
 	{
 		//Wheel Rotation	
-			RotateTransition wheelRotation1 = new RotateTransition(Duration.millis(8000), roulette_imgView);
+			RotateTransition wheelRotation1 = new RotateTransition(Duration.millis(8000), rouletteWheel);
 			
 			//Rotations
 			int decisiveLastWheelRotationAngle = (int)(Math.random()*360);
@@ -728,6 +1138,19 @@ public class Roulette extends GameInterface
 			
 			timeLine.play();
 			//timeLine2.play();*/
+			
+		//Ball Rotation
+			Path ballPath = new Path();
+			
+			MoveTo moveTo = new MoveTo();
+			moveTo.setX(0.0);
+			moveTo.setY(0.0);
+			
+			ArcTo arcTo = new ArcTo();
+			arcTo.setX(0.0);
+			arcTo.setY(0.0);
+			arcTo.setRadiusX(0.95*(OUTERCIRCLERADIUS+OUTERCIRCLESTROKE));
+			arcTo.setRadiusY(0.95*(OUTERCIRCLERADIUS+OUTERCIRCLESTROKE));		
 	}
 	
 	public void checkBallLocation()
