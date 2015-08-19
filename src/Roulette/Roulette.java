@@ -9,9 +9,14 @@ import javafx.animation.Transition;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
+
+import com.sun.javafx.collections.ObservableListWrapper;
 
 import Casino.GameInterface;
 import javafx.animation.RotateTransition;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.geometry.HPos;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -89,6 +94,7 @@ public class Roulette extends GameInterface
 	
 	//Roulette wheel
 	private StackPane rouletteWheel = null;
+	Circle pocketsCircle = null;
 	static final double INNERCIRCLERADIUS = 120.0;//Used to calculate the shape of the pockets, among others
 	public static final double OUTERCIRCLERADIUS = 180.0;//Used to calculate the shape of the pockets, among others
 	final double OUTERCIRCLESTROKE = 50.0;//Used to calculate the ball path, among others
@@ -277,7 +283,7 @@ public class Roulette extends GameInterface
 				outerMostCircle.setEffect(innerWheelLighting);
 				
 			//Mid pocket circle - The circle going through the pocket, separating the sockets from the number's zone
-				Circle pocketsCircle = new Circle(INNERCIRCLERADIUS+(OUTERCIRCLERADIUS-INNERCIRCLERADIUS)/2);
+				pocketsCircle = new Circle(INNERCIRCLERADIUS+(OUTERCIRCLERADIUS-INNERCIRCLERADIUS)/2);
 				pocketsCircle.setFill(Color.TRANSPARENT);
 				pocketsCircle.setStroke(Color.WHITE);
 				pocketsCircle.setStrokeWidth(2);
@@ -1110,7 +1116,62 @@ public class Roulette extends GameInterface
 	public void spinTheWheel()
 	{
 		//Wheel Rotation	
-			RotateTransition wheelRotation1 = new RotateTransition(Duration.millis(8000), rouletteWheel);
+			
+			Rotate wheelRotation = new Rotate();
+			
+			//Move the rotation pivot to the center of the wheel
+			//The default rotation pivot is at the top left corner of the 00 pocket bounds.
+			double pivotXTranslation = (pocket00Pane.getWidth())/2; //The x translation of the pivot is equal to half the width of a pocket.
+			wheelRotation.setPivotX(pivotXTranslation);
+			double pivotYTranslation = INNERCIRCLERADIUS + (OUTERCIRCLERADIUS-INNERCIRCLERADIUS);
+			wheelRotation.setPivotY(pivotYTranslation);
+			
+			pocketsPane.getTransforms().add(wheelRotation);
+			
+			//Timeline
+			List<KeyFrame> kfList = new ArrayList<KeyFrame>();
+			double initialDecelerationRate = 0.8;
+			double decelerationRate = 0.8;
+			/*kfList.add(new KeyFrame(Duration.millis(500), new KeyValue(wheelRotation.angleProperty(),180)));
+			kfList.add(new KeyFrame(Duration.millis(1000), new KeyValue(wheelRotation.angleProperty(),180*2*decelerationRate)));
+			decelerationRate *= initialDecelerationRate;
+			kfList.add(new KeyFrame(Duration.millis(1500), new KeyValue(wheelRotation.angleProperty(),180*3*(decelerationRate))));
+			decelerationRate *= initialDecelerationRate;
+			kfList.add(new KeyFrame(Duration.millis(2000), new KeyValue(wheelRotation.angleProperty(),180*4*(decelerationRate))));
+			decelerationRate *= initialDecelerationRate;
+			kfList.add(new KeyFrame(Duration.millis(2500), new KeyValue(wheelRotation.angleProperty(),180*5*(decelerationRate))));
+			decelerationRate *= initialDecelerationRate;
+			kfList.add(new KeyFrame(Duration.millis(3000), new KeyValue(wheelRotation.angleProperty(),180*6*(decelerationRate))));
+			decelerationRate *= initialDecelerationRate;
+			kfList.add(new KeyFrame(Duration.millis(3500), new KeyValue(wheelRotation.angleProperty(),180*7*(decelerationRate))));
+			decelerationRate *= initialDecelerationRate;
+			kfList.add(new KeyFrame(Duration.millis(4000), new KeyValue(wheelRotation.angleProperty(),180*8*(decelerationRate))));
+			decelerationRate *= initialDecelerationRate;
+			kfList.add(new KeyFrame(Duration.millis(4500), new KeyValue(wheelRotation.angleProperty(),180*9*(decelerationRate))));
+			decelerationRate *= initialDecelerationRate;
+			kfList.add(new KeyFrame(Duration.millis(5000), new KeyValue(wheelRotation.angleProperty(),180*10*(decelerationRate))));*/
+			
+			
+			
+			Timeline timelineWheel = new Timeline();
+			
+			/*for(KeyFrame kf : kfList)
+			{
+				timelineWheel.getKeyFrames().add(kf);
+			}	
+			System.out.println(timelineWheel.getKeyFrames().size());*/
+			
+			WheelInterpolator customInterpolator = new WheelInterpolator();
+			
+			timelineWheel.getKeyFrames().add(new KeyFrame(Duration.millis(10000), new KeyValue(wheelRotation.angleProperty(),1080, Interpolator.SPLINE(0.25, 0.4, 0.6, 0.99))));//Spline creates a  theoric curve going between 0,0 and 1,1 (x=time, y = animation progress, 1 being 100%). Playing with the coordinates parameters allows to adjust the deceleration vs time.
+			
+			SequentialTransition sequence = new SequentialTransition(timelineWheel);
+			
+			sequence.play();
+			
+			//***************button.disableProperty().bind(timeline.statusProperty().isEqualTo(Animation.Status.RUNNING));//Disable the rotate button while running  http://stackoverflow.com/questions/28652149/rotatetransition-around-a-pivot
+		
+			/*(RotateTransition wheelRotation1 = new RotateTransition(Duration.millis(8000), pocketsPane);
 			
 			//Rotations
 			int decisiveLastWheelRotationAngle = (int)(Math.random()*360);
@@ -1121,7 +1182,7 @@ public class Roulette extends GameInterface
 			SequentialTransition seqTransition = new SequentialTransition();
 			seqTransition.getChildren().addAll(wheelRotation1);
 			
-			seqTransition.play();
+			seqTransition.play();*/
 			
 			/*
 			final KeyValue keyValue = new KeyValue(roulette_imgView.rotateProperty(), 360);
