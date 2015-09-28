@@ -59,7 +59,6 @@ public class Control  extends Application{
 		
 		viewMainMenu = new Main_menu();
 		
-		
 		stage = pStage;
 		addListeners();
 		stage.setTitle("Casino");
@@ -200,7 +199,7 @@ public class Control  extends Application{
 			{
 				if(e.getSource() == viewRoulette.spinTheWheelButton)
 				{
-					viewRoulette.spinTheWheel();
+					viewRoulette.playWheelAnimation();;
 				}
 				
 				else if(e.getSource() == viewRoulette.removeLastBetButton)

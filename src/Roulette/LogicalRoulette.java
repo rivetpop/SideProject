@@ -1,5 +1,7 @@
 package Roulette;
 
+import java.util.ArrayList;
+
 import javafx.scene.control.Label;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.ArcTo;
@@ -10,13 +12,10 @@ import javafx.scene.shape.StrokeLineCap;
 import javafx.scene.shape.StrokeType;
 
 public class LogicalRoulette 
-{
-	Roulette rouletteView = new Roulette();
-	Pocket pock1 = null;
-	
+{	
 	static double INNERCIRCLERADIUS = Roulette.INNERCIRCLERADIUS;
 	static double OUTERCIRCLERADIUS = Roulette.OUTERCIRCLERADIUS;
-	
+			
 	static Pocket pocket00 = null;
 	static Pocket pocket0 = null;
 	static Pocket pocket1 = null;
@@ -55,6 +54,9 @@ public class LogicalRoulette
 	static Pocket pocket34 = null;
 	static Pocket pocket35 = null;
 	static Pocket pocket36 = null;
+	
+	//ArrayList containing the pocketsPane. Used to loop through them.
+	protected static ArrayList<Pocket> pocketsList = new ArrayList<Pocket>();
 	
 	static protected void createPocketObjects()
 	{
@@ -135,6 +137,45 @@ public class LogicalRoulette
 		pocket34 = new Pocket("34", Color.RED, path34);
 		pocket35 = new Pocket("35", Color.BLACK, path35);
 		pocket36 = new Pocket("36", Color.RED, path36);
+		
+		pocketsList.add(pocket00);
+		pocketsList.add(pocket1);
+		pocketsList.add(pocket13);
+		pocketsList.add(pocket36);
+		pocketsList.add(pocket24);
+		pocketsList.add(pocket3);
+		pocketsList.add(pocket15);
+		pocketsList.add(pocket34);
+		pocketsList.add(pocket22);
+		pocketsList.add(pocket5);
+		pocketsList.add(pocket17);
+		pocketsList.add(pocket32);
+		pocketsList.add(pocket20);
+		pocketsList.add(pocket7);
+		pocketsList.add(pocket11);
+		pocketsList.add(pocket30);
+		pocketsList.add(pocket26);
+		pocketsList.add(pocket9);
+		pocketsList.add(pocket28);
+		pocketsList.add(pocket0);
+		pocketsList.add(pocket2);
+		pocketsList.add(pocket14);
+		pocketsList.add(pocket35);
+		pocketsList.add(pocket23);
+		pocketsList.add(pocket4);
+		pocketsList.add(pocket16);
+		pocketsList.add(pocket33);
+		pocketsList.add(pocket21);
+		pocketsList.add(pocket6);
+		pocketsList.add(pocket18);
+		pocketsList.add(pocket31);
+		pocketsList.add(pocket19);
+		pocketsList.add(pocket8);
+		pocketsList.add(pocket12);
+		pocketsList.add(pocket29);
+		pocketsList.add(pocket25);
+		pocketsList.add(pocket10);
+		pocketsList.add(pocket27);			
 	}
 	
 	static private Path createPath()

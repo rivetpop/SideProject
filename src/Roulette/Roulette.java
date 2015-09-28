@@ -3,13 +3,16 @@ package Roulette;
 import javafx.animation.Interpolator;
 import javafx.animation.KeyFrame;
 import javafx.animation.KeyValue;
+import javafx.animation.PathTransition;
 import javafx.animation.SequentialTransition;
 import javafx.animation.Timeline;
 import javafx.animation.Transition;
 
+import java.awt.Point;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Random;
 
 import com.sun.javafx.collections.ObservableListWrapper;
 
@@ -17,8 +20,11 @@ import Casino.GameInterface;
 import javafx.animation.RotateTransition;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.geometry.HPos;
 import javafx.geometry.Insets;
+import javafx.geometry.Point2D;
 import javafx.geometry.Pos;
 import javafx.scene.Group;
 import javafx.scene.Node;
@@ -98,12 +104,14 @@ public class Roulette extends GameInterface
 	static final double INNERCIRCLERADIUS = 120.0;//Used to calculate the shape of the pockets, among others
 	public static final double OUTERCIRCLERADIUS = 180.0;//Used to calculate the shape of the pockets, among others
 	final double OUTERCIRCLESTROKE = 50.0;//Used to calculate the ball path, among others
+	final double OUTERMOSTCIRCLERADIUS = OUTERCIRCLERADIUS+OUTERCIRCLESTROKE; //Used to calculate the position of the ball
+	final double ballStackInnerWheelYTranslation = 15;//Distance between the outer edge of the wheel and the starting position of the ball
 	int rouletteWheelXTranslation = 10;
 	int rouletteWheelYTranslation = 10;
 	
 		//Pane containing all the pockets pane
 		private Pane pocketsPane = null;
-	
+			
 		//Graphic wheel pockets (each made of a path and a label in a pane (see function createPocketPath())
 		//The paths are made global variable because they are needed for collision(intersect) test with the ball
 		Path pocket00Path = null;
@@ -215,8 +223,8 @@ public class Roulette extends GameInterface
 		LogicalRoulette.createPocketObjects();//create the pockets objects, used in setWheel()
 		createMenu();
 		createPlayerInfo();
-		setWheel();
 		setBall();
+		setWheel();
 		setTable();
 		setButtons();
 		setMessageZone("Click on the table to place a bet!");
@@ -228,7 +236,7 @@ public class Roulette extends GameInterface
 		test.setTranslateX(250);
 		test.setTranslateY(100);*/
 		
-		root.getChildren().addAll(rouletteWheel, rouletteBallStack, msgZone, super.playerInfo, super.upperZone, tableLayout, buttonsGroup);
+		root.getChildren().addAll(rouletteWheel, msgZone, super.playerInfo, super.upperZone, tableLayout, buttonsGroup);
 		
 		super.playerInfo.setTranslateX(500);
 		super.playerInfo.setTranslateY(15);
@@ -248,9 +256,7 @@ public class Roulette extends GameInterface
 	}
 	
 	private void setWheel()
-	{
-		final double OUTERMOSTCIRCLERADIUS = OUTERCIRCLERADIUS+OUTERCIRCLESTROKE;
-			
+	{		
 		//Wheel (made of Inner Circle, numbered and colored pockets(see Pocket class), and an outer circle 
 			//Inner circle
 				Circle innerCircle = new Circle(INNERCIRCLERADIUS);
@@ -603,7 +609,7 @@ public class Roulette extends GameInterface
 					
 					pocket27Pane = new StackPane();
 					pocket27Pane.getChildren().addAll(pocket27Path, pocket27Label);
-					double rotationPointYTranslate = OUTERCIRCLERADIUS;//Rotation point X coordinate
+					double rotationPointYTranslate = OUTERCIRCLERADIUS;//Rotation point Y coordinate
 					double rotationPointXTranslate = (pocket27Pane.getBoundsInLocal().getWidth())/2;//Rotation point X coordinate
 					Rotate rotate27 = new Rotate(360.0/38.0, rotationPointXTranslate, rotationPointYTranslate);
 					pocket27Pane.getTransforms().add(rotate27);
@@ -762,7 +768,8 @@ public class Roulette extends GameInterface
 				
 		//RouletteWheel
 		rouletteWheel = new StackPane();
-		rouletteWheel.getChildren().addAll(outerMostCircle, outerCircle, innerCircle, pocketsPane, pocketsCircle);//**********AJOUTER LE PANE DES POCKETS
+		rouletteWheel.getChildren().addAll(outerMostCircle, outerCircle, innerCircle, pocketsPane, pocketsCircle, rouletteBallStack);
+		rouletteBallStack.setTranslateY(-OUTERMOSTCIRCLERADIUS+ballStackInnerWheelYTranslation);//Move the ball from the center of the wheel to it's starting position
 	}
 	
 	private void setBall()
@@ -776,8 +783,6 @@ public class Roulette extends GameInterface
 		//A stackpane to automatically center the ballCenter in the middle of the ball
 		rouletteBallStack = new StackPane();
 		rouletteBallStack.getChildren().addAll( rouletteBall, ballCenter);
-		rouletteBallStack.setTranslateX(250);
-		rouletteBallStack.setTranslateY(20);
 	}
 	
 	private void setTable()
@@ -1113,10 +1118,9 @@ public class Roulette extends GameInterface
 		msgZone.setPrefSize(msgZoneSizeX, msgZoneSizeY);
 	}
 	
-	public void spinTheWheel()
+	public void playWheelAnimation()
 	{
-		//Wheel Rotation	
-			
+		//Wheel Rotation Animation				
 			Rotate wheelRotation = new Rotate();
 			
 			//Move the rotation pivot to the center of the wheel
@@ -1128,90 +1132,162 @@ public class Roulette extends GameInterface
 			
 			pocketsPane.getTransforms().add(wheelRotation);
 			
-			//Timeline
-			List<KeyFrame> kfList = new ArrayList<KeyFrame>();
-			double initialDecelerationRate = 0.8;
-			double decelerationRate = 0.8;
-			/*kfList.add(new KeyFrame(Duration.millis(500), new KeyValue(wheelRotation.angleProperty(),180)));
-			kfList.add(new KeyFrame(Duration.millis(1000), new KeyValue(wheelRotation.angleProperty(),180*2*decelerationRate)));
-			decelerationRate *= initialDecelerationRate;
-			kfList.add(new KeyFrame(Duration.millis(1500), new KeyValue(wheelRotation.angleProperty(),180*3*(decelerationRate))));
-			decelerationRate *= initialDecelerationRate;
-			kfList.add(new KeyFrame(Duration.millis(2000), new KeyValue(wheelRotation.angleProperty(),180*4*(decelerationRate))));
-			decelerationRate *= initialDecelerationRate;
-			kfList.add(new KeyFrame(Duration.millis(2500), new KeyValue(wheelRotation.angleProperty(),180*5*(decelerationRate))));
-			decelerationRate *= initialDecelerationRate;
-			kfList.add(new KeyFrame(Duration.millis(3000), new KeyValue(wheelRotation.angleProperty(),180*6*(decelerationRate))));
-			decelerationRate *= initialDecelerationRate;
-			kfList.add(new KeyFrame(Duration.millis(3500), new KeyValue(wheelRotation.angleProperty(),180*7*(decelerationRate))));
-			decelerationRate *= initialDecelerationRate;
-			kfList.add(new KeyFrame(Duration.millis(4000), new KeyValue(wheelRotation.angleProperty(),180*8*(decelerationRate))));
-			decelerationRate *= initialDecelerationRate;
-			kfList.add(new KeyFrame(Duration.millis(4500), new KeyValue(wheelRotation.angleProperty(),180*9*(decelerationRate))));
-			decelerationRate *= initialDecelerationRate;
-			kfList.add(new KeyFrame(Duration.millis(5000), new KeyValue(wheelRotation.angleProperty(),180*10*(decelerationRate))));*/
-			
-			
-			
+			//Timeline			
 			Timeline timelineWheel = new Timeline();
 			
-			/*for(KeyFrame kf : kfList)
-			{
-				timelineWheel.getKeyFrames().add(kf);
-			}	
-			System.out.println(timelineWheel.getKeyFrames().size());*/
+			Double lastRotationAngle = Math.random()*360.0;
 			
-			WheelInterpolator customInterpolator = new WheelInterpolator();
+			timelineWheel.getKeyFrames().add(new KeyFrame(Duration.millis(10000), new KeyValue(wheelRotation.angleProperty(),720+lastRotationAngle, Interpolator.SPLINE(0.25, 0.4, 0.6, 0.99))));//Spline creates a curve going between 0,0 and 1,1 (x=time, y = animation progress, 1 being 100%). Playing with the coordinates parameters allows to adjust the deceleration vs time.
 			
-			timelineWheel.getKeyFrames().add(new KeyFrame(Duration.millis(10000), new KeyValue(wheelRotation.angleProperty(),1080, Interpolator.SPLINE(0.25, 0.4, 0.6, 0.99))));//Spline creates a  theoric curve going between 0,0 and 1,1 (x=time, y = animation progress, 1 being 100%). Playing with the coordinates parameters allows to adjust the deceleration vs time.
+			SequentialTransition wheelAnimationSequence = new SequentialTransition(timelineWheel);
 			
-			SequentialTransition sequence = new SequentialTransition(timelineWheel);
+			wheelAnimationSequence.play();
 			
-			sequence.play();
 			
-			//***************button.disableProperty().bind(timeline.statusProperty().isEqualTo(Animation.Status.RUNNING));//Disable the rotate button while running  http://stackoverflow.com/questions/28652149/rotatetransition-around-a-pivot
+		//Ball Animation
+			//Ball rotations
+				Path ballPath = new Path();
+				
+				MoveTo moveToBallStart = new MoveTo();
+				moveToBallStart.setX(rouletteWheelXTranslation + OUTERMOSTCIRCLERADIUS);
+				moveToBallStart.setY(rouletteWheelYTranslation + ballStackInnerWheelYTranslation); 
+				
+				ArcTo arcToHalf = new ArcTo();
+				arcToHalf.setX(moveToBallStart.getX());
+				arcToHalf.setY(moveToBallStart.getY() + (OUTERCIRCLERADIUS+OUTERCIRCLESTROKE-ballStackInnerWheelYTranslation)*2);
+				arcToHalf.setRadiusX(OUTERCIRCLERADIUS+OUTERCIRCLESTROKE-ballStackInnerWheelYTranslation);
+				arcToHalf.setRadiusY(OUTERCIRCLERADIUS+OUTERCIRCLESTROKE-ballStackInnerWheelYTranslation);		
+				
+				ArcTo arcToStart = new ArcTo();
+				arcToStart.setX(moveToBallStart.getX());
+				arcToStart.setY(moveToBallStart.getY());
+				arcToStart.setRadiusX(OUTERCIRCLERADIUS+OUTERCIRCLESTROKE-ballStackInnerWheelYTranslation);
+				arcToStart.setRadiusY(OUTERCIRCLERADIUS+OUTERCIRCLESTROKE-ballStackInnerWheelYTranslation);
+				
+				double[] finishPointCoordinnates = calculateBallLocation();//Calculate a random final position around the wheel
+				ArcTo arcToFinish = new ArcTo();
+				arcToFinish.setX(moveToBallStart.getX() + finishPointCoordinnates[0]);
+				arcToFinish.setY(moveToBallStart.getY() + finishPointCoordinnates[1]);
+				arcToFinish.setRadiusX(OUTERCIRCLERADIUS+OUTERCIRCLESTROKE-ballStackInnerWheelYTranslation);
+				arcToFinish.setRadiusY(OUTERCIRCLERADIUS+OUTERCIRCLESTROKE-ballStackInnerWheelYTranslation);
+				
+				//If the x coordinnate is higher than Pi(half the wheel), go to half the path (arcToHalf) before to go to the final position
+				//Whithout that check, the path of the ball is wrong when the final position is in the right half of the wheel
+				if (finishPointCoordinnates[0] > 0)
+				{
+							
+					ballPath.getElements().addAll(moveToBallStart, arcToHalf, arcToStart,arcToHalf, arcToStart, arcToHalf, arcToStart, arcToHalf, arcToFinish);
+				}
+				//else, go right to the final position
+				else
+				{
+					ballPath.getElements().addAll(moveToBallStart, arcToHalf, arcToStart,arcToHalf, arcToStart, arcToHalf, arcToStart, arcToFinish);
+				}
+						
+				PathTransition pathTransition = new PathTransition(Duration.millis(8000), ballPath, rouletteBallStack);
+				pathTransition.setInterpolator(Interpolator.SPLINE(0.25, 0.4, 0.6, 0.99));//Spline creates a curve going between 0,0 and 1,1 (x=time, y = animation progress, 1 being 100%). Playing with the coordinates parameters allows to adjust the deceleration vs time.
+			
+							
+			SequentialTransition ballAnimationSequence = new SequentialTransition(pathTransition);
+			ballAnimationSequence.play();
+			
+			ballAnimationSequence.setOnFinished(new EventHandler<ActionEvent>()
+					{
+						@Override
+						public void handle(ActionEvent event)
+						{
+							playGetBallInPocketAnimation(arcToFinish);
+						}
+					});
+	}
+	
+	//This method makes and plays the animation that gets the ball from it's final rotating point to a pocket.
+	private void playGetBallInPocketAnimation(ArcTo arcToFinish)
+	{
+		//For this animation, the initial position of the ball is at the end of it's rotation
+		MoveTo moveToBallEnd = new MoveTo();
+		moveToBallEnd.setX(arcToFinish.getX());
+		moveToBallEnd.setY(arcToFinish.getY());
 		
-			/*(RotateTransition wheelRotation1 = new RotateTransition(Duration.millis(8000), pocketsPane);
+		//Check which pocket is closest to the ball
+			Pocket closestPocket = null;
+			Double closestDistance = 9999.9;
+			Double closestDistanceX = 0.0;
+			Double closestDistanceY = 0.0;
 			
-			//Rotations
-			int decisiveLastWheelRotationAngle = (int)(Math.random()*360);
+			for(Pocket pocket: LogicalRoulette.pocketsList)
+			{
+				Path pathTemp = pocket.getPath();
+				Point2D pathCoordinnates = pathTemp.localToScene(Point2D.ZERO);
+				Point2D ballCenterCoordinates = ballCenter.localToScene(Point2D.ZERO);
+				
+				Double distanceX = pathCoordinnates.getX() - ballCenterCoordinates.getX();
+				Double distanceY = pathCoordinnates.getY() - ballCenterCoordinates.getY();
+				
+				Double distance = Math.sqrt(Math.pow(distanceX, 2) + Math.pow(distanceY, 2));//Pythagorean theorem to get the distance between the ball and the pocket
+				
+				if(distance < closestDistance)
+				{
+					closestDistance = distance;
+					closestDistanceX = distanceX;
+					closestDistanceY = distanceY;
+					closestPocket = pocket;
+				}
+			}
+		//Get the coordinate of the third pocket following the closest pocket	
+		//****************************************************************************************************************************
+		//Utiliser l'arrayList de pocket que j'ai mis dans l'ordre
 			
-			wheelRotation1.setByAngle(900+decisiveLastWheelRotationAngle);
 			
-			//SequentialTransition
-			SequentialTransition seqTransition = new SequentialTransition();
-			seqTransition.getChildren().addAll(wheelRotation1);
-			
-			seqTransition.play();*/
-			
-			/*
-			final KeyValue keyValue = new KeyValue(roulette_imgView.rotateProperty(), 360);
-			final KeyFrame keyFrame = new KeyFrame(Duration.millis(3000), keyValue);
-			final KeyValue keyValue2 = new KeyValue(roulette_imgView.rotateProperty(), 360);
-			final KeyFrame keyFrame2 = new KeyFrame(Duration.millis(1000), keyValue2);
-			
-			//Timeline
-			final Timeline timeLine = new Timeline();
-			timeLine.getKeyFrames().add(keyFrame);
-			
-			final Timeline timeLine2 = new Timeline();
-			timeLine2.getKeyFrames().add(keyFrame2);
-			
-			timeLine.play();
-			//timeLine2.play();*/
-			
-		//Ball Rotation
-			Path ballPath = new Path();
-			
-			MoveTo moveTo = new MoveTo();
-			moveTo.setX(0.0);
-			moveTo.setY(0.0);
-			
-			ArcTo arcTo = new ArcTo();
-			arcTo.setX(0.0);
-			arcTo.setY(0.0);
-			arcTo.setRadiusX(0.95*(OUTERCIRCLERADIUS+OUTERCIRCLESTROKE));
-			arcTo.setRadiusY(0.95*(OUTERCIRCLERADIUS+OUTERCIRCLESTROKE));		
+		//Make an ArcTo to the closest pocket
+		ArcTo arcToPocket = new ArcTo();
+		arcToPocket.setX(moveToBallEnd.getX() + 0.85*closestDistanceX);
+		arcToPocket.setY(moveToBallEnd.getY() + 0.85*closestDistanceY);
+		arcToPocket.setRadiusX(30);
+		arcToPocket.setRadiusY(60);
+		
+		//Create the ball path from the finished rotation's ball position to the appropriate pocket
+		Path ballToPocketPath = new Path();
+		ballToPocketPath.getElements().addAll(moveToBallEnd, arcToPocket);
+		
+		PathTransition ballToPocketTransition = new PathTransition(Duration.millis(2000), ballToPocketPath, rouletteBallStack);
+		ballToPocketTransition.play();
+		
+		//System.out.println(pocket00Pane.get);
+		//System.out.println(pocket00Pane.localToScene(Point2D.ZERO));
+	}
+	
+	//This method is used to calculate the final position of the ball.
+	//It calculates a random position around the wheel based on a random rotation angle.
+	//See WheelBallFinalPositionCalculation.xlsx for more details.
+	private double[] calculateBallLocation()
+	{
+		//Final x position of the ball around the wheel
+		double x;
+		//Final y position of the ball around the wheel
+		double y;
+		
+		double[] coordinateTable = new double[2];//Table containing the x and y coordinnates. Used to return them.
+		
+		//Random rotation angle (from the center of the wheel to the final position of the ball)
+		//The angle is in rads for calculation purpose
+		double finalSpinAngle = Math.random()*2*Math.PI;
+		
+				
+		double ballRadius = OUTERMOSTCIRCLERADIUS-ballStackInnerWheelYTranslation;//Value of the length between the center of the wheel and the center of the ball
+		double angleChord = 2*ballRadius*Math.sin(finalSpinAngle/2);//Chord of the finalSpinAngle, see https://en.wikipedia.org/wiki/Chord_(geometry)#Chords_in_trigonometry	
+				
+		if (finalSpinAngle < Math.PI)
+			x = -(Math.sin(Math.acos((angleChord/2)/ballRadius))*(angleChord));
+		else
+			x = Math.sin(Math.acos((angleChord/2)/ballRadius))*(angleChord);
+		
+		y = Math.cos(Math.acos((angleChord/2)/ballRadius))*(angleChord);
+		
+		coordinateTable[0] = x;
+		coordinateTable[1] = y;	
+				
+		return coordinateTable;
 	}
 	
 	public void checkBallLocation()
