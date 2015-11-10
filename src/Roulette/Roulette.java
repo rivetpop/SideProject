@@ -18,8 +18,12 @@ import com.sun.javafx.collections.ObservableListWrapper;
 
 import Casino.GameInterface;
 import javafx.animation.RotateTransition;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.concurrent.Service;
+import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.HPos;
@@ -220,7 +224,7 @@ public class Roulette extends GameInterface
 		root = new Pane();
 		scene = new Scene(root, 800,800);
 		
-		LogicalRoulette.createPocketObjects();//create the pockets objects, used in setWheel()
+		LogicalRoulette.createPocketObjects();//create the pockets objects
 		createMenu();
 		createPlayerInfo();
 		setBall();
@@ -1137,7 +1141,7 @@ public class Roulette extends GameInterface
 			
 			Double lastRotationAngle = Math.random()*360.0;
 			
-			timelineWheel.getKeyFrames().add(new KeyFrame(Duration.millis(10000), new KeyValue(wheelRotation.angleProperty(),720+lastRotationAngle, Interpolator.SPLINE(0.25, 0.4, 0.6, 0.99))));//Spline creates a curve going between 0,0 and 1,1 (x=time, y = animation progress, 1 being 100%). Playing with the coordinates parameters allows to adjust the deceleration vs time.
+			timelineWheel.getKeyFrames().add(new KeyFrame(Duration.millis(12000), new KeyValue(wheelRotation.angleProperty(),720+lastRotationAngle, Interpolator.SPLINE(0.25, 0.4, 0.6, 0.99))));//Spline creates a curve going between 0,0 and 1,1 (x=time, y = animation progress, 1 being 100%). Playing with the coordinates parameters allows to adjust the deceleration vs time.
 			
 			SequentialTransition wheelAnimationSequence = new SequentialTransition(timelineWheel);
 			
@@ -1164,7 +1168,7 @@ public class Roulette extends GameInterface
 				arcToStart.setRadiusX(OUTERCIRCLERADIUS+OUTERCIRCLESTROKE-ballStackInnerWheelYTranslation);
 				arcToStart.setRadiusY(OUTERCIRCLERADIUS+OUTERCIRCLESTROKE-ballStackInnerWheelYTranslation);
 				
-				double[] finishPointCoordinnates = calculateBallLocation();//Calculate a random final position around the wheel
+				double[] finishPointCoordinnates = calculateBallLastRotationPosition();//Calculate a random final position around the wheel
 				ArcTo arcToFinish = new ArcTo();
 				arcToFinish.setX(moveToBallStart.getX() + finishPointCoordinnates[0]);
 				arcToFinish.setY(moveToBallStart.getY() + finishPointCoordinnates[1]);
@@ -1185,7 +1189,7 @@ public class Roulette extends GameInterface
 				}
 						
 				PathTransition pathTransition = new PathTransition(Duration.millis(8000), ballPath, rouletteBallStack);
-				pathTransition.setInterpolator(Interpolator.SPLINE(0.25, 0.4, 0.6, 0.99));//Spline creates a curve going between 0,0 and 1,1 (x=time, y = animation progress, 1 being 100%). Playing with the coordinates parameters allows to adjust the deceleration vs time.
+				pathTransition.setInterpolator(Interpolator.SPLINE(0.25, 0.4, 0.6, 0.8));//Spline creates a curve going between 0,0 and 1,1 (x=time, y = animation progress, 1 being 100%). Playing with the coordinates parameters allows to adjust the deceleration vs time.
 			
 							
 			SequentialTransition ballAnimationSequence = new SequentialTransition(pathTransition);
@@ -1196,24 +1200,20 @@ public class Roulette extends GameInterface
 						@Override
 						public void handle(ActionEvent event)
 						{
-							playGetBallInPocketAnimation(arcToFinish);
+							playGetBallInPocketZoneAnimation(arcToFinish);
 						}
 					});
 	}
 	
-	//This method makes and plays the animation that gets the ball from it's final rotating point to a pocket.
-	private void playGetBallInPocketAnimation(ArcTo arcToFinish)
-	{
-		//For this animation, the initial position of the ball is at the end of it's rotation
-		MoveTo moveToBallEnd = new MoveTo();
-		moveToBallEnd.setX(arcToFinish.getX());
-		moveToBallEnd.setY(arcToFinish.getY());
-		
-		//Check which pocket is closest to the ball
-			Pocket closestPocket = null;
+	//This method creates and plays the animation that gets the ball from it's final rotating point to a pocket.
+	//
+	private void playGetBallInPocketZoneAnimation(ArcTo arcToFinish)
+	{		
+		//Find the ArrayList index of the pocket that is closest to the ball at the end of it's rotation
+			int closestPocketArrayIndex=-1;
 			Double closestDistance = 9999.9;
-			Double closestDistanceX = 0.0;
-			Double closestDistanceY = 0.0;
+			
+			int arrayIndex=0;
 			
 			for(Pocket pocket: LogicalRoulette.pocketsList)
 			{
@@ -1229,38 +1229,228 @@ public class Roulette extends GameInterface
 				if(distance < closestDistance)
 				{
 					closestDistance = distance;
-					closestDistanceX = distanceX;
-					closestDistanceY = distanceY;
-					closestPocket = pocket;
+					closestPocketArrayIndex = arrayIndex;
 				}
+			
+				arrayIndex++;
 			}
-		//Get the coordinate of the third pocket following the closest pocket	
-		//****************************************************************************************************************************
-		//Utiliser l'arrayList de pocket que j'ai mis dans l'ordre
+			
+		//Get the coordinates of the third pocket following the closest pocket. It is the position where the ball will end up at the end of this animation.
+		// It does not mean that the third pocket is the final pocket. We only use it's coordinate to make an animation that gets the ball in the pockets zone.
+			/*int thirdPocketIndex = closestPocketArrayIndex+3;
+			if (thirdPocketIndex > 37)//The ArrayLists indexes go from 0 to 37. After 37, it must go back to 0.
+			{
+				switch (thirdPocketIndex)
+				{
+					case 38:
+						thirdPocketIndex = 0;
+						break;
+						
+					case 39:
+						thirdPocketIndex = 1;
+						break;
+					
+					case 40:
+						thirdPocketIndex = 2;
+				}
+			}*/
 			
 			
-		//Make an ArcTo to the closest pocket
-		ArcTo arcToPocket = new ArcTo();
-		arcToPocket.setX(moveToBallEnd.getX() + 0.85*closestDistanceX);
-		arcToPocket.setY(moveToBallEnd.getY() + 0.85*closestDistanceY);
-		arcToPocket.setRadiusX(30);
-		arcToPocket.setRadiusY(60);
+			//Get the coordinates of the seventh pocket following the closest pocket. It is the position where the ball will end up at the end of this animation.
+			// It does not mean that the seventh pocket is the final pocket. We only use it's coordinate to make an animation that gets the ball in the pockets zone.
+				int seventhPocketIndex = closestPocketArrayIndex + 7;
+				if (seventhPocketIndex > 37)//The ArrayLists indexes go from 0 to 37. After 37, it must go back to 0.
+				{
+					switch (seventhPocketIndex)
+					{
+						case 38:
+							seventhPocketIndex = 0;
+							break;
+							
+						case 39:
+							seventhPocketIndex = 1;
+							break;
+						
+						case 40:
+							seventhPocketIndex = 2;
+							
+						case 41:
+							seventhPocketIndex = 3;
+							break;
+							
+						case 42:
+							seventhPocketIndex = 4;
+							break;
+						
+						case 43:
+							seventhPocketIndex = 5;
+							break;
+							
+						case 44:
+							seventhPocketIndex = 6;
+					}
+				}
+				
+			/*Pocket thirdPocket = LogicalRoulette.pocketsList.get(thirdPocketIndex);
+			Point2D thirdPocketPathCoord = thirdPocket.getPath().localToScene(Point2D.ZERO);
+			Point2D ballCenterCoordinates = ballCenter.localToScene(Point2D.ZERO);
+			
+			Double thirdPocketXDistance = thirdPocketPathCoord.getX() - ballCenterCoordinates.getX();
+			Double thirdPocketYDistance = thirdPocketPathCoord.getY() - ballCenterCoordinates.getY();*/
+			
+			
+			Pocket seventhPocket = LogicalRoulette.pocketsList.get(seventhPocketIndex);
+			Point2D seventhPocketPathCoord = seventhPocket.getPath().localToScene(Point2D.ZERO);
+			Point2D ballCenterCoordinates = ballCenter.localToScene(Point2D.ZERO);
+			
+			Double seventhPocketXDistance = seventhPocketPathCoord.getX() - ballCenterCoordinates.getX();
+			Double seventhPocketYDistance = seventhPocketPathCoord.getY() - ballCenterCoordinates.getY();
 		
-		//Create the ball path from the finished rotation's ball position to the appropriate pocket
+		//For this animation, the initial position of the ball is at the end of it's rotation.
+			MoveTo moveToBallEnd = new MoveTo();
+			moveToBallEnd.setX(arcToFinish.getX());
+			moveToBallEnd.setY(arcToFinish.getY());	
+		
+		//Get the ball into the pocket zone by following the path to the thirdPocket's coordinates
+			ArcTo arcToPocket = new ArcTo();
+			/*arcToPocket.setX(moveToBallEnd.getX() + 0.7*thirdPocketXDistance);
+			arcToPocket.setY(moveToBallEnd.getY() + 0.7*thirdPocketYDistance);*/
+			
+			arcToPocket.setX(moveToBallEnd.getX() + 0.7*seventhPocketXDistance);
+			arcToPocket.setY(moveToBallEnd.getY() + 0.7*seventhPocketYDistance);
+			arcToPocket.setRadiusX(10);
+			arcToPocket.setRadiusY(2);//*******************************************************************************Jouer avec les radius ou les sevent/third pocket pour faire une animation correcte
+			//Essayer avec une QuadCurve plutot que arcTo, ca permet de faire une curve avec des points de controles
+			
+		//Create the ball path from the finished rotation's ball position to the pocket zone
 		Path ballToPocketPath = new Path();
 		ballToPocketPath.getElements().addAll(moveToBallEnd, arcToPocket);
 		
-		PathTransition ballToPocketTransition = new PathTransition(Duration.millis(2000), ballToPocketPath, rouletteBallStack);
+		PathTransition ballToPocketTransition = new PathTransition(Duration.millis(1000), ballToPocketPath, rouletteBallStack);
+		ballToPocketTransition.setInterpolator(Interpolator.SPLINE(0.25, 0.4, 0.6, 0.8));//Spline creates a curve going between 0,0 and 1,1 (x=time, y = animation progress, 1 being 100%). Playing with the coordinates parameters allows to adjust the deceleration vs time.
 		ballToPocketTransition.play();
 		
-		//System.out.println(pocket00Pane.get);
-		//System.out.println(pocket00Pane.localToScene(Point2D.ZERO));
+		ballToPocketTransition.setOnFinished(new EventHandler<ActionEvent>()
+				{
+					@Override
+					public void handle(ActionEvent event)
+					{
+						/*Get the ball in it's final resting position in the pocket it collides
+						 * Made by placing the rouletteBallStack in the parent (StackPane) of the collidingPocket's path 
+						 */						
+						Pocket finalPocket = getCollidingPocket();
+						StackPane finalPocketStackPane = (StackPane) finalPocket.getPath().getParent();
+						rouletteBallStack.setTranslateY(12);//To replace the initial Y translation of the ballStack and place the ball in the proper place inside the pocket
+						rouletteBallStack.setTranslateX(0);//To replace the initial X translation of the ballStack
+						finalPocketStackPane.getChildren().add(2, rouletteBallStack);
+						
+						
+						/*TEMP
+						 * System.out.println("transalteY:" + rouletteBallStack.getTranslateY());
+						System.out.println(finalPocket.getPath().getParent());
+						System.out.println("transalteX:" + rouletteBallStack.getTranslateX());
+						System.out.println(finalPocket.getNumber());
+						System.out.println("test");
+						System.out.println(rouletteBallStack.getParent());*/
+						
+						
+						
+						/*StackPane rouletteStackPane = (StackPane)rouletteBallStack.getParent();
+						rouletteStackPane.getChildren().remove(rouletteBallStack);
+						StackPane finalPocketStackPane = (StackPane) finalPocket.getPath().getParent();
+						finalPocketStackPane.getChildren().add(rouletteBallStack);*/
+						
+						/*while (getCollidingPockets().size() > 1)
+						{
+							System.out.println(getCollidingPockets().size() > 1);
+						}*/
+					
+					
+						/*final Service<Void> finalBallAnimationService = new Service<Void>()
+						{
+							@Override
+							protected Task<Void> createTask()
+							{
+								return new Task<Void>()
+								{
+									@Override
+									protected Void call() throws Exception
+									{
+										int sizee = getCollidingPockets().size();
+										while (sizee > 1)
+										{
+											System.out.println("size"+sizee);
+											sizee = getCollidingPockets().size();
+										}
+										System.out.println("size" + sizee);
+										return null;
+									}
+								};
+							}
+						};
+						finalBallAnimationService.start();
+					*/}	
+				});
 	}
 	
-	//This method is used to calculate the final position of the ball.
-	//It calculates a random position around the wheel based on a random rotation angle.
+	//When the ball touches two pockets,
+	//this method moves the ball to it's final location in the appropriate pocket (the one that holds the ballCenter.
+	private void moveBallToFinalPositionInPocket(ArcTo ballPosition)
+	{
+		Pocket finalPocket = null;
+		Shape collisionShape = null;
+		
+		//With an intersect test, get the finalPocket that holds the center of the ball
+		for (Pocket pocket: LogicalRoulette.pocketsList)
+		{
+			collisionShape = Shape.intersect(ballCenter, pocket.getPath());
+			System.out.println(collisionShape.getBoundsInLocal().getWidth());
+			if (collisionShape.getBoundsInLocal().getWidth() != -1)//-1 because it is the returned value of .intersect when no intersection is detected
+			{	
+				finalPocket = pocket;
+				System.out.println(finalPocket.getNumber());
+				break;
+			}
+		}
+		
+		//rouletteBallStack.localToScene(Point2D.ZERO).
+		
+		//While the ball is not at it's final position, move it towards it.
+		if (getBallPosition().getX() != getFinalBallPosition(finalPocket).getX()
+			   && getBallPosition().getY() != getFinalBallPosition(finalPocket).getY())
+		{
+			
+			MoveTo moveToBallPosition = new MoveTo();
+			moveToBallPosition.setX(getBallPosition().getX());
+			moveToBallPosition.setY(getBallPosition().getY());	
+			
+			ArcTo arcToFinalPosition = new ArcTo();
+			arcToFinalPosition.setX(moveToBallPosition.getX() + (getFinalBallPosition(finalPocket).getX() - getBallPosition().getX()));
+			arcToFinalPosition.setY(moveToBallPosition.getY() + (getFinalBallPosition(finalPocket).getY() - getBallPosition().getY()));
+		
+			Path ballToPocketPath = new Path();
+			ballToPocketPath.getElements().addAll(moveToBallPosition, arcToFinalPosition);
+			
+			PathTransition ballToPocketTransition = new PathTransition(Duration.millis(100), ballToPocketPath, rouletteBallStack);
+			ballToPocketTransition.setInterpolator(Interpolator.SPLINE(0.25, 0.4, 0.6, 0.8));//Spline creates a curve going between 0,0 and 1,1 (x=time, y = animation progress, 1 being 100%). Playing with the coordinates parameters allows to adjust the deceleration vs time.
+			ballToPocketTransition.play();
+			System.out.println("test");
+		}
+		//*/
+		
+		/*StackPane rouletteStackPane = (StackPane)rouletteBallStack.getParent();
+		rouletteStackPane.getChildren().remove(rouletteBallStack);
+		StackPane finalPocketStackPane = (StackPane) finalPocket.getPath().getParent();
+		finalPocketStackPane.getChildren().add(rouletteBallStack);*/
+		
+		//https://community.oracle.com/thread/2348655
+		
+	}
+	
+	//This method is used to calculate the position of the ball after the rotation
+	//It calculates a position around the wheel based on a random rotation angle.
 	//See WheelBallFinalPositionCalculation.xlsx for more details.
-	private double[] calculateBallLocation()
+	private double[] calculateBallLastRotationPosition()
 	{
 		//Final x position of the ball around the wheel
 		double x;
@@ -1290,16 +1480,59 @@ public class Roulette extends GameInterface
 		return coordinateTable;
 	}
 	
+	//Returns an arraylist containing the pockets intersecting the ball
+	private ArrayList<Pocket> getCollidingPockets()
+	{
+		ArrayList<Pocket> collidingPocketsList = new ArrayList<Pocket>();
+		Shape collisionShape = null;
+		
+		for (Pocket pocket: LogicalRoulette.pocketsList)
+		{
+			collisionShape = Shape.intersect(rouletteBall, pocket.getPath());
+			if (collisionShape.getBoundsInLocal().getWidth() != -1)//-1 because it is the returned value of .intersect when no intersection is detected
+			{
+				collidingPocketsList.add(pocket);
+				System.out.println("pocket:" + pocket.getNumber());
+			}
+		}
+		return collidingPocketsList;
+	}
+	
+	private Pocket getCollidingPocket()
+	{
+		Shape collisionShape = null;
+		Pocket collidingPocket = null;
+		for (Pocket pocket: LogicalRoulette.pocketsList)
+		{
+			collisionShape = Shape.intersect(ballCenter, pocket.getPath());
+			if (collisionShape.getBoundsInLocal().getWidth() != -1)//-1 because it is the returned value of .intersect when no intersection is detected
+			{
+				collidingPocket = pocket;
+				//System.out.println("pocket:" + pocket.getNumber());
+			}
+		}
+		return collidingPocket;
+	}
+			
+	private Point2D getBallPosition()
+	{
+		return ballCenter.localToScene(Point2D.ZERO);
+	}
+	
+	private Point2D getFinalBallPosition(Pocket resultPocket)
+	{
+		return resultPocket.getPath().localToScene(LogicalRoulette.pocket00.getPath().getBoundsInLocal().getWidth()/2,LogicalRoulette.pocket00.getPath().getBoundsInLocal().getHeight()*0.60);
+	}
+	
 	public void checkBallLocation()
 	{
-		  /*  boolean ballCollision = false;
+		   boolean ballCollision = false;
 		    Shape shapeTemp = null;
 		    shapeTemp = (Shape.intersect(ballCenter, rouletteBall));
 		    
 		   if (shapeTemp.getBoundsInLocal().getWidth() != -1) 
 		    {
 		    	ballCollision = true;
-		    }
-	     */  
+		    }  
 	}
 }

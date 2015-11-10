@@ -1,9 +1,3 @@
-//Note: Envisager de générer un ArrayList avec les informations des joueurs provenant du fichier de 
-//sauvegarde lors du démarrage du programme,
-//ca pourrais simplifier beaucoup certaines methodes.
-
-//Note: Envisager de créer un fichier de sauvegarde par profile de joueur
-
 package Casino;
 
 import java.io.BufferedReader;
