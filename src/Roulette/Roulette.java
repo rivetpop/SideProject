@@ -30,6 +30,7 @@ import javafx.geometry.HPos;
 import javafx.geometry.Insets;
 import javafx.geometry.Point2D;
 import javafx.geometry.Pos;
+import javafx.scene.AmbientLight;
 import javafx.scene.Group;
 import javafx.scene.Node;
 import javafx.scene.Scene;
@@ -51,7 +52,6 @@ import javafx.scene.layout.Pane;
 import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.CornerRadii;
 import javafx.scene.layout.GridPane;
-import javafx.scene.layout.Pane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.RowConstraints;
@@ -68,6 +68,8 @@ import javafx.scene.shape.LineTo;
 import javafx.scene.shape.MoveTo;
 import javafx.scene.shape.Path;
 import javafx.scene.shape.Polygon;
+import javafx.scene.shape.QuadCurve;
+import javafx.scene.shape.QuadCurveTo;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.shape.Shape;
 import javafx.scene.shape.Sphere;
@@ -112,6 +114,10 @@ public class Roulette extends GameInterface
 	final double ballStackInnerWheelYTranslation = 15;//Distance between the outer edge of the wheel and the starting position of the ball
 	int rouletteWheelXTranslation = 10;
 	int rouletteWheelYTranslation = 10;
+	
+	//Rotation angle of the last spin of the ball around the wheel (in radians).
+	//Used to do calculations for the ball animations.
+	double finalSpinAngle;
 	
 		//Pane containing all the pockets pane
 		private Pane pocketsPane = null;
@@ -232,7 +238,6 @@ public class Roulette extends GameInterface
 		setTable();
 		setButtons();
 		setMessageZone("Click on the table to place a bet!");
-		checkBallLocation();
 		
 		/*Line test = new Line (0.0, 0.0, 0.0, 125.0);
 		test.setStrokeWidth(5);
@@ -266,9 +271,9 @@ public class Roulette extends GameInterface
 				Circle innerCircle = new Circle(INNERCIRCLERADIUS);
 				innerCircle.setFill(Color.GOLDENROD);
 				Light.Point light = new Light.Point();
-				light.setX(150);
-				 light.setY(150);
-				 light.setZ(150);
+				light.setX(120);
+				light.setY(120);
+				light.setZ(150);
 				Lighting innerWheelLighting = new Lighting();
 				innerWheelLighting.setLight(light);
 				
@@ -282,7 +287,13 @@ public class Roulette extends GameInterface
 				outerCircle.setStrokeType(StrokeType.OUTSIDE);
 				outerCircle.setStroke(Color.DARKRED);
 				
-				outerCircle.setEffect(innerWheelLighting);
+				Light.Point light2 = new Light.Point();
+				light2.setX(230);
+				light2.setY(230);
+				light2.setZ(300);
+				Lighting outerWheelLighting = new Lighting();
+				outerWheelLighting.setLight(light2);
+				outerCircle.setEffect(outerWheelLighting);
 				
 			//Outermost circle
 				Circle outerMostCircle = new Circle(OUTERMOSTCIRCLERADIUS);
@@ -296,7 +307,16 @@ public class Roulette extends GameInterface
 				pocketsCircle = new Circle(INNERCIRCLERADIUS+(OUTERCIRCLERADIUS-INNERCIRCLERADIUS)/2);
 				pocketsCircle.setFill(Color.TRANSPARENT);
 				pocketsCircle.setStroke(Color.WHITE);
-				pocketsCircle.setStrokeWidth(2);
+				pocketsCircle.setStrokeWidth(2);							
+				
+				Light.Point light4 = new Light.Point();
+				light4.setX(150);
+				light4.setY(150);
+				light4.setZ(200);
+				Lighting pocketsCircleLighting = new Lighting();
+				
+				pocketsCircleLighting.setLight(light4);
+				pocketsCircle.setEffect(pocketsCircleLighting);
 				
 				
 			//Graphic Pockets
@@ -768,7 +788,16 @@ public class Roulette extends GameInterface
 				pocketsPane.getChildren().addAll(pocket00Pane, pocket0Pane, pocket1Pane, pocket2Pane, pocket3Pane, pocket4Pane, pocket5Pane, pocket6Pane, pocket7Pane, pocket8Pane, pocket9Pane, pocket10Pane, pocket11Pane, pocket12Pane, pocket13Pane, pocket14Pane, pocket15Pane, pocket16Pane, pocket17Pane, pocket18Pane, pocket19Pane, pocket20Pane, pocket21Pane, pocket22Pane, pocket23Pane, pocket24Pane, pocket25Pane, pocket26Pane, pocket27Pane, pocket28Pane, pocket29Pane, pocket30Pane, pocket31Pane, pocket32Pane, pocket33Pane, pocket34Pane, pocket35Pane, pocket36Pane);
 				pocketsPane.setTranslateX(223.5);
 				pocketsPane.setTranslateY(60);
-		
+				
+				Light.Point light3 = new Light.Point();
+				light3.setX(180);
+				light3.setY(180);
+				light3.setZ(400);
+				Lighting pocketsLighting = new Lighting();
+				
+				pocketsLighting.setLight(light3);
+				pocketsPane.setEffect(pocketsLighting);
+				//APPLIQUER EFFET DE LUMIERE SUR LA BALLE et la table**************************************************************************************************************************
 				
 		//RouletteWheel
 		rouletteWheel = new StackPane();
@@ -1136,12 +1165,12 @@ public class Roulette extends GameInterface
 			
 			pocketsPane.getTransforms().add(wheelRotation);
 			
-			//Timeline			
+			//Timeline for wheel rotation animation			
 			Timeline timelineWheel = new Timeline();
 			
-			Double lastRotationAngle = Math.random()*360.0;
+			Double lastRotationAngle = Math.random()*360.0;//The angle of the last rotation of the wheel is random
 			
-			timelineWheel.getKeyFrames().add(new KeyFrame(Duration.millis(12000), new KeyValue(wheelRotation.angleProperty(),720+lastRotationAngle, Interpolator.SPLINE(0.25, 0.4, 0.6, 0.99))));//Spline creates a curve going between 0,0 and 1,1 (x=time, y = animation progress, 1 being 100%). Playing with the coordinates parameters allows to adjust the deceleration vs time.
+			timelineWheel.getKeyFrames().add(new KeyFrame(Duration.millis(12000), new KeyValue(wheelRotation.angleProperty(),720+lastRotationAngle, Interpolator.SPLINE(0.25, 0.4, 0.6, 0.99))));//SPLINE interpolator creates a curve going between 0,0 and 1,1 (x=time, y = animation progress, 1 being 100%). Playing with the coordinates parameters allows to adjust the deceleration vs time.
 			
 			SequentialTransition wheelAnimationSequence = new SequentialTransition(timelineWheel);
 			
@@ -1206,14 +1235,14 @@ public class Roulette extends GameInterface
 	}
 	
 	//This method creates and plays the animation that gets the ball from it's final rotating point to a pocket.
-	//
+	//ArcToFinish parameter is received to access the x,y coordinates of the ball after it's rotation.
 	private void playGetBallInPocketZoneAnimation(ArcTo arcToFinish)
 	{		
-		//Find the ArrayList index of the pocket that is closest to the ball at the end of it's rotation
-			int closestPocketArrayIndex=-1;
+		//Find the ArrayList's index of the pocket that is closest to the ball at the end of it's rotation
+			int closestPocketArrayIndex = -1;
 			Double closestDistance = 9999.9;
 			
-			int arrayIndex=0;
+			int arrayIndex = 0;
 			
 			for(Pocket pocket: LogicalRoulette.pocketsList)
 			{
@@ -1233,31 +1262,12 @@ public class Roulette extends GameInterface
 				}
 			
 				arrayIndex++;
-			}
+			}		
 			
-		//Get the coordinates of the third pocket following the closest pocket. It is the position where the ball will end up at the end of this animation.
-		// It does not mean that the third pocket is the final pocket. We only use it's coordinate to make an animation that gets the ball in the pockets zone.
-			/*int thirdPocketIndex = closestPocketArrayIndex+3;
-			if (thirdPocketIndex > 37)//The ArrayLists indexes go from 0 to 37. After 37, it must go back to 0.
-			{
-				switch (thirdPocketIndex)
-				{
-					case 38:
-						thirdPocketIndex = 0;
-						break;
-						
-					case 39:
-						thirdPocketIndex = 1;
-						break;
-					
-					case 40:
-						thirdPocketIndex = 2;
-				}
-			}*/
-			
-			
-			//Get the coordinates of the seventh pocket following the closest pocket. It is the position where the ball will end up at the end of this animation.
-			// It does not mean that the seventh pocket is the final pocket. We only use it's coordinate to make an animation that gets the ball in the pockets zone.
+			//Get the coordinates of the seventh pocket following the closest pocket. 
+			//It is used to create a path animation that gets the ball into the pocket zone.
+			//It does not mean that the seventh pocket is the final pocket, 
+			//we only use it's coordinate to make the path.
 				int seventhPocketIndex = closestPocketArrayIndex + 7;
 				if (seventhPocketIndex > 37)//The ArrayLists indexes go from 0 to 37. After 37, it must go back to 0.
 				{
@@ -1291,14 +1301,6 @@ public class Roulette extends GameInterface
 					}
 				}
 				
-			/*Pocket thirdPocket = LogicalRoulette.pocketsList.get(thirdPocketIndex);
-			Point2D thirdPocketPathCoord = thirdPocket.getPath().localToScene(Point2D.ZERO);
-			Point2D ballCenterCoordinates = ballCenter.localToScene(Point2D.ZERO);
-			
-			Double thirdPocketXDistance = thirdPocketPathCoord.getX() - ballCenterCoordinates.getX();
-			Double thirdPocketYDistance = thirdPocketPathCoord.getY() - ballCenterCoordinates.getY();*/
-			
-			
 			Pocket seventhPocket = LogicalRoulette.pocketsList.get(seventhPocketIndex);
 			Point2D seventhPocketPathCoord = seventhPocket.getPath().localToScene(Point2D.ZERO);
 			Point2D ballCenterCoordinates = ballCenter.localToScene(Point2D.ZERO);
@@ -1311,16 +1313,20 @@ public class Roulette extends GameInterface
 			moveToBallEnd.setX(arcToFinish.getX());
 			moveToBallEnd.setY(arcToFinish.getY());	
 		
-		//Get the ball into the pocket zone by following the path to the thirdPocket's coordinates
+		//Get the ball into the pocket zone by following the path to the seventhPocket's coordinates
 			ArcTo arcToPocket = new ArcTo();
-			/*arcToPocket.setX(moveToBallEnd.getX() + 0.7*thirdPocketXDistance);
-			arcToPocket.setY(moveToBallEnd.getY() + 0.7*thirdPocketYDistance);*/
 			
-			arcToPocket.setX(moveToBallEnd.getX() + 0.7*seventhPocketXDistance);
-			arcToPocket.setY(moveToBallEnd.getY() + 0.7*seventhPocketYDistance);
-			arcToPocket.setRadiusX(10);
-			arcToPocket.setRadiusY(2);//*******************************************************************************Jouer avec les radius ou les sevent/third pocket pour faire une animation correcte
-			//Essayer avec une QuadCurve plutot que arcTo, ca permet de faire une curve avec des points de controles
+			arcToPocket.setX(moveToBallEnd.getX() + 0.55*seventhPocketXDistance);//Get the ball at 55% of the path to seventhPockets position. It gets it inside the wheel where we want. 55% is determined by trial and error.
+			arcToPocket.setY(moveToBallEnd.getY() + 0.55*seventhPocketYDistance);//Get the ball at 55% of the path to seventhPockets position. It gets it inside the wheel where we want. 55% is determined by trial and error.
+			arcToPocket.setRadiusX(OUTERMOSTCIRCLERADIUS-ballStackInnerWheelYTranslation);//ArcTo path elements are elliptical. RadiusX is the distance between the center of the wheel and the ball.
+			arcToPocket.setRadiusY(OUTERMOSTCIRCLERADIUS-ballStackInnerWheelYTranslation-100);//YRadius determined by trial and error
+			arcToPocket.setXAxisRotation(-(Math.toDegrees(finalSpinAngle) - 45));//- 45 determined by trial and error. It rotates the elliptical path to get a good looking path.
+			
+			//DEBUG
+			//System.out.println("initX:" + moveToBallEnd.getX());
+			//System.out.println("initY:" + moveToBallEnd.getY());
+			//System.out.println("EndX:" + arcToPocket.getX());
+			//System.out.println("EndY:" + arcToPocket.getY());
 			
 		//Create the ball path from the finished rotation's ball position to the pocket zone
 		Path ballToPocketPath = new Path();
@@ -1335,7 +1341,7 @@ public class Roulette extends GameInterface
 					@Override
 					public void handle(ActionEvent event)
 					{
-						/*Get the ball in it's final resting position in the pocket it collides
+						/*Get the ball in it's final resting position in the pocket that it collides
 						 * Made by placing the rouletteBallStack in the parent (StackPane) of the collidingPocket's path 
 						 */						
 						Pocket finalPocket = getCollidingPocket();
@@ -1344,108 +1350,18 @@ public class Roulette extends GameInterface
 						rouletteBallStack.setTranslateX(0);//To replace the initial X translation of the ballStack
 						finalPocketStackPane.getChildren().add(2, rouletteBallStack);
 						
-						
-						/*TEMP
+						/*DEBUG
 						 * System.out.println("transalteY:" + rouletteBallStack.getTranslateY());
 						System.out.println(finalPocket.getPath().getParent());
 						System.out.println("transalteX:" + rouletteBallStack.getTranslateX());
 						System.out.println(finalPocket.getNumber());
 						System.out.println("test");
 						System.out.println(rouletteBallStack.getParent());*/
-						
-						
-						
-						/*StackPane rouletteStackPane = (StackPane)rouletteBallStack.getParent();
-						rouletteStackPane.getChildren().remove(rouletteBallStack);
-						StackPane finalPocketStackPane = (StackPane) finalPocket.getPath().getParent();
-						finalPocketStackPane.getChildren().add(rouletteBallStack);*/
-						
-						/*while (getCollidingPockets().size() > 1)
-						{
-							System.out.println(getCollidingPockets().size() > 1);
-						}*/
-					
-					
-						/*final Service<Void> finalBallAnimationService = new Service<Void>()
-						{
-							@Override
-							protected Task<Void> createTask()
-							{
-								return new Task<Void>()
-								{
-									@Override
-									protected Void call() throws Exception
-									{
-										int sizee = getCollidingPockets().size();
-										while (sizee > 1)
-										{
-											System.out.println("size"+sizee);
-											sizee = getCollidingPockets().size();
-										}
-										System.out.println("size" + sizee);
-										return null;
-									}
-								};
-							}
-						};
-						finalBallAnimationService.start();
-					*/}	
+						}	
 				});
 	}
 	
-	//When the ball touches two pockets,
-	//this method moves the ball to it's final location in the appropriate pocket (the one that holds the ballCenter.
-	private void moveBallToFinalPositionInPocket(ArcTo ballPosition)
-	{
-		Pocket finalPocket = null;
-		Shape collisionShape = null;
-		
-		//With an intersect test, get the finalPocket that holds the center of the ball
-		for (Pocket pocket: LogicalRoulette.pocketsList)
-		{
-			collisionShape = Shape.intersect(ballCenter, pocket.getPath());
-			System.out.println(collisionShape.getBoundsInLocal().getWidth());
-			if (collisionShape.getBoundsInLocal().getWidth() != -1)//-1 because it is the returned value of .intersect when no intersection is detected
-			{	
-				finalPocket = pocket;
-				System.out.println(finalPocket.getNumber());
-				break;
-			}
-		}
-		
-		//rouletteBallStack.localToScene(Point2D.ZERO).
-		
-		//While the ball is not at it's final position, move it towards it.
-		if (getBallPosition().getX() != getFinalBallPosition(finalPocket).getX()
-			   && getBallPosition().getY() != getFinalBallPosition(finalPocket).getY())
-		{
-			
-			MoveTo moveToBallPosition = new MoveTo();
-			moveToBallPosition.setX(getBallPosition().getX());
-			moveToBallPosition.setY(getBallPosition().getY());	
-			
-			ArcTo arcToFinalPosition = new ArcTo();
-			arcToFinalPosition.setX(moveToBallPosition.getX() + (getFinalBallPosition(finalPocket).getX() - getBallPosition().getX()));
-			arcToFinalPosition.setY(moveToBallPosition.getY() + (getFinalBallPosition(finalPocket).getY() - getBallPosition().getY()));
-		
-			Path ballToPocketPath = new Path();
-			ballToPocketPath.getElements().addAll(moveToBallPosition, arcToFinalPosition);
-			
-			PathTransition ballToPocketTransition = new PathTransition(Duration.millis(100), ballToPocketPath, rouletteBallStack);
-			ballToPocketTransition.setInterpolator(Interpolator.SPLINE(0.25, 0.4, 0.6, 0.8));//Spline creates a curve going between 0,0 and 1,1 (x=time, y = animation progress, 1 being 100%). Playing with the coordinates parameters allows to adjust the deceleration vs time.
-			ballToPocketTransition.play();
-			System.out.println("test");
-		}
-		//*/
-		
-		/*StackPane rouletteStackPane = (StackPane)rouletteBallStack.getParent();
-		rouletteStackPane.getChildren().remove(rouletteBallStack);
-		StackPane finalPocketStackPane = (StackPane) finalPocket.getPath().getParent();
-		finalPocketStackPane.getChildren().add(rouletteBallStack);*/
-		
-		//https://community.oracle.com/thread/2348655
-		
-	}
+	
 	
 	//This method is used to calculate the position of the ball after the rotation
 	//It calculates a position around the wheel based on a random rotation angle.
@@ -1457,11 +1373,12 @@ public class Roulette extends GameInterface
 		//Final y position of the ball around the wheel
 		double y;
 		
-		double[] coordinateTable = new double[2];//Table containing the x and y coordinnates. Used to return them.
+		double[] coordinateTable = new double[2];//Table containing the x and y coordinates. Used to return them.
 		
 		//Random rotation angle (from the center of the wheel to the final position of the ball)
 		//The angle is in rads for calculation purpose
-		double finalSpinAngle = Math.random()*2*Math.PI;
+		finalSpinAngle = Math.random()*2*Math.PI;
+		//finalSpinAngle = 2*Math.PI*0.25; //DEBUG (DETERMINED ANGLE)
 		
 				
 		double ballRadius = OUTERMOSTCIRCLERADIUS-ballStackInnerWheelYTranslation;//Value of the length between the center of the wheel and the center of the ball
@@ -1480,24 +1397,8 @@ public class Roulette extends GameInterface
 		return coordinateTable;
 	}
 	
-	//Returns an arraylist containing the pockets intersecting the ball
-	private ArrayList<Pocket> getCollidingPockets()
-	{
-		ArrayList<Pocket> collidingPocketsList = new ArrayList<Pocket>();
-		Shape collisionShape = null;
-		
-		for (Pocket pocket: LogicalRoulette.pocketsList)
-		{
-			collisionShape = Shape.intersect(rouletteBall, pocket.getPath());
-			if (collisionShape.getBoundsInLocal().getWidth() != -1)//-1 because it is the returned value of .intersect when no intersection is detected
-			{
-				collidingPocketsList.add(pocket);
-				System.out.println("pocket:" + pocket.getNumber());
-			}
-		}
-		return collidingPocketsList;
-	}
-	
+	//Check which pocket is intersecting the ballCenter.
+	//Returns that pocket.
 	private Pocket getCollidingPocket()
 	{
 		Shape collisionShape = null;
@@ -1508,31 +1409,10 @@ public class Roulette extends GameInterface
 			if (collisionShape.getBoundsInLocal().getWidth() != -1)//-1 because it is the returned value of .intersect when no intersection is detected
 			{
 				collidingPocket = pocket;
+				//DEBUG
 				//System.out.println("pocket:" + pocket.getNumber());
 			}
 		}
 		return collidingPocket;
-	}
-			
-	private Point2D getBallPosition()
-	{
-		return ballCenter.localToScene(Point2D.ZERO);
-	}
-	
-	private Point2D getFinalBallPosition(Pocket resultPocket)
-	{
-		return resultPocket.getPath().localToScene(LogicalRoulette.pocket00.getPath().getBoundsInLocal().getWidth()/2,LogicalRoulette.pocket00.getPath().getBoundsInLocal().getHeight()*0.60);
-	}
-	
-	public void checkBallLocation()
-	{
-		   boolean ballCollision = false;
-		    Shape shapeTemp = null;
-		    shapeTemp = (Shape.intersect(ballCenter, rouletteBall));
-		    
-		   if (shapeTemp.getBoundsInLocal().getWidth() != -1) 
-		    {
-		    	ballCollision = true;
-		    }  
 	}
 }
