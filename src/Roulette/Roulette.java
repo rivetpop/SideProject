@@ -52,6 +52,10 @@ import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Background;
 import javafx.scene.layout.BackgroundFill;
+import javafx.scene.layout.Border;
+import javafx.scene.layout.BorderStroke;
+import javafx.scene.layout.BorderStrokeStyle;
+import javafx.scene.layout.BorderWidths;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.CornerRadii;
@@ -93,7 +97,7 @@ public class Roulette extends GameInterface
 	public Scene scene = null;
 	private Pane root  = null;
 	private Group buttonsGroup = null;
-	private VBox msgZone = null;
+	private StackPane msgZone = null;
 	
 	public Button spinTheWheelButton = null;
 	public Button removeLastBetButton = null;
@@ -236,6 +240,9 @@ public class Roulette extends GameInterface
 			Map<String, Shape> straightBetZoneMap = new HashMap<String, Shape>();
 			Map<String, Shape> splitBetZoneMap = new HashMap<String, Shape>();
 			Map<String, Shape> streetBetZoneMap = new HashMap<String, Shape>();
+			Map<String, Shape> cornerBetZoneMap = new HashMap<String, Shape>();
+			Map<String, Shape> basketBetZoneMap = new HashMap<String, Shape>();
+			Map<String, Shape> topLineBetZoneMap = new HashMap<String, Shape>();
 			
 		//Pane containing the different table betting zones
 		private Pane tableBetLayout = null;
@@ -245,12 +252,19 @@ public class Roulette extends GameInterface
 				private GridPane tableStraightBetZone2;
 			//Zone containing the zeros bets	
 				private VBox tableStraightBetZone3;
+				
+	//Roulette chip image
+		Image rouletteChipImg = null;
+		ImageView rouletteChipImgView = null;
 			
 	public Roulette()
 	{
 		root = new Pane();
 		scene = new Scene(root, 800,800);
 				
+		rouletteChipImg = new Image("roulette_chip.jpg");
+		rouletteChipImgView = new ImageView(rouletteChipImg);
+		
 		LogicalRoulette.createPocketObjects();//create the pockets objects
 		createMenu();
 		createPlayerInfo();
@@ -260,6 +274,9 @@ public class Roulette extends GameInterface
 		setStraightBetZones();
 		setSplitBetZones();
 		setStreetBetZones();
+		setCornerBetZones();
+		setBasketBetZone();
+		topLineBetZone();
 		setButtons();
 		setMessageZone("Click on the table to place a bet!");
 		
@@ -277,7 +294,7 @@ public class Roulette extends GameInterface
 		buttonsGroup.setTranslateX(430);
 		buttonsGroup.setTranslateY(370);
 		
-		msgZone.setTranslateX(475);
+		msgZone.setTranslateX(500);
 		msgZone.setTranslateY(130);
 		
 		rouletteWheel.setTranslateX(rouletteWheelXTranslation);
@@ -1138,14 +1155,7 @@ public class Roulette extends GameInterface
 		tableLayout.setTranslateY(520);
 		
 		//Set the lighting of the table
-		Light.Point tableLight = new Light.Point();
-		tableLight.setX(300);
-		tableLight.setY(150);
-		tableLight.setZ(600);
-		Lighting tableLighting = new Lighting();		
-		tableLighting.setLight(tableLight);
-		tableLayout.setEffect(tableLighting);
-		
+		setTableLight();	
 			
 		//Set the border of the table. Made of a white background with gaps between the cells.
 		tableCenterZone.setBackground(new Background(new BackgroundFill(Color.WHITE, CornerRadii.EMPTY, Insets.EMPTY)));
@@ -1157,6 +1167,20 @@ public class Roulette extends GameInterface
 		tableRightZone.setVgap(TABLE_MAIN_CELL_GAP);
 		tableRightZone.setHgap(TABLE_MAIN_CELL_GAP);
 		tableRightZone.setPadding(new Insets(TABLE_MAIN_CELL_GAP, TABLE_MAIN_CELL_GAP, TABLE_MAIN_CELL_GAP, 0));
+	}
+	
+	//This function is called at the launch of the game and after each mouseExited event on the table bet zones.
+	//Otherwise, the events were causing lighting issues.
+	private void setTableLight()
+	{
+		//Set the lighting of the table
+				Light.Point tableLight = new Light.Point();
+				tableLight.setX(300);
+				tableLight.setY(150);
+				tableLight.setZ(600);
+				Lighting tableLighting = new Lighting();		
+				tableLighting.setLight(tableLight);
+				tableLayout.setEffect(tableLighting);
 	}
 	
 	private void setStraightBetZones()
@@ -1178,6 +1202,7 @@ public class Roulette extends GameInterface
 								public void handle(MouseEvent mouseEvent)
 								{
 									bet_00innerZone.setFill(Color.web("#00FF00",0.5));
+									changeMessage("Straight bet");
 								}
 							});
 							
@@ -1187,6 +1212,8 @@ public class Roulette extends GameInterface
 								public void handle(MouseEvent mouseEvent)
 								{
 									bet_00innerZone.setFill(Color.TRANSPARENT);
+									setTableLight();
+									changeMessage("Click on the table to place a bet");
 								}
 							});
 					
@@ -1203,6 +1230,7 @@ public class Roulette extends GameInterface
 								public void handle(MouseEvent mouseEvent)
 								{
 									bet_0innerZone.setFill(Color.web("#00FF00",0.5));
+									changeMessage("Straight bet");
 								}
 							});
 							
@@ -1212,6 +1240,8 @@ public class Roulette extends GameInterface
 								public void handle(MouseEvent mouseEvent)
 								{
 									bet_0innerZone.setFill(Color.TRANSPARENT);
+									setTableLight();
+									changeMessage("Click on the table to place a bet");
 								}
 							});
 				
@@ -1236,6 +1266,7 @@ public class Roulette extends GameInterface
 						public void handle(MouseEvent mouseEvent)
 						{
 							rect.setFill(Color.web("#00FF00",0.5));
+							changeMessage("Straight bet");
 						}
 					});
 					
@@ -1245,6 +1276,8 @@ public class Roulette extends GameInterface
 								public void handle(MouseEvent mouseEvent)
 								{
 									rect.setFill(Color.TRANSPARENT);
+									setTableLight();
+									changeMessage("Click on the table to place a bet");
 								}
 							});
 					
@@ -1269,6 +1302,7 @@ public class Roulette extends GameInterface
 								public void handle(MouseEvent mouseEvent)
 								{
 									rect1.setFill(Color.web("#00FF00",0.5));
+									changeMessage("First 12");
 								}
 							});
 							
@@ -1278,6 +1312,8 @@ public class Roulette extends GameInterface
 								public void handle(MouseEvent mouseEvent)
 								{
 									rect1.setFill(Color.TRANSPARENT);
+									setTableLight();
+									changeMessage("Click on the table to place a bet");
 								}
 							});
 			
@@ -1291,6 +1327,7 @@ public class Roulette extends GameInterface
 								public void handle(MouseEvent mouseEvent)
 								{
 									rect2.setFill(Color.web("#00FF00",0.5));
+									changeMessage("Second 12");
 								}
 							});
 							
@@ -1300,6 +1337,8 @@ public class Roulette extends GameInterface
 								public void handle(MouseEvent mouseEvent)
 								{
 									rect2.setFill(Color.TRANSPARENT);
+									setTableLight();
+									changeMessage("Click on the table to place a bet");
 								}
 							});
 			
@@ -1313,6 +1352,7 @@ public class Roulette extends GameInterface
 								public void handle(MouseEvent mouseEvent)
 								{
 									rect3.setFill(Color.web("#00FF00",0.5));
+									changeMessage("Third 12");
 								}
 							});
 							
@@ -1322,6 +1362,8 @@ public class Roulette extends GameInterface
 								public void handle(MouseEvent mouseEvent)
 								{
 									rect3.setFill(Color.TRANSPARENT);
+									setTableLight();
+									changeMessage("Click on the table to place a bet");
 								}
 							});
 			
@@ -1341,6 +1383,7 @@ public class Roulette extends GameInterface
 							public void handle(MouseEvent mouseEvent)
 							{
 								rect4.setFill(Color.web("#00FF00",0.5));
+								changeMessage("1 to 18");
 							}
 						});
 						
@@ -1350,6 +1393,8 @@ public class Roulette extends GameInterface
 							public void handle(MouseEvent mouseEvent)
 							{
 								rect4.setFill(Color.TRANSPARENT);
+								setTableLight();
+								changeMessage("Click on the table to place a bet");
 							}
 						});
 				
@@ -1362,6 +1407,7 @@ public class Roulette extends GameInterface
 							public void handle(MouseEvent mouseEvent)
 							{
 								rect5.setFill(Color.web("#00FF00",0.5));
+								changeMessage("Even numbers");
 							}
 						});
 						
@@ -1371,6 +1417,8 @@ public class Roulette extends GameInterface
 							public void handle(MouseEvent mouseEvent)
 							{
 								rect5.setFill(Color.TRANSPARENT);
+								setTableLight();
+								changeMessage("Click on the table to place a bet");
 							}
 						});
 				
@@ -1384,6 +1432,7 @@ public class Roulette extends GameInterface
 								public void handle(MouseEvent mouseEvent)
 								{
 									rect6.setFill(Color.web("#00FF00",0.5));
+									changeMessage("Red");
 								}
 							});
 							
@@ -1393,6 +1442,8 @@ public class Roulette extends GameInterface
 								public void handle(MouseEvent mouseEvent)
 								{
 									rect6.setFill(Color.TRANSPARENT);
+									setTableLight();
+									changeMessage("Click on the table to place a bet");
 								}
 							});
 					
@@ -1405,6 +1456,7 @@ public class Roulette extends GameInterface
 								public void handle(MouseEvent mouseEvent)
 								{
 									rect7.setFill(Color.web("#00FF00",0.5));
+									changeMessage("Black");
 								}
 							});
 							
@@ -1414,6 +1466,8 @@ public class Roulette extends GameInterface
 								public void handle(MouseEvent mouseEvent)
 								{
 									rect7.setFill(Color.TRANSPARENT);
+									setTableLight();
+									changeMessage("Click on the table to place a bet");
 								}
 							});
 					
@@ -1426,6 +1480,7 @@ public class Roulette extends GameInterface
 								public void handle(MouseEvent mouseEvent)
 								{
 									rect8.setFill(Color.web("#00FF00",0.5));
+									changeMessage("Odd numbers");
 								}
 							});
 							
@@ -1435,6 +1490,8 @@ public class Roulette extends GameInterface
 								public void handle(MouseEvent mouseEvent)
 								{
 									rect8.setFill(Color.TRANSPARENT);
+									setTableLight();
+									changeMessage("Click on the table to place a bet");
 								}
 							});
 					
@@ -1447,6 +1504,7 @@ public class Roulette extends GameInterface
 								public void handle(MouseEvent mouseEvent)
 								{
 									rect9.setFill(Color.web("#00FF00",0.5));
+									changeMessage("19 to 36");
 								}
 							});
 							
@@ -1456,6 +1514,8 @@ public class Roulette extends GameInterface
 								public void handle(MouseEvent mouseEvent)
 								{
 									rect9.setFill(Color.TRANSPARENT);
+									setTableLight();
+									changeMessage("Click on the table to place a bet");
 								}
 							});
 					
@@ -1477,6 +1537,7 @@ public class Roulette extends GameInterface
 					public void handle(MouseEvent mouseEvent)
 					{
 						rect10.setFill(Color.web("#00FF00",0.5));
+						changeMessage("Column bet");
 					}
 				});
 				
@@ -1486,6 +1547,8 @@ public class Roulette extends GameInterface
 					public void handle(MouseEvent mouseEvent)
 					{
 						rect10.setFill(Color.TRANSPARENT);
+						setTableLight();
+						changeMessage("Click on the table to place a bet");
 					}
 				});
 		
@@ -1497,6 +1560,7 @@ public class Roulette extends GameInterface
 					public void handle(MouseEvent mouseEvent)
 					{
 						rect11.setFill(Color.web("#00FF00",0.5));
+						changeMessage("Column bet");
 					}
 				});
 				
@@ -1506,6 +1570,8 @@ public class Roulette extends GameInterface
 					public void handle(MouseEvent mouseEvent)
 					{
 						rect11.setFill(Color.TRANSPARENT);
+						setTableLight();
+						changeMessage("Click on the table to place a bet");
 					}
 				});
 				
@@ -1518,6 +1584,7 @@ public class Roulette extends GameInterface
 					public void handle(MouseEvent mouseEvent)
 					{
 						rect12.setFill(Color.web("#00FF00",0.5));
+						changeMessage("Column bet");
 					}
 				});
 				
@@ -1527,6 +1594,8 @@ public class Roulette extends GameInterface
 					public void handle(MouseEvent mouseEvent)
 					{
 						rect12.setFill(Color.TRANSPARENT);
+						setTableLight();
+						changeMessage("Click on the table to place a bet");
 					}
 				});
 		
@@ -1579,7 +1648,7 @@ public class Roulette extends GameInterface
 				for (int j=1; j<=3; j++)
 				{
 					Rectangle sideBetZone = new Rectangle((int)(TABLE_MAIN_CELL_WIDTH*0.40), (int)(TABLE_MAIN_CELL_HEIGHT*2/3), Color.TRANSPARENT);
-					splitBetZoneMap.put(String.valueOf(3*i-(j-1)).concat(String.valueOf(3*(i+1)-(j-1))), sideBetZone); //The key is a string made of both numbers included in the split bet. Ex: 36 for the 3 and 6 split bet
+					splitBetZoneMap.put(String.valueOf(3*i-(j-1))+"-"+(String.valueOf(3*(i+1)-(j-1))), sideBetZone); //The key is a string made of both numbers included in the split bet. Ex: 3-6 for the 3 and 6 split bet
 					sideBetZone.setTranslateX(i * (TABLE_MAIN_CELL_WIDTH + TABLE_MAIN_CELL_GAP) - sideBetZone.getWidth()/2 + TABLE_MAIN_CELL_GAP/2);
 					sideBetZone.setTranslateY(((j-1)*TABLE_MAIN_CELL_HEIGHT) + (TABLE_MAIN_CELL_HEIGHT*1/6) + (j*TABLE_MAIN_CELL_GAP));
 					
@@ -1594,6 +1663,7 @@ public class Roulette extends GameInterface
 								public void handle(MouseEvent mouseEvent)
 								{
 									sideBetZone.setFill(Color.web("#00FF00",0.5));
+									changeMessage("Split bet");
 								}
 							});
 							
@@ -1603,6 +1673,8 @@ public class Roulette extends GameInterface
 								public void handle(MouseEvent mouseEvent)
 								{
 									sideBetZone.setFill(Color.TRANSPARENT);
+									setTableLight();
+									changeMessage("Click on the table to place a bet");
 								}
 							});
 				}
@@ -1615,11 +1687,11 @@ public class Roulette extends GameInterface
 				for (int j=1; j<=2; j++)
 				{
 					Rectangle bottomBetZone = new Rectangle((int)(TABLE_MAIN_CELL_WIDTH*2/3), (int)(TABLE_MAIN_CELL_HEIGHT*0.4), Color.TRANSPARENT);
-					splitBetZoneMap.put(String.valueOf(3*i-(j-1)).concat(String.valueOf(3*i-(j-2))), bottomBetZone); //The key is a string made of both numbers included in the split bet. Ex: 32 for the 3 and 2 split bet
-					bottomBetZone.setTranslateX(((i-1)*TABLE_MAIN_CELL_WIDTH) + (TABLE_MAIN_CELL_WIDTH*1/6) + (i*TABLE_MAIN_CELL_GAP));
+					splitBetZoneMap.put((String.valueOf(3*i-(j-1)-1) +"-"+ String.valueOf(3*i-(j-1))), bottomBetZone); //The key is a string made of both numbers included in the split bet. Ex: 2-3 for the 2 and 3 split bet
+					bottomBetZone.setTranslateX(((i-1)*TABLE_MAIN_CELL_WIDTH) + (TABLE_MAIN_CELL_WIDTH*1/6) + (i*TABLE_MAIN_CELL_GAP) + TABLE_MAIN_CELL_GAP/2);
 					bottomBetZone.setTranslateY(j*(TABLE_MAIN_CELL_HEIGHT + TABLE_MAIN_CELL_GAP) - bottomBetZone.getHeight()/2 + TABLE_MAIN_CELL_GAP/2);
 					
-					//Add the side split bet zone to the tableBetLayout
+					//Add the bottom split bet zone to the tableBetLayout
 					tableBetLayout.getChildren().add(bottomBetZone);
 					mapKeyNumber++;
 					
@@ -1630,6 +1702,7 @@ public class Roulette extends GameInterface
 								public void handle(MouseEvent mouseEvent)
 								{
 									bottomBetZone.setFill(Color.web("#00FF00",0.5));
+									changeMessage("Split bet");
 								}
 							});
 							
@@ -1639,6 +1712,8 @@ public class Roulette extends GameInterface
 								public void handle(MouseEvent mouseEvent)
 								{
 									bottomBetZone.setFill(Color.TRANSPARENT);
+									setTableLight();
+									changeMessage("Click on the table to place a bet");
 								}
 							});
 				}
@@ -1647,39 +1722,234 @@ public class Roulette extends GameInterface
 	
 	private void setStreetBetZones()
 	{
-		//The street bet zones are created at the bottom of each row of the table layout
-		mapKeyNumber = 1;//Incrementing number used to make the splitBetZoneMap keys
-		for (int i=1; i<=12 ; i++)
-		{
-				Rectangle streetBetZone = new Rectangle((int)(TABLE_MAIN_CELL_WIDTH), (int)(TABLE_MAIN_CELL_HEIGHT*0.4), Color.TRANSPARENT);
-				streetBetZoneMap.put(String.valueOf(3*i-(j-1)).concat(String.valueOf(3*i-(j-2))), bottomBetZone); //The key is a string made of both numbers included in the split bet. Ex: 32 for the 3 and 2 split bet
+		//Street bet zones
+			//The street bet zones are created at the bottom of each row of the table layout
+			int mapKeyNumber = 1;//Incrementing number used to make the streetBetZoneMap keys
+			for (int i=1; i<=12 ; i++)
+			{
+				Rectangle streetBetZone = new Rectangle((int)(TABLE_MAIN_CELL_WIDTH*2/3), (int)(TABLE_MAIN_CELL_HEIGHT*0.4), Color.TRANSPARENT);
+				streetBetZoneMap.put("street"+mapKeyNumber, streetBetZone); //The key is a string made of "street" + the first number of the column (1, 4, 7, 10,...)
+				streetBetZone.setTranslateX(((i-1)*TABLE_MAIN_CELL_WIDTH) + (TABLE_MAIN_CELL_WIDTH*1/6) + (i*TABLE_MAIN_CELL_GAP) + TABLE_MAIN_CELL_GAP/2);
+				streetBetZone.setTranslateY(3*(TABLE_MAIN_CELL_HEIGHT + TABLE_MAIN_CELL_GAP) - streetBetZone.getHeight()/2 + TABLE_MAIN_CELL_GAP/2);
 				
-				bottomBetZone.setTranslateX(((i-1)*TABLE_MAIN_CELL_WIDTH) + (TABLE_MAIN_CELL_WIDTH*1/6) + (i*TABLE_MAIN_CELL_GAP));
-				bottomBetZone.setTranslateY(j*(TABLE_MAIN_CELL_HEIGHT + TABLE_MAIN_CELL_GAP) - bottomBetZone.getHeight()/2 + TABLE_MAIN_CELL_GAP/2);
-				
-				//Add the side split bet zone to the tableBetLayout
-				tableBetLayout.getChildren().add(bottomBetZone);
-				mapKeyNumber++;
+				//Add the street bet zone to the tableBetLayout
+				tableBetLayout.getChildren().add(streetBetZone);
+				mapKeyNumber += 3;
 				
 				//Add a MouseEntered and a MouseExited Listener
-				bottomBetZone.setOnMouseEntered(new EventHandler<MouseEvent>()
+				streetBetZone.setOnMouseEntered(new EventHandler<MouseEvent>()
 						{
 							@Override
 							public void handle(MouseEvent mouseEvent)
 							{
-								bottomBetZone.setFill(Color.web("#00FF00",0.5));
+								streetBetZone.setFill(Color.web("#00FF00",0.5));
+								changeMessage("Street bet");
 							}
 						});
 						
-				bottomBetZone.setOnMouseExited(new EventHandler<MouseEvent>()
+				streetBetZone.setOnMouseExited(new EventHandler<MouseEvent>()
 						{
 							@Override
 							public void handle(MouseEvent mouseEvent)
 							{
-								bottomBetZone.setFill(Color.TRANSPARENT);
+								streetBetZone.setFill(Color.TRANSPARENT);
+								setTableLight();
+								changeMessage("Click on the table to place a bet");
 							}
 						});
+			}
+		//Double street bet zones
+			//The street between each street bet zone
+			for (int i=1; i<=11; i++)
+			{
+				Rectangle doubleStreetBetZone = new Rectangle((int)(TABLE_MAIN_CELL_WIDTH*1/2), (int)(TABLE_MAIN_CELL_HEIGHT*0.4), Color.TRANSPARENT);
+				streetBetZoneMap.put("doublestreet"+mapKeyNumber, doubleStreetBetZone); //The key is a string made of "doublestreet" + the first numbers of the 2 columns (dobuelstreet14, doublestreet47,...)
+				doubleStreetBetZone.setTranslateX(i * (TABLE_MAIN_CELL_WIDTH + TABLE_MAIN_CELL_GAP) - doubleStreetBetZone.getWidth()/2 + TABLE_MAIN_CELL_GAP/2);
+				doubleStreetBetZone.setTranslateY(3*(TABLE_MAIN_CELL_HEIGHT + TABLE_MAIN_CELL_GAP) - doubleStreetBetZone.getHeight()/2 + TABLE_MAIN_CELL_GAP/2);
+				
+				//Add the double street bet zone to the tableBetLayout
+				tableBetLayout.getChildren().add(doubleStreetBetZone);
+				mapKeyNumber += 3;
+				
+				//Add a MouseEntered and a MouseExited Listener
+				doubleStreetBetZone.setOnMouseEntered(new EventHandler<MouseEvent>()
+						{
+							@Override
+							public void handle(MouseEvent mouseEvent)
+							{
+								doubleStreetBetZone.setFill(Color.web("#00FF00",0.5));
+								changeMessage("Double Street bet");
+							}
+						});
+						
+				doubleStreetBetZone.setOnMouseExited(new EventHandler<MouseEvent>()
+						{
+							@Override
+							public void handle(MouseEvent mouseEvent)
+							{
+								doubleStreetBetZone.setFill(Color.TRANSPARENT);
+								setTableLight();
+								changeMessage("Click on the table to place a bet");
+							}
+						});
+			}
+	}
+	
+	private void setCornerBetZones()
+	{
+		//The corner bet zones are created at the bottom-left of each rectangle of the first two lines of the table layout
+		for (int i=1; i<=11 ; i++)
+		{
+			for (int j=1; j<=2; j++)
+			{
+				Rectangle cornerBetZone = new Rectangle((int)(TABLE_MAIN_CELL_WIDTH*1/2), (int)(TABLE_MAIN_CELL_HEIGHT*0.4), Color.TRANSPARENT);
+				cornerBetZoneMap.put(String.valueOf(3*i-(j-1)-1) +"-"+ String.valueOf(3*i-(j-1)) +"-"+ String.valueOf(3*(i+1)-(j-1)-1) +"-"+ String.valueOf(3*(i+1)-(j-1)), cornerBetZone); //The key is a string made of all the number included in the corner bet Ex: 2-3-4-5 or 1-2-3-4
+				cornerBetZone.setTranslateX(i * (TABLE_MAIN_CELL_WIDTH + TABLE_MAIN_CELL_GAP) - cornerBetZone.getWidth()/2 + TABLE_MAIN_CELL_GAP/2);
+				cornerBetZone.setTranslateY(j*(TABLE_MAIN_CELL_HEIGHT + TABLE_MAIN_CELL_GAP) - cornerBetZone.getHeight()/2 + TABLE_MAIN_CELL_GAP/2);
+				
+				//Add the corner bet zone to the tableBetLayout
+				tableBetLayout.getChildren().add(cornerBetZone);
+				
+				//Add a MouseEntered and a MouseExited Listener
+				cornerBetZone.setOnMouseEntered(new EventHandler<MouseEvent>()
+						{
+							@Override
+							public void handle(MouseEvent mouseEvent)
+							{
+								cornerBetZone.setFill(Color.web("#00FF00",0.5));
+								changeMessage("Corner bet");
+							}
+						});
+						
+				cornerBetZone.setOnMouseExited(new EventHandler<MouseEvent>()
+						{
+							@Override
+							public void handle(MouseEvent mouseEvent)
+							{
+								cornerBetZone.setFill(Color.TRANSPARENT);
+								setTableLight();
+								changeMessage("Click on the table to place a bet");
+							}
+						});
+			}
 		}
+	}
+	
+	private void setBasketBetZone()
+	{
+		//Basket bet zone
+				String mapKeyValue = "";
+				
+				for (int i=1; i<=3 ; i++)
+				{	
+					switch(i)
+					{
+						case 1: mapKeyValue = "2-00-3";
+								break;
+						case 2: mapKeyValue = "0-2-00";
+								break;
+						case 3: mapKeyValue = "1-0-2";
+								break;
+					}					
+					
+					Rectangle basketBetZone = new Rectangle((int)(TABLE_MAIN_CELL_WIDTH*1/2), (int)(TABLE_MAIN_CELL_HEIGHT*0.4), Color.TRANSPARENT);
+					basketBetZoneMap.put(mapKeyValue,basketBetZone); //The key is a string made of all the number included in the basket bet: 2-00-3 , 0-2-00, 1-0-2
+					basketBetZone.setTranslateX(-basketBetZone.getWidth()/2 + TABLE_MAIN_CELL_GAP/2);
+					if (i==2)
+						basketBetZone.setTranslateY(TABLE_MAIN_CELL_HEIGHT*1.5 + 2*TABLE_MAIN_CELL_GAP - basketBetZone.getHeight()/2);	
+					else if (i==1)
+						basketBetZone.setTranslateY(TABLE_MAIN_CELL_HEIGHT + TABLE_MAIN_CELL_GAP - basketBetZone.getHeight()/2);
+					else
+						basketBetZone.setTranslateY(2*(TABLE_MAIN_CELL_HEIGHT + TABLE_MAIN_CELL_GAP - basketBetZone.getHeight()/2) + basketBetZone.getHeight()/2);
+					
+					//Add the basket bet zone to the tableBetLayout
+					tableBetLayout.getChildren().add(basketBetZone);
+					
+					
+					//Add a MouseEntered and a MouseExited Listener
+					basketBetZone.setOnMouseEntered(new EventHandler<MouseEvent>()
+							{
+								@Override
+								public void handle(MouseEvent mouseEvent)
+								{
+									basketBetZone.setFill(Color.web("#00FF00",0.5));
+									changeMessage("Basket bet");
+								}
+							});
+							
+					basketBetZone.setOnMouseExited(new EventHandler<MouseEvent>()
+							{
+								@Override
+								public void handle(MouseEvent mouseEvent)
+								{
+									basketBetZone.setFill(Color.TRANSPARENT);
+									setTableLight();
+									changeMessage("Click on the table to place a bet");
+								}
+							});
+				}
+	}
+	
+	private void topLineBetZone()
+	{
+		//TopLine bet zone1		
+			Rectangle topLineBetZone1 = new Rectangle((int)(TABLE_MAIN_CELL_WIDTH*1/2), (int)(TABLE_MAIN_CELL_HEIGHT*0.4), Color.BLUE);
+			topLineBetZoneMap.put("topline1",topLineBetZone1); 
+			topLineBetZone1.setTranslateX(-topLineBetZone1.getWidth()/2 + TABLE_MAIN_CELL_GAP/2);
+			topLineBetZone1.setTranslateY(3*(TABLE_MAIN_CELL_HEIGHT + TABLE_MAIN_CELL_GAP) - topLineBetZone1.getHeight()/2 + TABLE_MAIN_CELL_GAP/2);
+			
+			//Add a MouseEntered and a MouseExited Listener
+			topLineBetZone1.setOnMouseEntered(new EventHandler<MouseEvent>()
+					{
+						@Override
+						public void handle(MouseEvent mouseEvent)
+						{
+							topLineBetZone1.setFill(Color.web("#00FF00",0.5));
+							changeMessage("Top line bet");
+						}
+					});
+					
+			topLineBetZone1.setOnMouseExited(new EventHandler<MouseEvent>()
+					{
+						@Override
+						public void handle(MouseEvent mouseEvent)
+						{
+							topLineBetZone1.setFill(Color.TRANSPARENT);
+							setTableLight();
+							changeMessage("Click on the table to place a bet");
+						}
+					});
+			
+		//TopLine bet zone2	
+		Rectangle topLineBetZone2 = new Rectangle((int)(TABLE_MAIN_CELL_WIDTH*1/2), (int)(TABLE_MAIN_CELL_HEIGHT*0.4), Color.BLUE);
+		topLineBetZoneMap.put("topline1",topLineBetZone2); 
+		topLineBetZone2.setTranslateX(-topLineBetZone2.getWidth()/2 + TABLE_MAIN_CELL_GAP/2);
+		topLineBetZone2.setTranslateY(- topLineBetZone2.getHeight()/2 + TABLE_MAIN_CELL_GAP/2);
+		
+		//Add a MouseEntered and a MouseExited Listener
+		topLineBetZone2.setOnMouseEntered(new EventHandler<MouseEvent>()
+				{
+					@Override
+					public void handle(MouseEvent mouseEvent)
+					{
+						topLineBetZone2.setFill(Color.web("#00FF00",0.5));
+						changeMessage("Top line bet");
+					}
+				});
+				
+		topLineBetZone2.setOnMouseExited(new EventHandler<MouseEvent>()
+				{
+					@Override
+					public void handle(MouseEvent mouseEvent)
+					{
+						topLineBetZone2.setFill(Color.TRANSPARENT);
+						setTableLight();
+						changeMessage("Click on the table to place a bet");
+					}
+				});
+		
+		//Add the basket bet zone to the tableBetLayout
+		tableBetLayout.getChildren().addAll(topLineBetZone1, topLineBetZone2);
 	}
 	
 	private void setButtons()
@@ -1711,22 +1981,31 @@ public class Roulette extends GameInterface
 	{
 		Label msg = new Label(message);
 		msg.setStyle("-fx-font-size: 20pt;");
-		msg.setMaxWidth(300);
+		msg.setMaxWidth(280);
 		msg.setWrapText(true);
+		msg.setMaxWidth(Integer.MAX_VALUE);
 		msg.setTextAlignment(TextAlignment.CENTER);
+		msg.setAlignment(Pos.CENTER);
 		
-		msgZone = new VBox();
+		msgZone = new StackPane();//StackPane necessary to allow center alignment of children
 		
 		msgZone.getChildren().add(msg);
 		msgZone.setAlignment(Pos.CENTER);
 		
-		int msgZoneSizeX = 300;
+		int msgZoneSizeX = 280;
 		int msgZoneSizeY = 225;
 		msgZone.setMinHeight(msgZoneSizeY);
 		msgZone.setMaxHeight(msgZoneSizeY);
 		msgZone.setMinWidth(msgZoneSizeX);
 		msgZone.setMaxWidth(msgZoneSizeX);
 		msgZone.setPrefSize(msgZoneSizeX, msgZoneSizeY);
+		//msgZone.setBorder(new Border(new BorderStroke(Paint.valueOf("blue"), BorderStrokeStyle.SOLID, CornerRadii.EMPTY,  BorderWidths.DEFAULT)));
+	}
+	
+	private void changeMessage(String message)
+	{
+		Label msg = ((Label)msgZone.getChildren().get(0));
+		msg.setText(message);
 	}
 	
 	public void playWheelAnimation()
