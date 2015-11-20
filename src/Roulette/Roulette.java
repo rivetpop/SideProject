@@ -11,7 +11,9 @@ import javafx.animation.Transition;
 import java.awt.Point;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
 
 import com.sun.javafx.collections.ObservableListWrapper;
@@ -26,6 +28,7 @@ import javafx.concurrent.Service;
 import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
+import javafx.geometry.Bounds;
 import javafx.geometry.HPos;
 import javafx.geometry.Insets;
 import javafx.geometry.Point2D;
@@ -46,6 +49,7 @@ import javafx.scene.effect.Bloom;
 import javafx.scene.effect.Lighting;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Background;
 import javafx.scene.layout.BackgroundFill;
 import javafx.scene.layout.Pane;
@@ -213,6 +217,8 @@ public class Roulette extends GameInterface
 		static final ArrayList redNumbersList = new ArrayList(Arrays.asList(1,3,5,7,9,12,14,16,18,19,21,23,25,27,30,32,34,36));
 	
 	//Table Layout
+		//Map of the 1 to 36 layout zones
+		Map<String, Rectangle> rectangles1to36LayoutMap = new HashMap<String, Rectangle>();	
 		//Pane containing the different table zones
 		private Pane tableLayout = null;
 		
@@ -222,30 +228,48 @@ public class Roulette extends GameInterface
 			//Center Zone containing the numbers (1 to 36) and the bottom special bets
 				private GridPane tableCenterZone = null;
 				
-			//Bottom zone containing the 2 to 1's bets
+			//Right zone containing the 2 to 1's bets
 			private GridPane tableRightZone = null;
 	
+	//Table betting zones
+		//Map of the bet zones
+			Map<String, Shape> straightBetZoneMap = new HashMap<String, Shape>();
+			Map<String, Shape> splitBetZoneMap = new HashMap<String, Shape>();
+			Map<String, Shape> streetBetZoneMap = new HashMap<String, Shape>();
+			
+		//Pane containing the different table betting zones
+		private Pane tableBetLayout = null;
+			//Zone containing the numbers (1 to 36) and the bottom special bets
+				private GridPane tableStraightBetZone1;
+			//Zone containing the 2 to 1's bets 
+				private GridPane tableStraightBetZone2;
+			//Zone containing the zeros bets	
+				private VBox tableStraightBetZone3;
+			
 	public Roulette()
 	{
 		root = new Pane();
 		scene = new Scene(root, 800,800);
-		
+				
 		LogicalRoulette.createPocketObjects();//create the pockets objects
 		createMenu();
 		createPlayerInfo();
 		setBall();
 		setWheel();
 		setTable();
+		setStraightBetZones();
+		setSplitBetZones();
+		setStreetBetZones();
 		setButtons();
 		setMessageZone("Click on the table to place a bet!");
 		
 		/*Line test = new Line (0.0, 0.0, 0.0, 125.0);
 		test.setStrokeWidth(5);
-		test.setStroke(Color.BLUE);
+		test.setStroke(Color.web("#00FF00",0.5));
 		test.setTranslateX(250);
 		test.setTranslateY(100);*/
 		
-		root.getChildren().addAll(rouletteWheel, msgZone, super.playerInfo, super.upperZone, tableLayout, buttonsGroup);
+		root.getChildren().addAll(rouletteWheel, msgZone, super.playerInfo, super.upperZone, tableLayout, buttonsGroup, tableBetLayout);
 		
 		super.playerInfo.setTranslateX(500);
 		super.playerInfo.setTranslateY(15);
@@ -797,12 +821,12 @@ public class Roulette extends GameInterface
 				
 				pocketsLighting.setLight(light3);
 				pocketsPane.setEffect(pocketsLighting);
-				//APPLIQUER EFFET DE LUMIERE SUR LA BALLE et la table**************************************************************************************************************************
+				
 				
 		//RouletteWheel
 		rouletteWheel = new StackPane();
-		rouletteWheel.getChildren().addAll(outerMostCircle, outerCircle, innerCircle, pocketsPane, pocketsCircle, rouletteBallStack);
-		rouletteBallStack.setTranslateY(-OUTERMOSTCIRCLERADIUS+ballStackInnerWheelYTranslation);//Move the ball from the center of the wheel to it's starting position
+		rouletteWheel.getChildren().addAll(outerMostCircle, outerCircle, innerCircle, pocketsPane, pocketsCircle);
+		bringBallToInitialPosition();
 	}
 	
 	private void setBall()
@@ -812,15 +836,35 @@ public class Roulette extends GameInterface
 	
 		//Center point, made of a 1 pixel rectangle
 		ballCenter = new Rectangle(1, 1, Color.RED);
+		ballCenter.setVisible(false);
 				
 		//A stackpane to automatically center the ballCenter in the middle of the ball
 		rouletteBallStack = new StackPane();
 		rouletteBallStack.getChildren().addAll( rouletteBall, ballCenter);
 	}
 	
-	private void setTable()
+	//Take the ball out of the pocket's pane (necessary after an wheel animation) and back to it's initial position
+	private void bringBallToInitialPosition()
 	{
-		
+		Pocket lastAnimationFinalPocket = getCollidingPocket();
+		//if the ball is colliding a pocket, it means that an animation has run
+		//and we need to take the ball out of the pocket
+		if (lastAnimationFinalPocket != null)
+		{
+			StackPane ballParent = (StackPane)rouletteBallStack.getParent();
+			ballParent.getChildren().remove(rouletteBallStack);	
+		}
+		//If the ball isn't already at it's initial position in the rouletteWheel StackPane, place it there.
+		//The "if" is necessary, otherwise a fatal error will happen on the first animation because we try to put the ball twice in the same parent
+		if (rouletteBallStack.getParent() != rouletteWheel)
+		{
+			rouletteWheel.getChildren().add(rouletteBallStack);
+			rouletteBallStack.setTranslateY(-OUTERMOSTCIRCLERADIUS+ballStackInnerWheelYTranslation);//Move the ball from the center of the wheel to it's starting position
+		}
+	}
+	
+	private void setTable()
+	{		
 		//Create left betting zone. Made of text inside polygons.
 		//A bigger white polygon is used to make the white border around the smaller green polygon
 		
@@ -903,6 +947,7 @@ public class Roulette extends GameInterface
 						}
 						
 						Rectangle rect = new Rectangle(TABLE_MAIN_CELL_WIDTH, TABLE_MAIN_CELL_HEIGHT, Color.GREEN);
+						rectangles1to36LayoutMap.put(String.valueOf(number), rect);
 						Text text = new Text(Integer.toString(number));
 						text.setRotate(270);
 						text.setFill(Color.WHITE);
@@ -1091,6 +1136,16 @@ public class Roulette extends GameInterface
 		//Set the position of the tableLayout Pane
 		tableLayout.setTranslateX(150);
 		tableLayout.setTranslateY(520);
+		
+		//Set the lighting of the table
+		Light.Point tableLight = new Light.Point();
+		tableLight.setX(300);
+		tableLight.setY(150);
+		tableLight.setZ(600);
+		Lighting tableLighting = new Lighting();		
+		tableLighting.setLight(tableLight);
+		tableLayout.setEffect(tableLighting);
+		
 			
 		//Set the border of the table. Made of a white background with gaps between the cells.
 		tableCenterZone.setBackground(new Background(new BackgroundFill(Color.WHITE, CornerRadii.EMPTY, Insets.EMPTY)));
@@ -1102,6 +1157,529 @@ public class Roulette extends GameInterface
 		tableRightZone.setVgap(TABLE_MAIN_CELL_GAP);
 		tableRightZone.setHgap(TABLE_MAIN_CELL_GAP);
 		tableRightZone.setPadding(new Insets(TABLE_MAIN_CELL_GAP, TABLE_MAIN_CELL_GAP, TABLE_MAIN_CELL_GAP, 0));
+	}
+	
+	private void setStraightBetZones()
+	{
+		//Straight bets
+		//Create left betting zone. Made of text inside polygons.
+				//A bigger white polygon is used to make the white border around the smaller green polygon
+				
+					double zerosZonesInnerHeight = (int)(1.5*TABLE_MAIN_CELL_HEIGHT+TABLE_MAIN_CELL_GAP);
+					double zerosZonesInnerTriangleWidth = (int)TABLE_MAIN_CELL_WIDTH*3/8;
+					
+					Polygon bet_00innerZone = new Polygon();
+					bet_00innerZone.getPoints().addAll(new Double[]{0.0, -zerosZonesInnerHeight/2, zerosZonesInnerTriangleWidth, 0.0, zerosZonesInnerTriangleWidth+TABLE_MAIN_CELL_WIDTH, 0.0, zerosZonesInnerTriangleWidth+TABLE_MAIN_CELL_WIDTH, -zerosZonesInnerHeight, zerosZonesInnerTriangleWidth, -zerosZonesInnerHeight});
+					bet_00innerZone.setFill(Color.TRANSPARENT);
+					straightBetZoneMap.put("00", bet_00innerZone);//Add this betting zone to the straightBetZonemap
+					bet_00innerZone.setOnMouseEntered(new EventHandler<MouseEvent>()
+							{
+								@Override
+								public void handle(MouseEvent mouseEvent)
+								{
+									bet_00innerZone.setFill(Color.web("#00FF00",0.5));
+								}
+							});
+							
+					bet_00innerZone.setOnMouseExited(new EventHandler<MouseEvent>()
+							{
+								@Override
+								public void handle(MouseEvent mouseEvent)
+								{
+									bet_00innerZone.setFill(Color.TRANSPARENT);
+								}
+							});
+					
+					
+					Polygon bet_0innerZone = new Polygon();
+					bet_0innerZone.getPoints().addAll(new Double[]{0.0, -zerosZonesInnerHeight/2, zerosZonesInnerTriangleWidth, 0.0, zerosZonesInnerTriangleWidth+TABLE_MAIN_CELL_WIDTH, 0.0, zerosZonesInnerTriangleWidth+TABLE_MAIN_CELL_WIDTH, -zerosZonesInnerHeight, zerosZonesInnerTriangleWidth, -zerosZonesInnerHeight});
+					bet_0innerZone.setFill(Color.TRANSPARENT);
+					bet_0innerZone.getPoints().addAll(new Double[]{0.0, -zerosZonesInnerHeight/2, zerosZonesInnerTriangleWidth, 0.0, zerosZonesInnerTriangleWidth+TABLE_MAIN_CELL_WIDTH, 0.0, zerosZonesInnerTriangleWidth+TABLE_MAIN_CELL_WIDTH, -zerosZonesInnerHeight, zerosZonesInnerTriangleWidth, -zerosZonesInnerHeight});
+					bet_0innerZone.setFill(Color.TRANSPARENT);
+					straightBetZoneMap.put("0", bet_0innerZone);//Add this betting zone to the straightBetZonemap
+					bet_0innerZone.setOnMouseEntered(new EventHandler<MouseEvent>()
+							{
+								@Override
+								public void handle(MouseEvent mouseEvent)
+								{
+									bet_0innerZone.setFill(Color.web("#00FF00",0.5));
+								}
+							});
+							
+					bet_0innerZone.setOnMouseExited(new EventHandler<MouseEvent>()
+							{
+								@Override
+								public void handle(MouseEvent mouseEvent)
+								{
+									bet_0innerZone.setFill(Color.TRANSPARENT);
+								}
+							});
+				
+					tableStraightBetZone3 = new VBox();
+					
+					tableStraightBetZone3.getChildren().addAll(bet_00innerZone, bet_0innerZone);
+					bet_0innerZone.setTranslateY(-(int)1.5*TABLE_MAIN_CELL_GAP);//O bet zone translation to fill a gap between it and the 00 zone
+			
+			//Zone 1 to 36
+				tableStraightBetZone1 = new GridPane();
+				int i=0;
+				int j=2;
+				int number = 1;
+				
+				for (; number<=36 ; number++)
+				{
+					Rectangle rect = new Rectangle(TABLE_MAIN_CELL_WIDTH, TABLE_MAIN_CELL_HEIGHT, Color.TRANSPARENT);
+					straightBetZoneMap.put(String.valueOf(number), rect);//Add this betting zone to the straightBetZonemap
+					rect.setOnMouseEntered(new EventHandler<MouseEvent>()
+					{
+						@Override
+						public void handle(MouseEvent mouseEvent)
+						{
+							rect.setFill(Color.web("#00FF00",0.5));
+						}
+					});
+					
+					rect.setOnMouseExited(new EventHandler<MouseEvent>()
+							{
+								@Override
+								public void handle(MouseEvent mouseEvent)
+								{
+									rect.setFill(Color.TRANSPARENT);
+								}
+							});
+					
+					tableStraightBetZone1.add(rect, i, j);
+		
+					j--;
+					
+					if (j==-1)
+					{
+						i++;
+						j=2;
+					}
+				}
+				
+				//First 12
+					int table_12sZoneWidth = TABLE_MAIN_CELL_WIDTH*4 + 3*TABLE_MAIN_CELL_GAP;//Column size, spanning on 4 normal columns
+					Rectangle rect1 = new Rectangle(table_12sZoneWidth, (int)(TABLE_MAIN_CELL_HEIGHT*0.75), Color.TRANSPARENT);//height is casted to int to avoid getting floating point number for a pixel size 
+					straightBetZoneMap.put("first12", rect1);//Add this betting zone to the straightBetZonemap
+					rect1.setOnMouseEntered(new EventHandler<MouseEvent>()
+							{
+								@Override
+								public void handle(MouseEvent mouseEvent)
+								{
+									rect1.setFill(Color.web("#00FF00",0.5));
+								}
+							});
+							
+					rect1.setOnMouseExited(new EventHandler<MouseEvent>()
+							{
+								@Override
+								public void handle(MouseEvent mouseEvent)
+								{
+									rect1.setFill(Color.TRANSPARENT);
+								}
+							});
+			
+			
+				//12nd 12
+					Rectangle rect2 = new Rectangle(table_12sZoneWidth, (int)(TABLE_MAIN_CELL_HEIGHT*0.75), Color.TRANSPARENT);//height is casted to int to avoid getting floating point number for a pixel size 
+					straightBetZoneMap.put("second12", rect2);//Add this betting zone to the straightBetZonemap
+					rect2.setOnMouseEntered(new EventHandler<MouseEvent>()
+							{
+								@Override
+								public void handle(MouseEvent mouseEvent)
+								{
+									rect2.setFill(Color.web("#00FF00",0.5));
+								}
+							});
+							
+					rect2.setOnMouseExited(new EventHandler<MouseEvent>()
+							{
+								@Override
+								public void handle(MouseEvent mouseEvent)
+								{
+									rect2.setFill(Color.TRANSPARENT);
+								}
+							});
+			
+			
+				//3rd 12
+					Rectangle rect3 = new Rectangle(table_12sZoneWidth, (int)(TABLE_MAIN_CELL_HEIGHT*0.75), Color.TRANSPARENT);//height is casted to int to avoid getting floating point number for a pixel size 
+					straightBetZoneMap.put("third12", rect3);//Add this betting zone to the straightBetZonemap
+					rect3.setOnMouseEntered(new EventHandler<MouseEvent>()		
+							{
+								@Override
+								public void handle(MouseEvent mouseEvent)
+								{
+									rect3.setFill(Color.web("#00FF00",0.5));
+								}
+							});
+							
+					rect3.setOnMouseExited(new EventHandler<MouseEvent>()
+							{
+								@Override
+								public void handle(MouseEvent mouseEvent)
+								{
+									rect3.setFill(Color.TRANSPARENT);
+								}
+							});
+			
+			
+				//Add the 12s bets zone to their gridpane
+					tableStraightBetZone1.add(rect1, 0, 3, 4, 1);
+					tableStraightBetZone1.add(rect2, 4, 3, 4, 1);
+					tableStraightBetZone1.add(rect3, 8, 3, 4, 1);
+				
+			int table_BottomZoneWidth = TABLE_MAIN_CELL_WIDTH*2 + TABLE_MAIN_CELL_GAP;//Column size, spanning on 2 normal columns
+			//1 to 18 bet
+				Rectangle rect4 = new Rectangle(table_BottomZoneWidth, (int)(TABLE_MAIN_CELL_HEIGHT*0.75), Color.TRANSPARENT);//height is casted to int to avoid getting floating point number for a pixel size 
+				straightBetZoneMap.put("1to18", rect4);//Add this betting zone to the straightBetZonemap
+				rect4.setOnMouseEntered(new EventHandler<MouseEvent>()
+						{
+							@Override
+							public void handle(MouseEvent mouseEvent)
+							{
+								rect4.setFill(Color.web("#00FF00",0.5));
+							}
+						});
+						
+				rect4.setOnMouseExited(new EventHandler<MouseEvent>()
+						{
+							@Override
+							public void handle(MouseEvent mouseEvent)
+							{
+								rect4.setFill(Color.TRANSPARENT);
+							}
+						});
+				
+			//Even bet
+				Rectangle rect5 = new Rectangle(table_BottomZoneWidth, (int)(TABLE_MAIN_CELL_HEIGHT*0.75), Color.TRANSPARENT);//height is casted to int to avoid getting floating point number for a pixel size 
+				straightBetZoneMap.put("even", rect5);//Add this betting zone to the straightBetZonemap
+				rect5.setOnMouseEntered(new EventHandler<MouseEvent>()
+						{
+							@Override
+							public void handle(MouseEvent mouseEvent)
+							{
+								rect5.setFill(Color.web("#00FF00",0.5));
+							}
+						});
+						
+				rect5.setOnMouseExited(new EventHandler<MouseEvent>()
+						{
+							@Override
+							public void handle(MouseEvent mouseEvent)
+							{
+								rect5.setFill(Color.TRANSPARENT);
+							}
+						});
+				
+			//Color bets
+				//Red
+					Rectangle rect6 = new Rectangle(table_BottomZoneWidth, (int)(TABLE_MAIN_CELL_HEIGHT*0.75), Color.TRANSPARENT);//height is casted to int to avoid getting floating point number for a pixel size 
+					straightBetZoneMap.put("red", rect6);//Add this betting zone to the straightBetZonemap
+					rect6.setOnMouseEntered(new EventHandler<MouseEvent>()
+							{
+								@Override
+								public void handle(MouseEvent mouseEvent)
+								{
+									rect6.setFill(Color.web("#00FF00",0.5));
+								}
+							});
+							
+					rect6.setOnMouseExited(new EventHandler<MouseEvent>()
+							{
+								@Override
+								public void handle(MouseEvent mouseEvent)
+								{
+									rect6.setFill(Color.TRANSPARENT);
+								}
+							});
+					
+				//Black
+					Rectangle rect7 = new Rectangle(table_BottomZoneWidth, (int)(TABLE_MAIN_CELL_HEIGHT*0.75), Color.TRANSPARENT);//height is casted to int to avoid getting floating point number for a pixel size 
+					straightBetZoneMap.put("black", rect7);//Add this betting zone to the straightBetZonemap
+					rect7.setOnMouseEntered(new EventHandler<MouseEvent>()
+							{
+								@Override
+								public void handle(MouseEvent mouseEvent)
+								{
+									rect7.setFill(Color.web("#00FF00",0.5));
+								}
+							});
+							
+					rect7.setOnMouseExited(new EventHandler<MouseEvent>()
+							{
+								@Override
+								public void handle(MouseEvent mouseEvent)
+								{
+									rect7.setFill(Color.TRANSPARENT);
+								}
+							});
+					
+			//Odd bet
+					Rectangle rect8 = new Rectangle(table_BottomZoneWidth, (int)(TABLE_MAIN_CELL_HEIGHT*0.75), Color.TRANSPARENT);//height is casted to int to avoid getting floating point number for a pixel size 
+					straightBetZoneMap.put("odd", rect8);//Add this betting zone to the straightBetZonemap
+					rect8.setOnMouseEntered(new EventHandler<MouseEvent>()
+							{
+								@Override
+								public void handle(MouseEvent mouseEvent)
+								{
+									rect8.setFill(Color.web("#00FF00",0.5));
+								}
+							});
+							
+					rect8.setOnMouseExited(new EventHandler<MouseEvent>()
+							{
+								@Override
+								public void handle(MouseEvent mouseEvent)
+								{
+									rect8.setFill(Color.TRANSPARENT);
+								}
+							});
+					
+			//19 to 36 bet
+					Rectangle rect9 = new Rectangle(table_BottomZoneWidth, (int)(TABLE_MAIN_CELL_HEIGHT*0.75), Color.TRANSPARENT);//height is casted to int to avoid getting floating point number for a pixel size 
+					straightBetZoneMap.put("19to36", rect9);//Add this betting zone to the straightBetZonemap
+					rect9.setOnMouseEntered(new EventHandler<MouseEvent>()
+							{
+								@Override
+								public void handle(MouseEvent mouseEvent)
+								{
+									rect9.setFill(Color.web("#00FF00",0.5));
+								}
+							});
+							
+					rect9.setOnMouseExited(new EventHandler<MouseEvent>()
+							{
+								@Override
+								public void handle(MouseEvent mouseEvent)
+								{
+									rect9.setFill(Color.TRANSPARENT);
+								}
+							});
+					
+			//Add the bets zone to the center zone
+			tableStraightBetZone1.add(rect4, 0, 4, 2, 1);
+			tableStraightBetZone1.add(rect5, 2, 4, 2, 1);
+			tableStraightBetZone1.add(rect6, 4, 4, 2, 1);
+			tableStraightBetZone1.add(rect7, 6, 4, 2, 1);
+			tableStraightBetZone1.add(rect8, 8, 4, 2, 1);
+			tableStraightBetZone1.add(rect9, 10, 4, 2, 1);
+												
+			
+	/*2 to 1 zones*/
+		Rectangle rect10 = new Rectangle(TABLE_MAIN_CELL_WIDTH, TABLE_MAIN_CELL_HEIGHT, Color.TRANSPARENT);
+		straightBetZoneMap.put("columnTop", rect10);//Add this betting zone to the straightBetZonemap
+		rect10.setOnMouseEntered(new EventHandler<MouseEvent>()
+				{
+					@Override
+					public void handle(MouseEvent mouseEvent)
+					{
+						rect10.setFill(Color.web("#00FF00",0.5));
+					}
+				});
+				
+		rect10.setOnMouseExited(new EventHandler<MouseEvent>()
+				{
+					@Override
+					public void handle(MouseEvent mouseEvent)
+					{
+						rect10.setFill(Color.TRANSPARENT);
+					}
+				});
+		
+		Rectangle rect11 = new Rectangle(TABLE_MAIN_CELL_WIDTH, TABLE_MAIN_CELL_HEIGHT, Color.TRANSPARENT);
+		straightBetZoneMap.put("columnMid", rect11);//Add this betting zone to the straightBetZonemap
+		rect11.setOnMouseEntered(new EventHandler<MouseEvent>()
+				{
+					@Override
+					public void handle(MouseEvent mouseEvent)
+					{
+						rect11.setFill(Color.web("#00FF00",0.5));
+					}
+				});
+				
+		rect11.setOnMouseExited(new EventHandler<MouseEvent>()
+				{
+					@Override
+					public void handle(MouseEvent mouseEvent)
+					{
+						rect11.setFill(Color.TRANSPARENT);
+					}
+				});
+				
+		
+		Rectangle rect12 = new Rectangle(TABLE_MAIN_CELL_WIDTH, TABLE_MAIN_CELL_HEIGHT, Color.TRANSPARENT);
+		straightBetZoneMap.put("columnBottom", rect12);//Add this betting zone to the straightBetZonemap
+		rect12.setOnMouseEntered(new EventHandler<MouseEvent>()
+				{
+					@Override
+					public void handle(MouseEvent mouseEvent)
+					{
+						rect12.setFill(Color.web("#00FF00",0.5));
+					}
+				});
+				
+		rect12.setOnMouseExited(new EventHandler<MouseEvent>()
+				{
+					@Override
+					public void handle(MouseEvent mouseEvent)
+					{
+						rect12.setFill(Color.TRANSPARENT);
+					}
+				});
+		
+		tableStraightBetZone2 = new GridPane();							
+		tableStraightBetZone2.add(rect10, 0,0);
+		tableStraightBetZone2.add(rect11, 0,1);
+		tableStraightBetZone2.add(rect12, 0,2);
+		
+
+		//Add the zones to the tableBetLayout Pane
+		tableBetLayout = new Pane();
+		tableBetLayout.getChildren().addAll(tableStraightBetZone1, tableStraightBetZone2, tableStraightBetZone3);
+		
+		//Translate the zones to their proper position
+		tableStraightBetZone2.setTranslateX(12*TABLE_MAIN_CELL_WIDTH+13*TABLE_MAIN_CELL_GAP);
+		
+		double leftZoneTranslateValue = -(int)((TABLE_MAIN_CELL_WIDTH + (TABLE_MAIN_CELL_WIDTH*3/8) + (Math.sqrt((Math.pow(TABLE_MAIN_CELL_GAP,2))*2))));//Calculation based on the size of inner and outer polygons used to make the leftZone (see the code used to make the leftZone for details)
+		tableStraightBetZone3.setTranslateX(leftZoneTranslateValue);
+		
+		bet_0innerZone.setTranslateY(TABLE_MAIN_CELL_GAP*2);
+		bet_00innerZone.setTranslateY(TABLE_MAIN_CELL_GAP);
+		double zeroZonesXTranslation = (int)(Math.sqrt((Math.pow(TABLE_MAIN_CELL_GAP,2))*2));//Pythagorean theorem used to calculate the difference between the inner and outer triangle's width
+		bet_0innerZone.setTranslateX(zeroZonesXTranslation);
+		bet_00innerZone.setTranslateX(zeroZonesXTranslation);
+		
+		
+		//Set the position of the tableLayout Pane
+		tableBetLayout.setTranslateX(150);
+		tableBetLayout.setTranslateY(520);
+		
+		//Set the gaps between the betting zones.
+		tableStraightBetZone1.setBackground(new Background(new BackgroundFill(Color.TRANSPARENT, CornerRadii.EMPTY, Insets.EMPTY)));
+		tableStraightBetZone1.setVgap(TABLE_MAIN_CELL_GAP);
+		tableStraightBetZone1.setHgap(TABLE_MAIN_CELL_GAP);
+		tableStraightBetZone1.setPadding(new Insets(TABLE_MAIN_CELL_GAP));
+		
+		tableStraightBetZone2.setBackground(new Background(new BackgroundFill(Color.TRANSPARENT, CornerRadii.EMPTY, Insets.EMPTY)));
+		tableStraightBetZone2.setVgap(TABLE_MAIN_CELL_GAP);
+		tableStraightBetZone2.setHgap(TABLE_MAIN_CELL_GAP);
+		tableStraightBetZone2.setPadding(new Insets(TABLE_MAIN_CELL_GAP, TABLE_MAIN_CELL_GAP, TABLE_MAIN_CELL_GAP, 0));
+	}
+	
+	private void setSplitBetZones()
+	{
+		//Side (vertical) split bet zones
+			//The side split bet zones are created at the left of each 4 to 36 rectangles of the table layout
+			int mapKeyNumber = 1;//Incrementing number used to make the splitBetZoneMap keys
+			for (int i=1; i<=11 ; i++)
+			{
+				for (int j=1; j<=3; j++)
+				{
+					Rectangle sideBetZone = new Rectangle((int)(TABLE_MAIN_CELL_WIDTH*0.40), (int)(TABLE_MAIN_CELL_HEIGHT*2/3), Color.TRANSPARENT);
+					splitBetZoneMap.put(String.valueOf(3*i-(j-1)).concat(String.valueOf(3*(i+1)-(j-1))), sideBetZone); //The key is a string made of both numbers included in the split bet. Ex: 36 for the 3 and 6 split bet
+					sideBetZone.setTranslateX(i * (TABLE_MAIN_CELL_WIDTH + TABLE_MAIN_CELL_GAP) - sideBetZone.getWidth()/2 + TABLE_MAIN_CELL_GAP/2);
+					sideBetZone.setTranslateY(((j-1)*TABLE_MAIN_CELL_HEIGHT) + (TABLE_MAIN_CELL_HEIGHT*1/6) + (j*TABLE_MAIN_CELL_GAP));
+					
+					//Add the side split bet zone to the tableBetLayout
+					tableBetLayout.getChildren().add(sideBetZone);
+					mapKeyNumber++;
+					
+					//Add a MouseEntered and a MouseExited Listener
+					sideBetZone.setOnMouseEntered(new EventHandler<MouseEvent>()
+							{
+								@Override
+								public void handle(MouseEvent mouseEvent)
+								{
+									sideBetZone.setFill(Color.web("#00FF00",0.5));
+								}
+							});
+							
+					sideBetZone.setOnMouseExited(new EventHandler<MouseEvent>()
+							{
+								@Override
+								public void handle(MouseEvent mouseEvent)
+								{
+									sideBetZone.setFill(Color.TRANSPARENT);
+								}
+							});
+				}
+			}
+		//Bottom (horizontal) split bet zones
+			//The bottom split bet zones are created at the bottom of the rectangles of the first two lines of the table layout
+			mapKeyNumber = 1;//Incrementing number used to make the splitBetZoneMap keys
+			for (int i=1; i<=12 ; i++)
+			{
+				for (int j=1; j<=2; j++)
+				{
+					Rectangle bottomBetZone = new Rectangle((int)(TABLE_MAIN_CELL_WIDTH*2/3), (int)(TABLE_MAIN_CELL_HEIGHT*0.4), Color.TRANSPARENT);
+					splitBetZoneMap.put(String.valueOf(3*i-(j-1)).concat(String.valueOf(3*i-(j-2))), bottomBetZone); //The key is a string made of both numbers included in the split bet. Ex: 32 for the 3 and 2 split bet
+					bottomBetZone.setTranslateX(((i-1)*TABLE_MAIN_CELL_WIDTH) + (TABLE_MAIN_CELL_WIDTH*1/6) + (i*TABLE_MAIN_CELL_GAP));
+					bottomBetZone.setTranslateY(j*(TABLE_MAIN_CELL_HEIGHT + TABLE_MAIN_CELL_GAP) - bottomBetZone.getHeight()/2 + TABLE_MAIN_CELL_GAP/2);
+					
+					//Add the side split bet zone to the tableBetLayout
+					tableBetLayout.getChildren().add(bottomBetZone);
+					mapKeyNumber++;
+					
+					//Add a MouseEntered and a MouseExited Listener
+					bottomBetZone.setOnMouseEntered(new EventHandler<MouseEvent>()
+							{
+								@Override
+								public void handle(MouseEvent mouseEvent)
+								{
+									bottomBetZone.setFill(Color.web("#00FF00",0.5));
+								}
+							});
+							
+					bottomBetZone.setOnMouseExited(new EventHandler<MouseEvent>()
+							{
+								@Override
+								public void handle(MouseEvent mouseEvent)
+								{
+									bottomBetZone.setFill(Color.TRANSPARENT);
+								}
+							});
+				}
+			}
+	}
+	
+	private void setStreetBetZones()
+	{
+		//The street bet zones are created at the bottom of each row of the table layout
+		mapKeyNumber = 1;//Incrementing number used to make the splitBetZoneMap keys
+		for (int i=1; i<=12 ; i++)
+		{
+				Rectangle streetBetZone = new Rectangle((int)(TABLE_MAIN_CELL_WIDTH), (int)(TABLE_MAIN_CELL_HEIGHT*0.4), Color.TRANSPARENT);
+				streetBetZoneMap.put(String.valueOf(3*i-(j-1)).concat(String.valueOf(3*i-(j-2))), bottomBetZone); //The key is a string made of both numbers included in the split bet. Ex: 32 for the 3 and 2 split bet
+				
+				bottomBetZone.setTranslateX(((i-1)*TABLE_MAIN_CELL_WIDTH) + (TABLE_MAIN_CELL_WIDTH*1/6) + (i*TABLE_MAIN_CELL_GAP));
+				bottomBetZone.setTranslateY(j*(TABLE_MAIN_CELL_HEIGHT + TABLE_MAIN_CELL_GAP) - bottomBetZone.getHeight()/2 + TABLE_MAIN_CELL_GAP/2);
+				
+				//Add the side split bet zone to the tableBetLayout
+				tableBetLayout.getChildren().add(bottomBetZone);
+				mapKeyNumber++;
+				
+				//Add a MouseEntered and a MouseExited Listener
+				bottomBetZone.setOnMouseEntered(new EventHandler<MouseEvent>()
+						{
+							@Override
+							public void handle(MouseEvent mouseEvent)
+							{
+								bottomBetZone.setFill(Color.web("#00FF00",0.5));
+							}
+						});
+						
+				bottomBetZone.setOnMouseExited(new EventHandler<MouseEvent>()
+						{
+							@Override
+							public void handle(MouseEvent mouseEvent)
+							{
+								bottomBetZone.setFill(Color.TRANSPARENT);
+							}
+						});
+		}
 	}
 	
 	private void setButtons()
@@ -1152,7 +1730,10 @@ public class Roulette extends GameInterface
 	}
 	
 	public void playWheelAnimation()
-	{
+	{	
+		//Take the ball at it's initial position
+		bringBallToInitialPosition();
+		
 		//Wheel Rotation Animation				
 			Rotate wheelRotation = new Rotate();
 			
