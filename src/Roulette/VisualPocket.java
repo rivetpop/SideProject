@@ -8,7 +8,7 @@ import javafx.scene.shape.LineTo;
 import javafx.scene.shape.MoveTo;
 import javafx.scene.shape.Path;
 
-public class Pocket
+public class VisualPocket
 {
 	private String number;
 	private Color color;
@@ -17,7 +17,7 @@ public class Pocket
 	//Pocket constructor
 	//param num as a string, to be able to use the 00 num
 	//path as a parameter, to be able to link a path to a num after graphical Ball&Pocket colision test
-	protected Pocket(String num, Color col, Path p_path)
+	protected VisualPocket(String num, Color col, Path p_path)
 	{
 		number = num;
 		color = col;

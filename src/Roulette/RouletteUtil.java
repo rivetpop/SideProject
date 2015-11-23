@@ -2,6 +2,7 @@ package Roulette;
 
 import java.util.ArrayList;
 
+
 import javafx.scene.control.Label;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.ArcTo;
@@ -11,52 +12,53 @@ import javafx.scene.shape.Path;
 import javafx.scene.shape.StrokeLineCap;
 import javafx.scene.shape.StrokeType;
 
-public class LogicalRoulette 
+//This class provides utilities for the roulette program 
+public class RouletteUtil 
 {	
 	static double INNERCIRCLERADIUS = Roulette.INNERCIRCLERADIUS;
 	static double OUTERCIRCLERADIUS = Roulette.OUTERCIRCLERADIUS;
 			
-	static Pocket pocket00 = null;
-	static Pocket pocket0 = null;
-	static Pocket pocket1 = null;
-	static Pocket pocket2 = null;
-	static Pocket pocket3 = null;
-	static Pocket pocket4 = null;
-	static Pocket pocket5 = null;
-	static Pocket pocket6 = null;	
-	static Pocket pocket7 = null;
-	static Pocket pocket8 = null;
-	static Pocket pocket9 = null;
-	static Pocket pocket10 = null;
-	static Pocket pocket11 = null;
-	static Pocket pocket12 = null;
-	static Pocket pocket13 = null;
-	static Pocket pocket14 = null;
-	static Pocket pocket15 = null;
-	static Pocket pocket16 = null;
-	static Pocket pocket17 = null;
-	static Pocket pocket18 = null;
-	static Pocket pocket19 = null;
-	static Pocket pocket20 = null;
-	static Pocket pocket21 = null;
-	static Pocket pocket22 = null;
-	static Pocket pocket23 = null;
-	static Pocket pocket24 = null;
-	static Pocket pocket25 = null;
-	static Pocket pocket26 = null;
-	static Pocket pocket27 = null;
-	static Pocket pocket28 = null;
-	static Pocket pocket29 = null;
-	static Pocket pocket30 = null;
-	static Pocket pocket31 = null;
-	static Pocket pocket32 = null;
-	static Pocket pocket33 = null;
-	static Pocket pocket34 = null;
-	static Pocket pocket35 = null;
-	static Pocket pocket36 = null;
+	static VisualPocket pocket00 = null;
+	static VisualPocket pocket0 = null;
+	static VisualPocket pocket1 = null;
+	static VisualPocket pocket2 = null;
+	static VisualPocket pocket3 = null;
+	static VisualPocket pocket4 = null;
+	static VisualPocket pocket5 = null;
+	static VisualPocket pocket6 = null;	
+	static VisualPocket pocket7 = null;
+	static VisualPocket pocket8 = null;
+	static VisualPocket pocket9 = null;
+	static VisualPocket pocket10 = null;
+	static VisualPocket pocket11 = null;
+	static VisualPocket pocket12 = null;
+	static VisualPocket pocket13 = null;
+	static VisualPocket pocket14 = null;
+	static VisualPocket pocket15 = null;
+	static VisualPocket pocket16 = null;
+	static VisualPocket pocket17 = null;
+	static VisualPocket pocket18 = null;
+	static VisualPocket pocket19 = null;
+	static VisualPocket pocket20 = null;
+	static VisualPocket pocket21 = null;
+	static VisualPocket pocket22 = null;
+	static VisualPocket pocket23 = null;
+	static VisualPocket pocket24 = null;
+	static VisualPocket pocket25 = null;
+	static VisualPocket pocket26 = null;
+	static VisualPocket pocket27 = null;
+	static VisualPocket pocket28 = null;
+	static VisualPocket pocket29 = null;
+	static VisualPocket pocket30 = null;
+	static VisualPocket pocket31 = null;
+	static VisualPocket pocket32 = null;
+	static VisualPocket pocket33 = null;
+	static VisualPocket pocket34 = null;
+	static VisualPocket pocket35 = null;
+	static VisualPocket pocket36 = null;
 	
 	//ArrayList containing the pocketsPane. Used to loop through them.
-	protected static ArrayList<Pocket> pocketsList = new ArrayList<Pocket>();
+	protected static ArrayList<VisualPocket> pocketsList = new ArrayList<VisualPocket>();
 	
 	static protected void createPocketObjects()
 	{
@@ -99,44 +101,44 @@ public class LogicalRoulette
 		Path path35 = createPath();
 		Path path36 = createPath();
 		
-		pocket00 = new Pocket("00", Color.GREEN, path00);
-		pocket0 = new Pocket("0", Color.GREEN, path0);
-		pocket1 = new Pocket("1", Color.RED, path1);
-		pocket2 = new Pocket("2", Color.BLACK, path2);
-		pocket3 = new Pocket("3", Color.RED, path3);
-		pocket4 = new Pocket("4", Color.BLACK, path4);
-		pocket5 = new Pocket("5", Color.RED, path5);
-		pocket6 = new Pocket("6", Color.BLACK, path6);	
-		pocket7 = new Pocket("7", Color.RED, path7);
-		pocket8 = new Pocket("8", Color.BLACK, path8);
-		pocket9 = new Pocket("9", Color.RED, path9);
-		pocket10 = new Pocket("10", Color.BLACK, path10);
-		pocket11 = new Pocket("11", Color.BLACK, path11);
-		pocket12 = new Pocket("12", Color.RED, path12);
-		pocket13 = new Pocket("13", Color.BLACK, path13);
-		pocket14 = new Pocket("14", Color.RED, path14);
-		pocket15 = new Pocket("15", Color.BLACK, path15);
-		pocket16 = new Pocket("16", Color.RED, path16);
-		pocket17 = new Pocket("17", Color.BLACK, path17);
-		pocket18 = new Pocket("18", Color.RED, path18);
-		pocket19 = new Pocket("19", Color.RED, path19);
-		pocket20 = new Pocket("20", Color.BLACK, path20);
-		pocket21 = new Pocket("21", Color.RED, path21);
-		pocket22 = new Pocket("22", Color.BLACK, path22);
-		pocket23 = new Pocket("23", Color.RED, path23);
-		pocket24 = new Pocket("24", Color.BLACK, path24);
-		pocket25 = new Pocket("25", Color.RED, path25);
-		pocket26 = new Pocket("26", Color.BLACK, path26);
-		pocket27 = new Pocket("27", Color.RED, path27);
-		pocket28 = new Pocket("28", Color.BLACK, path28);
-		pocket29 = new Pocket("29", Color.BLACK, path29);
-		pocket30 = new Pocket("30", Color.RED, path30);
-		pocket31 = new Pocket("31", Color.BLACK, path31);
-		pocket32 = new Pocket("32", Color.RED, path32);
-		pocket33 = new Pocket("33", Color.BLACK, path33);
-		pocket34 = new Pocket("34", Color.RED, path34);
-		pocket35 = new Pocket("35", Color.BLACK, path35);
-		pocket36 = new Pocket("36", Color.RED, path36);
+		pocket00 = new VisualPocket("00", Color.GREEN, path00);
+		pocket0 = new VisualPocket("0", Color.GREEN, path0);
+		pocket1 = new VisualPocket("1", Color.RED, path1);
+		pocket2 = new VisualPocket("2", Color.BLACK, path2);
+		pocket3 = new VisualPocket("3", Color.RED, path3);
+		pocket4 = new VisualPocket("4", Color.BLACK, path4);
+		pocket5 = new VisualPocket("5", Color.RED, path5);
+		pocket6 = new VisualPocket("6", Color.BLACK, path6);	
+		pocket7 = new VisualPocket("7", Color.RED, path7);
+		pocket8 = new VisualPocket("8", Color.BLACK, path8);
+		pocket9 = new VisualPocket("9", Color.RED, path9);
+		pocket10 = new VisualPocket("10", Color.BLACK, path10);
+		pocket11 = new VisualPocket("11", Color.BLACK, path11);
+		pocket12 = new VisualPocket("12", Color.RED, path12);
+		pocket13 = new VisualPocket("13", Color.BLACK, path13);
+		pocket14 = new VisualPocket("14", Color.RED, path14);
+		pocket15 = new VisualPocket("15", Color.BLACK, path15);
+		pocket16 = new VisualPocket("16", Color.RED, path16);
+		pocket17 = new VisualPocket("17", Color.BLACK, path17);
+		pocket18 = new VisualPocket("18", Color.RED, path18);
+		pocket19 = new VisualPocket("19", Color.RED, path19);
+		pocket20 = new VisualPocket("20", Color.BLACK, path20);
+		pocket21 = new VisualPocket("21", Color.RED, path21);
+		pocket22 = new VisualPocket("22", Color.BLACK, path22);
+		pocket23 = new VisualPocket("23", Color.RED, path23);
+		pocket24 = new VisualPocket("24", Color.BLACK, path24);
+		pocket25 = new VisualPocket("25", Color.RED, path25);
+		pocket26 = new VisualPocket("26", Color.BLACK, path26);
+		pocket27 = new VisualPocket("27", Color.RED, path27);
+		pocket28 = new VisualPocket("28", Color.BLACK, path28);
+		pocket29 = new VisualPocket("29", Color.BLACK, path29);
+		pocket30 = new VisualPocket("30", Color.RED, path30);
+		pocket31 = new VisualPocket("31", Color.BLACK, path31);
+		pocket32 = new VisualPocket("32", Color.RED, path32);
+		pocket33 = new VisualPocket("33", Color.BLACK, path33);
+		pocket34 = new VisualPocket("34", Color.RED, path34);
+		pocket35 = new VisualPocket("35", Color.BLACK, path35);
+		pocket36 = new VisualPocket("36", Color.RED, path36);
 		
 		pocketsList.add(pocket00);
 		pocketsList.add(pocket1);
@@ -178,6 +180,7 @@ public class LogicalRoulette
 		pocketsList.add(pocket27);			
 	}
 	
+	//Creates a custom path used to build the visual roulette' pockets
 	static private Path createPath()
 	{
 		 	Path path = new Path();		

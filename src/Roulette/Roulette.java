@@ -14,6 +14,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Random;
 
 import com.sun.javafx.collections.ObservableListWrapper;
@@ -37,13 +38,18 @@ import javafx.scene.AmbientLight;
 import javafx.scene.Group;
 import javafx.scene.Node;
 import javafx.scene.Scene;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.Control;
+import javafx.scene.control.Dialog;
 import javafx.scene.control.Label;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuBar;
 import javafx.scene.control.MenuItem;
+import javafx.scene.control.Slider;
 import javafx.scene.control.TextArea;
+import javafx.scene.control.ButtonBar.ButtonData;
 import javafx.scene.effect.BlendMode;
 import javafx.scene.effect.Bloom;
 import javafx.scene.effect.Lighting;
@@ -89,6 +95,7 @@ import javafx.scene.text.Text;
 import javafx.scene.text.TextAlignment;
 import javafx.scene.text.TextBoundsType;
 import javafx.scene.transform.Rotate;
+import javafx.util.Callback;
 import javafx.util.Duration;
 import javafx.scene.effect.Light;
 
@@ -254,18 +261,16 @@ public class Roulette extends GameInterface
 				private VBox tableStraightBetZone3;
 				
 	//Roulette chip image
-		Image rouletteChipImg = null;
-		ImageView rouletteChipImgView = null;
+		private Image rouletteChipImg = null;
 			
 	public Roulette()
 	{
 		root = new Pane();
 		scene = new Scene(root, 800,800);
 				
-		rouletteChipImg = new Image("roulette_chip.jpg");
-		rouletteChipImgView = new ImageView(rouletteChipImg);
+		rouletteChipImg = new Image("roulette_chip.png");
 		
-		LogicalRoulette.createPocketObjects();//create the pockets objects
+		RouletteUtil.createPocketObjects();//create the pockets objects
 		createMenu();
 		createPlayerInfo();
 		setBall();
@@ -277,7 +282,9 @@ public class Roulette extends GameInterface
 		setCornerBetZones();
 		setBasketBetZone();
 		topLineBetZone();
+		setOnClickEventHandlerToBettingZones();
 		setButtons();
+		setOnClickEventHandlerToBettingZones();
 		setMessageZone("Click on the table to place a bet!");
 		
 		/*Line test = new Line (0.0, 0.0, 0.0, 125.0);
@@ -362,118 +369,118 @@ public class Roulette extends GameInterface
 				
 			//Graphic Pockets
 				//Paths
-					pocket00Path = LogicalRoulette.pocket00.getPath();
+					pocket00Path = RouletteUtil.pocket00.getPath();
 					pocket00Path.setFill(Color.GREEN);
 					
-					pocket27Path = LogicalRoulette.pocket27.getPath();
+					pocket27Path = RouletteUtil.pocket27.getPath();
 					pocket27Path.setFill(Color.RED);
 					
-					pocket10Path = LogicalRoulette.pocket10.getPath();
+					pocket10Path = RouletteUtil.pocket10.getPath();
 					pocket10Path.setFill(Color.BLACK);
 					
-					pocket25Path = LogicalRoulette.pocket25.getPath();
+					pocket25Path = RouletteUtil.pocket25.getPath();
 					pocket25Path.setFill(Color.RED);
 					
-					pocket29Path = LogicalRoulette.pocket29.getPath();
+					pocket29Path = RouletteUtil.pocket29.getPath();
 					pocket29Path.setFill(Color.BLACK);
 	
-					pocket12Path = LogicalRoulette.pocket12.getPath();
+					pocket12Path = RouletteUtil.pocket12.getPath();
 					pocket12Path.setFill(Color.RED);
 					
-					pocket8Path = LogicalRoulette.pocket8.getPath();
+					pocket8Path = RouletteUtil.pocket8.getPath();
 					pocket8Path.setFill(Color.BLACK);
 					
-					pocket19Path = LogicalRoulette.pocket19.getPath();
+					pocket19Path = RouletteUtil.pocket19.getPath();
 					pocket19Path.setFill(Color.RED);
 					
-					pocket31Path = LogicalRoulette.pocket31.getPath();
+					pocket31Path = RouletteUtil.pocket31.getPath();
 					pocket31Path.setFill(Color.BLACK);
 					
-					pocket18Path = LogicalRoulette.pocket18.getPath();
+					pocket18Path = RouletteUtil.pocket18.getPath();
 					pocket18Path.setFill(Color.RED);
 					
-					pocket6Path = LogicalRoulette.pocket6.getPath();
+					pocket6Path = RouletteUtil.pocket6.getPath();
 					pocket6Path.setFill(Color.BLACK);
 					
-					pocket21Path = LogicalRoulette.pocket21.getPath();
+					pocket21Path = RouletteUtil.pocket21.getPath();
 					pocket21Path.setFill(Color.RED);
 					
-					pocket33Path = LogicalRoulette.pocket33.getPath();
+					pocket33Path = RouletteUtil.pocket33.getPath();
 					pocket33Path.setFill(Color.BLACK);
 					
-					pocket16Path = LogicalRoulette.pocket16.getPath();
+					pocket16Path = RouletteUtil.pocket16.getPath();
 					pocket16Path.setFill(Color.RED);
 					
-					pocket4Path = LogicalRoulette.pocket4.getPath();
+					pocket4Path = RouletteUtil.pocket4.getPath();
 					pocket4Path.setFill(Color.BLACK);
 					
-					pocket23Path = LogicalRoulette.pocket23.getPath();
+					pocket23Path = RouletteUtil.pocket23.getPath();
 					pocket23Path.setFill(Color.RED);
 					
-					pocket35Path = LogicalRoulette.pocket35.getPath();
+					pocket35Path = RouletteUtil.pocket35.getPath();
 					pocket35Path.setFill(Color.BLACK);
 					
-					pocket14Path = LogicalRoulette.pocket14.getPath();
+					pocket14Path = RouletteUtil.pocket14.getPath();
 					pocket14Path.setFill(Color.RED);
 					
-					pocket2Path = LogicalRoulette.pocket2.getPath();
+					pocket2Path = RouletteUtil.pocket2.getPath();
 					pocket2Path.setFill(Color.BLACK);
 					
-					pocket0Path = LogicalRoulette.pocket0.getPath();
+					pocket0Path = RouletteUtil.pocket0.getPath();
 					pocket0Path.setFill(Color.GREEN);
 					
-					pocket28Path = LogicalRoulette.pocket28.getPath();
+					pocket28Path = RouletteUtil.pocket28.getPath();
 					pocket28Path.setFill(Color.BLACK);
 					
-					pocket9Path = LogicalRoulette.pocket9.getPath();
+					pocket9Path = RouletteUtil.pocket9.getPath();
 					pocket9Path.setFill(Color.RED);
 					
-					pocket26Path = LogicalRoulette.pocket26.getPath();
+					pocket26Path = RouletteUtil.pocket26.getPath();
 					pocket26Path.setFill(Color.BLACK);
 					
-					pocket30Path = LogicalRoulette.pocket30.getPath();
+					pocket30Path = RouletteUtil.pocket30.getPath();
 					pocket30Path.setFill(Color.RED);
 					
-					pocket11Path = LogicalRoulette.pocket11.getPath();
+					pocket11Path = RouletteUtil.pocket11.getPath();
 					pocket11Path.setFill(Color.BLACK);
 					
-					pocket7Path = LogicalRoulette.pocket7.getPath();
+					pocket7Path = RouletteUtil.pocket7.getPath();
 					pocket7Path.setFill(Color.RED);
 					
-					pocket20Path = LogicalRoulette.pocket20.getPath();
+					pocket20Path = RouletteUtil.pocket20.getPath();
 					pocket20Path.setFill(Color.BLACK);
 					
-					pocket32Path = LogicalRoulette.pocket32.getPath();
+					pocket32Path = RouletteUtil.pocket32.getPath();
 					pocket32Path.setFill(Color.RED);
 					
-					pocket17Path = LogicalRoulette.pocket17.getPath();
+					pocket17Path = RouletteUtil.pocket17.getPath();
 					pocket17Path.setFill(Color.BLACK);
 					
-					pocket5Path = LogicalRoulette.pocket5.getPath();
+					pocket5Path = RouletteUtil.pocket5.getPath();
 					pocket5Path.setFill(Color.RED);
 					
-					pocket22Path = LogicalRoulette.pocket22.getPath();
+					pocket22Path = RouletteUtil.pocket22.getPath();
 					pocket22Path.setFill(Color.BLACK);
 					
-					pocket34Path = LogicalRoulette.pocket34.getPath();
+					pocket34Path = RouletteUtil.pocket34.getPath();
 					pocket34Path.setFill(Color.RED);
 					
-					pocket15Path = LogicalRoulette.pocket15.getPath();
+					pocket15Path = RouletteUtil.pocket15.getPath();
 					pocket15Path.setFill(Color.BLACK);
 					
-					pocket3Path = LogicalRoulette.pocket3.getPath();
+					pocket3Path = RouletteUtil.pocket3.getPath();
 					pocket3Path.setFill(Color.RED);
 					
-					pocket24Path = LogicalRoulette.pocket24.getPath();
+					pocket24Path = RouletteUtil.pocket24.getPath();
 					pocket24Path.setFill(Color.BLACK);
 					
-					pocket36Path = LogicalRoulette.pocket36.getPath();
+					pocket36Path = RouletteUtil.pocket36.getPath();
 					pocket36Path.setFill(Color.RED);
 					
-					pocket13Path = LogicalRoulette.pocket13.getPath();
+					pocket13Path = RouletteUtil.pocket13.getPath();
 					pocket13Path.setFill(Color.BLACK);
 					
-					pocket1Path = LogicalRoulette.pocket1.getPath();
+					pocket1Path = RouletteUtil.pocket1.getPath();
 					pocket1Path.setFill(Color.RED);
 				
 				//Labels
@@ -863,7 +870,7 @@ public class Roulette extends GameInterface
 	//Take the ball out of the pocket's pane (necessary after an wheel animation) and back to it's initial position
 	private void bringBallToInitialPosition()
 	{
-		Pocket lastAnimationFinalPocket = getCollidingPocket();
+		VisualPocket lastAnimationFinalPocket = getCollidingPocket();
 		//if the ball is colliding a pocket, it means that an animation has run
 		//and we need to take the ball out of the pocket
 		if (lastAnimationFinalPocket != null)
@@ -1195,7 +1202,7 @@ public class Roulette extends GameInterface
 					Polygon bet_00innerZone = new Polygon();
 					bet_00innerZone.getPoints().addAll(new Double[]{0.0, -zerosZonesInnerHeight/2, zerosZonesInnerTriangleWidth, 0.0, zerosZonesInnerTriangleWidth+TABLE_MAIN_CELL_WIDTH, 0.0, zerosZonesInnerTriangleWidth+TABLE_MAIN_CELL_WIDTH, -zerosZonesInnerHeight, zerosZonesInnerTriangleWidth, -zerosZonesInnerHeight});
 					bet_00innerZone.setFill(Color.TRANSPARENT);
-					straightBetZoneMap.put("00", bet_00innerZone);//Add this betting zone to the straightBetZonemap
+					straightBetZoneMap.put("straight00", bet_00innerZone);//Add this betting zone to the straightBetZonemap
 					bet_00innerZone.setOnMouseEntered(new EventHandler<MouseEvent>()
 							{
 								@Override
@@ -1223,7 +1230,7 @@ public class Roulette extends GameInterface
 					bet_0innerZone.setFill(Color.TRANSPARENT);
 					bet_0innerZone.getPoints().addAll(new Double[]{0.0, -zerosZonesInnerHeight/2, zerosZonesInnerTriangleWidth, 0.0, zerosZonesInnerTriangleWidth+TABLE_MAIN_CELL_WIDTH, 0.0, zerosZonesInnerTriangleWidth+TABLE_MAIN_CELL_WIDTH, -zerosZonesInnerHeight, zerosZonesInnerTriangleWidth, -zerosZonesInnerHeight});
 					bet_0innerZone.setFill(Color.TRANSPARENT);
-					straightBetZoneMap.put("0", bet_0innerZone);//Add this betting zone to the straightBetZonemap
+					straightBetZoneMap.put("straight0", bet_0innerZone);//Add this betting zone to the straightBetZonemap
 					bet_0innerZone.setOnMouseEntered(new EventHandler<MouseEvent>()
 							{
 								@Override
@@ -1259,7 +1266,7 @@ public class Roulette extends GameInterface
 				for (; number<=36 ; number++)
 				{
 					Rectangle rect = new Rectangle(TABLE_MAIN_CELL_WIDTH, TABLE_MAIN_CELL_HEIGHT, Color.TRANSPARENT);
-					straightBetZoneMap.put(String.valueOf(number), rect);//Add this betting zone to the straightBetZonemap
+					straightBetZoneMap.put("straight" + String.valueOf(number), rect);//Add this betting zone to the straightBetZonemap
 					rect.setOnMouseEntered(new EventHandler<MouseEvent>()
 					{
 						@Override
@@ -1648,7 +1655,7 @@ public class Roulette extends GameInterface
 				for (int j=1; j<=3; j++)
 				{
 					Rectangle sideBetZone = new Rectangle((int)(TABLE_MAIN_CELL_WIDTH*0.40), (int)(TABLE_MAIN_CELL_HEIGHT*2/3), Color.TRANSPARENT);
-					splitBetZoneMap.put(String.valueOf(3*i-(j-1))+"-"+(String.valueOf(3*(i+1)-(j-1))), sideBetZone); //The key is a string made of both numbers included in the split bet. Ex: 3-6 for the 3 and 6 split bet
+					splitBetZoneMap.put("split" + String.valueOf(3*i-(j-1))+"-"+(String.valueOf(3*(i+1)-(j-1))), sideBetZone); //The key is a string made of both numbers included in the split bet. Ex: split3-6 for the 3 and 6 split bet
 					sideBetZone.setTranslateX(i * (TABLE_MAIN_CELL_WIDTH + TABLE_MAIN_CELL_GAP) - sideBetZone.getWidth()/2 + TABLE_MAIN_CELL_GAP/2);
 					sideBetZone.setTranslateY(((j-1)*TABLE_MAIN_CELL_HEIGHT) + (TABLE_MAIN_CELL_HEIGHT*1/6) + (j*TABLE_MAIN_CELL_GAP));
 					
@@ -1687,7 +1694,7 @@ public class Roulette extends GameInterface
 				for (int j=1; j<=2; j++)
 				{
 					Rectangle bottomBetZone = new Rectangle((int)(TABLE_MAIN_CELL_WIDTH*2/3), (int)(TABLE_MAIN_CELL_HEIGHT*0.4), Color.TRANSPARENT);
-					splitBetZoneMap.put((String.valueOf(3*i-(j-1)-1) +"-"+ String.valueOf(3*i-(j-1))), bottomBetZone); //The key is a string made of both numbers included in the split bet. Ex: 2-3 for the 2 and 3 split bet
+					splitBetZoneMap.put(("split"+String.valueOf(3*i-(j-1)-1) +"-"+ String.valueOf(3*i-(j-1))), bottomBetZone); //The key is a string made of both numbers included in the split bet. Ex: split2-3 for the 2 and 3 split bet
 					bottomBetZone.setTranslateX(((i-1)*TABLE_MAIN_CELL_WIDTH) + (TABLE_MAIN_CELL_WIDTH*1/6) + (i*TABLE_MAIN_CELL_GAP) + TABLE_MAIN_CELL_GAP/2);
 					bottomBetZone.setTranslateY(j*(TABLE_MAIN_CELL_HEIGHT + TABLE_MAIN_CELL_GAP) - bottomBetZone.getHeight()/2 + TABLE_MAIN_CELL_GAP/2);
 					
@@ -1803,7 +1810,7 @@ public class Roulette extends GameInterface
 			for (int j=1; j<=2; j++)
 			{
 				Rectangle cornerBetZone = new Rectangle((int)(TABLE_MAIN_CELL_WIDTH*1/2), (int)(TABLE_MAIN_CELL_HEIGHT*0.4), Color.TRANSPARENT);
-				cornerBetZoneMap.put(String.valueOf(3*i-(j-1)-1) +"-"+ String.valueOf(3*i-(j-1)) +"-"+ String.valueOf(3*(i+1)-(j-1)-1) +"-"+ String.valueOf(3*(i+1)-(j-1)), cornerBetZone); //The key is a string made of all the number included in the corner bet Ex: 2-3-4-5 or 1-2-3-4
+				cornerBetZoneMap.put("corner" + String.valueOf(3*i-(j-1)-1) +"-"+ String.valueOf(3*i-(j-1)) +"-"+ String.valueOf(3*(i+1)-(j-1)-1) +"-"+ String.valueOf(3*(i+1)-(j-1)), cornerBetZone); //The key is a string made of all the number included in the corner bet Ex: corner2-3-4-5 or corner1-2-3-4
 				cornerBetZone.setTranslateX(i * (TABLE_MAIN_CELL_WIDTH + TABLE_MAIN_CELL_GAP) - cornerBetZone.getWidth()/2 + TABLE_MAIN_CELL_GAP/2);
 				cornerBetZone.setTranslateY(j*(TABLE_MAIN_CELL_HEIGHT + TABLE_MAIN_CELL_GAP) - cornerBetZone.getHeight()/2 + TABLE_MAIN_CELL_GAP/2);
 				
@@ -1853,7 +1860,7 @@ public class Roulette extends GameInterface
 					}					
 					
 					Rectangle basketBetZone = new Rectangle((int)(TABLE_MAIN_CELL_WIDTH*1/2), (int)(TABLE_MAIN_CELL_HEIGHT*0.4), Color.TRANSPARENT);
-					basketBetZoneMap.put(mapKeyValue,basketBetZone); //The key is a string made of all the number included in the basket bet: 2-00-3 , 0-2-00, 1-0-2
+					basketBetZoneMap.put("basket" + mapKeyValue,basketBetZone); //The key is a string made of all the number included in the basket bet: basket2-00-3 , basket0-2-00, basket1-0-2
 					basketBetZone.setTranslateX(-basketBetZone.getWidth()/2 + TABLE_MAIN_CELL_GAP/2);
 					if (i==2)
 						basketBetZone.setTranslateY(TABLE_MAIN_CELL_HEIGHT*1.5 + 2*TABLE_MAIN_CELL_GAP - basketBetZone.getHeight()/2);	
@@ -1894,7 +1901,7 @@ public class Roulette extends GameInterface
 	{
 		//TopLine bet zone1		
 			Rectangle topLineBetZone1 = new Rectangle((int)(TABLE_MAIN_CELL_WIDTH*1/2), (int)(TABLE_MAIN_CELL_HEIGHT*0.4), Color.BLUE);
-			topLineBetZoneMap.put("topline1",topLineBetZone1); 
+			topLineBetZoneMap.put("topline1",topLineBetZone1);//The key of the bottom topLineBet is topline1
 			topLineBetZone1.setTranslateX(-topLineBetZone1.getWidth()/2 + TABLE_MAIN_CELL_GAP/2);
 			topLineBetZone1.setTranslateY(3*(TABLE_MAIN_CELL_HEIGHT + TABLE_MAIN_CELL_GAP) - topLineBetZone1.getHeight()/2 + TABLE_MAIN_CELL_GAP/2);
 			
@@ -1922,7 +1929,7 @@ public class Roulette extends GameInterface
 			
 		//TopLine bet zone2	
 		Rectangle topLineBetZone2 = new Rectangle((int)(TABLE_MAIN_CELL_WIDTH*1/2), (int)(TABLE_MAIN_CELL_HEIGHT*0.4), Color.BLUE);
-		topLineBetZoneMap.put("topline1",topLineBetZone2); 
+		topLineBetZoneMap.put("topline2",topLineBetZone2); //The key of the top topLineBet is topline2
 		topLineBetZone2.setTranslateX(-topLineBetZone2.getWidth()/2 + TABLE_MAIN_CELL_GAP/2);
 		topLineBetZone2.setTranslateY(- topLineBetZone2.getHeight()/2 + TABLE_MAIN_CELL_GAP/2);
 		
@@ -1950,6 +1957,81 @@ public class Roulette extends GameInterface
 		
 		//Add the basket bet zone to the tableBetLayout
 		tableBetLayout.getChildren().addAll(topLineBetZone1, topLineBetZone2);
+	}
+	
+	//This method sets a mouse click event handler to the betting zones.
+	//When a betting zone is clicked, an alert ask the user how much he wants to bet
+	//then a StackPane made of an imageView of a chip with a bet number label appears
+	//on the betting zone
+	private void setOnClickEventHandlerToBettingZones()
+	{
+		//Set the straightBetZone Events
+		for (Map.Entry<String, Shape> entry : straightBetZoneMap.entrySet())
+		{
+			entry.getValue().setOnMouseClicked(new EventHandler<MouseEvent>()
+			{
+				@Override
+				public void handle(MouseEvent mouseEvent)
+				{
+					Slider stakeSlider = new Slider();
+					stakeSlider.setMin(1);
+					stakeSlider.setMax(1000);
+					stakeSlider.setMajorTickUnit(1000);
+					stakeSlider.setMinorTickCount(100);
+					stakeSlider.setBlockIncrement(1);
+					
+					Dialog <Integer> stakeDialog = new Dialog<Integer>();
+					stakeDialog.setTitle("Bet");
+					stakeDialog.setHeaderText("Choose a stake!");
+					stakeDialog.getDialogPane().setContent(stakeSlider);
+					ButtonType buttonTypeBet = new ButtonType("Bet", ButtonData.OK_DONE);
+					stakeDialog.getDialogPane().getButtonTypes().addAll(buttonTypeBet, ButtonType.CANCEL);
+					stakeDialog.setResultConverter(new Callback<ButtonType, Integer>()
+					{
+						@Override
+						public Integer call(ButtonType buttonType)
+						{
+							if (buttonType == buttonTypeBet)
+								return (int)stakeSlider.getValue();
+							
+							else
+								return null;	
+						}
+					});
+					
+					Optional<Integer> result = stakeDialog.showAndWait();
+					
+					if (result != null)
+					{
+						//Set the chip imageView
+						ImageView chipImgView = new ImageView(rouletteChipImg);
+						chipImgView.setPreserveRatio(true);
+						chipImgView.setFitHeight(TABLE_MAIN_CELL_HEIGHT/2);
+						
+						//Set the stake label
+						Label stakeLabel = new Label(String.valueOf(result.get()));
+						stakeLabel.setStyle("-fx-font-size: 10pt; -fx-text-fill: black;");
+						
+						//Set the stackpane containing the chip and the stake
+						StackPane chipStackPane = new StackPane(chipImgView, stakeLabel);
+						Point2D stackPaneCoordMin = entry.getValue().localToScene(Point2D.ZERO);
+						int stackPaneCenterXCoord = (int)(stackPaneCoordMin.getX() + TABLE_MAIN_CELL_WIDTH/2 - chipImgView.getFitHeight()/2);
+						int stackPaneCenterYCoord = (int)(stackPaneCoordMin.getY() + TABLE_MAIN_CELL_HEIGHT/2 - chipImgView.getFitHeight()/2);
+						chipStackPane.setTranslateX(stackPaneCenterXCoord);
+						chipStackPane.setTranslateY(stackPaneCenterYCoord);
+						
+						root.getChildren().add(chipStackPane);
+					}
+				}
+			});
+		}
+		
+		//straightBetZoneMap. 
+		//splitBetZoneMap. 
+		//streetBetZoneMap.
+		//cornerBetZoneMap. 
+		//basketBetZoneMap. 
+		//topLineBetZoneMap.
 	}
 	
 	private void setButtons()
@@ -2104,7 +2186,7 @@ public class Roulette extends GameInterface
 			
 			int arrayIndex = 0;
 			
-			for(Pocket pocket: LogicalRoulette.pocketsList)
+			for(VisualPocket pocket: RouletteUtil.pocketsList)
 			{
 				Path pathTemp = pocket.getPath();
 				Point2D pathCoordinnates = pathTemp.localToScene(Point2D.ZERO);
@@ -2161,7 +2243,7 @@ public class Roulette extends GameInterface
 					}
 				}
 				
-			Pocket seventhPocket = LogicalRoulette.pocketsList.get(seventhPocketIndex);
+			VisualPocket seventhPocket = RouletteUtil.pocketsList.get(seventhPocketIndex);
 			Point2D seventhPocketPathCoord = seventhPocket.getPath().localToScene(Point2D.ZERO);
 			Point2D ballCenterCoordinates = ballCenter.localToScene(Point2D.ZERO);
 			
@@ -2204,7 +2286,7 @@ public class Roulette extends GameInterface
 						/*Get the ball in it's final resting position in the pocket that it collides
 						 * Made by placing the rouletteBallStack in the parent (StackPane) of the collidingPocket's path 
 						 */						
-						Pocket finalPocket = getCollidingPocket();
+						VisualPocket finalPocket = getCollidingPocket();
 						StackPane finalPocketStackPane = (StackPane) finalPocket.getPath().getParent();
 						rouletteBallStack.setTranslateY(12);//To replace the initial Y translation of the ballStack and place the ball in the proper place inside the pocket
 						rouletteBallStack.setTranslateX(0);//To replace the initial X translation of the ballStack
@@ -2259,11 +2341,11 @@ public class Roulette extends GameInterface
 	
 	//Check which pocket is intersecting the ballCenter.
 	//Returns that pocket.
-	private Pocket getCollidingPocket()
+	private VisualPocket getCollidingPocket()
 	{
 		Shape collisionShape = null;
-		Pocket collidingPocket = null;
-		for (Pocket pocket: LogicalRoulette.pocketsList)
+		VisualPocket collidingPocket = null;
+		for (VisualPocket pocket: RouletteUtil.pocketsList)
 		{
 			collisionShape = Shape.intersect(ballCenter, pocket.getPath());
 			if (collisionShape.getBoundsInLocal().getWidth() != -1)//-1 because it is the returned value of .intersect when no intersection is detected
