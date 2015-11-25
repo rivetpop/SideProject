@@ -1900,7 +1900,7 @@ public class Roulette extends GameInterface
 	private void topLineBetZone()
 	{
 		//TopLine bet zone1		
-			Rectangle topLineBetZone1 = new Rectangle((int)(TABLE_MAIN_CELL_WIDTH*1/2), (int)(TABLE_MAIN_CELL_HEIGHT*0.4), Color.BLUE);
+			Rectangle topLineBetZone1 = new Rectangle((int)(TABLE_MAIN_CELL_WIDTH*1/2), (int)(TABLE_MAIN_CELL_HEIGHT*0.4), Color.TRANSPARENT);
 			topLineBetZoneMap.put("topline1",topLineBetZone1);//The key of the bottom topLineBet is topline1
 			topLineBetZone1.setTranslateX(-topLineBetZone1.getWidth()/2 + TABLE_MAIN_CELL_GAP/2);
 			topLineBetZone1.setTranslateY(3*(TABLE_MAIN_CELL_HEIGHT + TABLE_MAIN_CELL_GAP) - topLineBetZone1.getHeight()/2 + TABLE_MAIN_CELL_GAP/2);
@@ -1928,7 +1928,7 @@ public class Roulette extends GameInterface
 					});
 			
 		//TopLine bet zone2	
-		Rectangle topLineBetZone2 = new Rectangle((int)(TABLE_MAIN_CELL_WIDTH*1/2), (int)(TABLE_MAIN_CELL_HEIGHT*0.4), Color.BLUE);
+		Rectangle topLineBetZone2 = new Rectangle((int)(TABLE_MAIN_CELL_WIDTH*1/2), (int)(TABLE_MAIN_CELL_HEIGHT*0.4), Color.TRANSPARENT);
 		topLineBetZoneMap.put("topline2",topLineBetZone2); //The key of the top topLineBet is topline2
 		topLineBetZone2.setTranslateX(-topLineBetZone2.getWidth()/2 + TABLE_MAIN_CELL_GAP/2);
 		topLineBetZone2.setTranslateY(- topLineBetZone2.getHeight()/2 + TABLE_MAIN_CELL_GAP/2);
@@ -1976,32 +1976,35 @@ public class Roulette extends GameInterface
 					Slider stakeSlider = new Slider();
 					stakeSlider.setMin(1);
 					stakeSlider.setMax(1000);
-					stakeSlider.setMajorTickUnit(1000);
+					stakeSlider.setMajorTickUnit(499);
 					stakeSlider.setMinorTickCount(100);
-					stakeSlider.setBlockIncrement(1);
+					stakeSlider.setBlockIncrement(100);
+					stakeSlider.setShowTickLabels(true);
+					stakeSlider.setShowTickMarks(true);
 					
 					Dialog <Integer> stakeDialog = new Dialog<Integer>();
 					stakeDialog.setTitle("Bet");
 					stakeDialog.setHeaderText("Choose a stake!");
 					stakeDialog.getDialogPane().setContent(stakeSlider);
 					ButtonType buttonTypeBet = new ButtonType("Bet", ButtonData.OK_DONE);
-					stakeDialog.getDialogPane().getButtonTypes().addAll(buttonTypeBet, ButtonType.CANCEL);
+					ButtonType buttonTypeCancel = new ButtonType("Cancel", ButtonData.CANCEL_CLOSE);
+					stakeDialog.getDialogPane().getButtonTypes().addAll(buttonTypeBet, buttonTypeCancel);
 					stakeDialog.setResultConverter(new Callback<ButtonType, Integer>()
 					{
 						@Override
 						public Integer call(ButtonType buttonType)
 						{
+							Integer returnValue = null;
 							if (buttonType == buttonTypeBet)
-								return (int)stakeSlider.getValue();
-							
-							else
-								return null;	
+								returnValue = (int)stakeSlider.getValue();
+
+							return returnValue;
 						}
 					});
 					
 					Optional<Integer> result = stakeDialog.showAndWait();
 					
-					if (result != null)
+					if (result.isPresent())
 					{
 						//Set the chip imageView
 						ImageView chipImgView = new ImageView(rouletteChipImg);
