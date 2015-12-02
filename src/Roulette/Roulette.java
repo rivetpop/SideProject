@@ -16,11 +16,16 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Random;
+import java.util.Stack;
 
 import com.sun.javafx.collections.ObservableListWrapper;
 
+import Casino.Control;
 import Casino.GameInterface;
 import javafx.animation.RotateTransition;
+import javafx.beans.binding.Bindings;
+import javafx.beans.property.SimpleIntegerProperty;
+import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
@@ -39,9 +44,9 @@ import javafx.scene.Group;
 import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
+import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
-import javafx.scene.control.Control;
 import javafx.scene.control.Dialog;
 import javafx.scene.control.Label;
 import javafx.scene.control.Menu;
@@ -50,6 +55,8 @@ import javafx.scene.control.MenuItem;
 import javafx.scene.control.Slider;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.ButtonBar.ButtonData;
+import javafx.scene.control.TextField;
+import javafx.scene.control.TextInputDialog;
 import javafx.scene.effect.BlendMode;
 import javafx.scene.effect.Bloom;
 import javafx.scene.effect.Lighting;
@@ -97,6 +104,8 @@ import javafx.scene.text.TextBoundsType;
 import javafx.scene.transform.Rotate;
 import javafx.util.Callback;
 import javafx.util.Duration;
+import javafx.util.StringConverter;
+import javafx.util.converter.NumberStringConverter;
 import javafx.scene.effect.Light;
 
 public class Roulette extends GameInterface
@@ -259,9 +268,16 @@ public class Roulette extends GameInterface
 				private GridPane tableStraightBetZone2;
 			//Zone containing the zeros bets	
 				private VBox tableStraightBetZone3;
+	
+	//Stack of all the bets made by the player
+		Stack<Bet> betStack = new Stack<>();
 				
 	//Roulette chip image
 		private Image rouletteChipImg = null;
+	
+	//Player cash Integer Object (the basic player cash is a int, so it is not observable).
+	//For the roulette graphic interface we need a player cash property to bind it to the cash display text in the scene.
+		private SimpleIntegerProperty playerCashProperty = new SimpleIntegerProperty(Control.currentPlayer.getCash());
 			
 	public Roulette()
 	{
@@ -273,6 +289,7 @@ public class Roulette extends GameInterface
 		RouletteUtil.createPocketObjects();//create the pockets objects
 		createMenu();
 		createPlayerInfo();
+		setPlayerCashListener();;
 		setBall();
 		setWheel();
 		setTable();
@@ -310,6 +327,20 @@ public class Roulette extends GameInterface
 		
 		root.setBackground(new Background(new BackgroundFill(Color.GREEN, CornerRadii.EMPTY, Insets.EMPTY)));
 		scene.getStylesheets().add(getClass().getResource("style.css").toExternalForm());
+	}
+	
+	//This function creates a listener that changes the scene player cash display (playerStats's text) 
+	//when the playerCashProperty is changed
+	private void setPlayerCashListener()
+	{
+		playerCashProperty.addListener(new ChangeListener() {
+			@Override
+			public void changed(ObservableValue observableValue, Object oldValue, Object newValue)
+			{
+				playerStats.setText("    " + Control.currentPlayer.getName() + "\n    Your cash : " + String.valueOf(newValue) + "$");
+				System.out.println("Cash de la scene ajusté");
+			}
+		});
 	}
 	
 	private void setWheel()
@@ -1202,7 +1233,7 @@ public class Roulette extends GameInterface
 					Polygon bet_00innerZone = new Polygon();
 					bet_00innerZone.getPoints().addAll(new Double[]{0.0, -zerosZonesInnerHeight/2, zerosZonesInnerTriangleWidth, 0.0, zerosZonesInnerTriangleWidth+TABLE_MAIN_CELL_WIDTH, 0.0, zerosZonesInnerTriangleWidth+TABLE_MAIN_CELL_WIDTH, -zerosZonesInnerHeight, zerosZonesInnerTriangleWidth, -zerosZonesInnerHeight});
 					bet_00innerZone.setFill(Color.TRANSPARENT);
-					straightBetZoneMap.put("straight00", bet_00innerZone);//Add this betting zone to the straightBetZonemap
+					straightBetZoneMap.put("straight-00", bet_00innerZone);//Add this betting zone to the straightBetZonemap
 					bet_00innerZone.setOnMouseEntered(new EventHandler<MouseEvent>()
 							{
 								@Override
@@ -1230,7 +1261,7 @@ public class Roulette extends GameInterface
 					bet_0innerZone.setFill(Color.TRANSPARENT);
 					bet_0innerZone.getPoints().addAll(new Double[]{0.0, -zerosZonesInnerHeight/2, zerosZonesInnerTriangleWidth, 0.0, zerosZonesInnerTriangleWidth+TABLE_MAIN_CELL_WIDTH, 0.0, zerosZonesInnerTriangleWidth+TABLE_MAIN_CELL_WIDTH, -zerosZonesInnerHeight, zerosZonesInnerTriangleWidth, -zerosZonesInnerHeight});
 					bet_0innerZone.setFill(Color.TRANSPARENT);
-					straightBetZoneMap.put("straight0", bet_0innerZone);//Add this betting zone to the straightBetZonemap
+					straightBetZoneMap.put("straight-0", bet_0innerZone);//Add this betting zone to the straightBetZonemap
 					bet_0innerZone.setOnMouseEntered(new EventHandler<MouseEvent>()
 							{
 								@Override
@@ -1266,7 +1297,7 @@ public class Roulette extends GameInterface
 				for (; number<=36 ; number++)
 				{
 					Rectangle rect = new Rectangle(TABLE_MAIN_CELL_WIDTH, TABLE_MAIN_CELL_HEIGHT, Color.TRANSPARENT);
-					straightBetZoneMap.put("straight" + String.valueOf(number), rect);//Add this betting zone to the straightBetZonemap
+					straightBetZoneMap.put("straight-" + String.valueOf(number), rect);//Add this betting zone to the straightBetZonemap. Key is "straight-" + number. Ex: "straight-20"
 					rect.setOnMouseEntered(new EventHandler<MouseEvent>()
 					{
 						@Override
@@ -1960,7 +1991,7 @@ public class Roulette extends GameInterface
 	}
 	
 	//This method sets a mouse click event handler to the betting zones.
-	//When a betting zone is clicked, an alert ask the user how much he wants to bet
+	//When a betting zone is clicked, a dialog ask the user how much he wants to bet
 	//then a StackPane made of an imageView of a chip with a bet number label appears
 	//on the betting zone
 	private void setOnClickEventHandlerToBettingZones()
@@ -1968,62 +1999,118 @@ public class Roulette extends GameInterface
 		//Set the straightBetZone Events
 		for (Map.Entry<String, Shape> entry : straightBetZoneMap.entrySet())
 		{
-			entry.getValue().setOnMouseClicked(new EventHandler<MouseEvent>()
-			{
+			Shape betZone = entry.getValue();//get the bet Zone from the entry of the map
+			String betKey = entry.getKey();//get the bet key from the entry map
+			betZone.setOnMouseClicked(new EventHandler<MouseEvent>()
+			{				
 				@Override
 				public void handle(MouseEvent mouseEvent)
-				{
-					Slider stakeSlider = new Slider();
-					stakeSlider.setMin(1);
-					stakeSlider.setMax(1000);
-					stakeSlider.setMajorTickUnit(499);
-					stakeSlider.setMinorTickCount(100);
-					stakeSlider.setBlockIncrement(100);
-					stakeSlider.setShowTickLabels(true);
-					stakeSlider.setShowTickMarks(true);
-					
-					Dialog <Integer> stakeDialog = new Dialog<Integer>();
-					stakeDialog.setTitle("Bet");
-					stakeDialog.setHeaderText("Choose a stake!");
-					stakeDialog.getDialogPane().setContent(stakeSlider);
-					ButtonType buttonTypeBet = new ButtonType("Bet", ButtonData.OK_DONE);
-					ButtonType buttonTypeCancel = new ButtonType("Cancel", ButtonData.CANCEL_CLOSE);
-					stakeDialog.getDialogPane().getButtonTypes().addAll(buttonTypeBet, buttonTypeCancel);
-					stakeDialog.setResultConverter(new Callback<ButtonType, Integer>()
+				{	
+					boolean stakeInputValid = true;//boolean used to validate the stake input
+					Optional <String> stakeInputString;
+					if (playerCashProperty.get() > 0)
 					{
-						@Override
-						public Integer call(ButtonType buttonType)
+						do//Ask the user to enter a stake input until he enters a valid number
 						{
-							Integer returnValue = null;
-							if (buttonType == buttonTypeBet)
-								returnValue = (int)stakeSlider.getValue();
-
-							return returnValue;
+							stakeInputValid = true;
+							
+							TextField stakeTextField = new TextField();
+							stakeTextField.setMinWidth(50);
+							stakeTextField.setPrefWidth(50);
+												
+							int maxBet = (500 < playerCashProperty.get()) ? 500 :  playerCashProperty.get();	
+							TextInputDialog stakeDialog = new TextInputDialog();
+							stakeDialog.setTitle("Bet");
+							stakeDialog.setHeaderText("Straight bet.\nEnter a number between 1 and " + maxBet + ".");
+					
+							ButtonType buttonTypeBet = new ButtonType("Bet", ButtonData.OK_DONE);
+							ButtonType buttonTypeCancel = new ButtonType("Cancel", ButtonData.CANCEL_CLOSE);
+							stakeDialog.getDialogPane().getButtonTypes().clear();//Remove the default OK and Cancel Button. They display in french probably because of machine language settings.
+							stakeDialog.getDialogPane().getButtonTypes().addAll(buttonTypeBet, buttonTypeCancel);
+							
+							stakeInputString = stakeDialog.showAndWait();
+			
+							if (stakeInputString.isPresent() && stakeInputString.get() == "")
+								stakeInputValid = false;//if the user clicked the bet button with no input
+							
+							if (stakeInputString.isPresent())
+							{
+								try
+								{
+									int stakeInputInt = Integer.parseInt(stakeInputString.get());//if the input is not a number, this will throw a NumberFormatException
+									
+									//Check if the input is in the allowed range
+									if (stakeInputInt < 1 || stakeInputInt > maxBet)
+									{
+										stakeInputValid = false;
+									}	
+								}
+								catch (NumberFormatException e)
+								{
+									stakeInputValid = false;//if the parseInt fails, the user didn't enter a number
+								}							
+							}
 						}
-					});
-					
-					Optional<Integer> result = stakeDialog.showAndWait();
-					
-					if (result.isPresent())
+						while (!stakeInputValid);
+						
+						//if the user entered a valid stake number, make and display the chip StackPane and add the bet to betStack
+						if (stakeInputString.isPresent())//isPresent = false if the user clicked the Cancel button, it doesn't mean that the input is empty
+						{
+							//Chip stackPane
+								//Set the chip imageView
+								ImageView chipImgView = new ImageView(rouletteChipImg);
+								chipImgView.setPreserveRatio(true);
+								chipImgView.setFitHeight(TABLE_MAIN_CELL_HEIGHT/2);
+							
+								//Set the stake label
+								Label stakeChipLabel = new Label(stakeInputString.get());
+								stakeChipLabel.setStyle("-fx-font-size: 10pt; -fx-text-fill: black;");
+							
+								//Set the stackpane containing the chip and the stake
+								StackPane chipStackPane = new StackPane(chipImgView, stakeChipLabel);
+								Point2D stackPaneCoordMin = betZone.localToScene(Point2D.ZERO);
+								int stackPaneCenterXCoord;
+								int stackPaneCenterYCoord;
+//								if (betZone instanceof Rectangle)
+//								{
+//									stackPaneCenterXCoord = (int)(stackPaneCoordMin.getX() + ((Rectangle)betZone).getWidth()/2 - chipImgView.getFitHeight()/2);
+//									stackPaneCenterYCoord = (int)(stackPaneCoordMin.getY() + ((Rectangle)betZone).getHeight()/2 - chipImgView.getFitHeight()/2);
+//								}
+//								else
+//								{
+//									stackPaneCenterXCoord = (int)(stackPaneCoordMin.getX() + ((Polygon)betZone).getWidth()/2 - chipImgView.getFitHeight()/2);
+//									stackPaneCenterYCoord = (int)(stackPaneCoordMin.getY() + ((Rectangle)betZone).getHeight()/2 - chipImgView.getFitHeight()/2);
+//								}
+								stackPaneCenterXCoord = (int)(stackPaneCoordMin.getX() + betZone.getBoundsInLocal().getWidth()/2 - chipImgView.getFitHeight()/2);
+								stackPaneCenterYCoord = (int)(stackPaneCoordMin.getY() + betZone.getBoundsInLocal().getHeight()/2 - chipImgView.getFitHeight()/2);
+								chipStackPane.setTranslateX(stackPaneCenterXCoord);
+								chipStackPane.setTranslateY(stackPaneCenterYCoord);
+								
+								//Display the stackPane
+								root.getChildren().add(chipStackPane);
+								
+							//Bet Addition to the betStack
+								//Create the bet
+								Bet bet = new Bet("straight", getLogicalPocketsOfBet(betKey), Integer.parseInt(stakeInputString.get()));
+							//Substract the bet's cash amount from the player's cash
+								playerCashProperty.set(playerCashProperty.get() - bet.getCash());
+								
+								
+								//DEBUG
+								//System.out.println("betType:" + bet.getBetType());
+								//System.out.println("couleur" + bet.getPocketList().get(0).getColor());
+								//System.out.println("Num:" + bet.getPocketList().get(0).getNum());
+								//System.out.println("cash" + bet.getCash());
+								//***************************************COMMENT ALLER CHERCHER LE NUMERO ET LA COULEUR POUR CRÉER LE LOGICAL POCKET?
+								//playerCashProperty.set(playerCashProperty.get() + 100);
+						}
+					}
+					else
 					{
-						//Set the chip imageView
-						ImageView chipImgView = new ImageView(rouletteChipImg);
-						chipImgView.setPreserveRatio(true);
-						chipImgView.setFitHeight(TABLE_MAIN_CELL_HEIGHT/2);
-						
-						//Set the stake label
-						Label stakeLabel = new Label(String.valueOf(result.get()));
-						stakeLabel.setStyle("-fx-font-size: 10pt; -fx-text-fill: black;");
-						
-						//Set the stackpane containing the chip and the stake
-						StackPane chipStackPane = new StackPane(chipImgView, stakeLabel);
-						Point2D stackPaneCoordMin = entry.getValue().localToScene(Point2D.ZERO);
-						int stackPaneCenterXCoord = (int)(stackPaneCoordMin.getX() + TABLE_MAIN_CELL_WIDTH/2 - chipImgView.getFitHeight()/2);
-						int stackPaneCenterYCoord = (int)(stackPaneCoordMin.getY() + TABLE_MAIN_CELL_HEIGHT/2 - chipImgView.getFitHeight()/2);
-						chipStackPane.setTranslateX(stackPaneCenterXCoord);
-						chipStackPane.setTranslateY(stackPaneCenterYCoord);
-						
-						root.getChildren().add(chipStackPane);
+						Alert noMoreCashToBetAlert = new Alert(AlertType.ERROR);
+						noMoreCashToBetAlert.setTitle("Bet");
+						noMoreCashToBetAlert.setHeaderText("You are out of cash!");
+						noMoreCashToBetAlert.showAndWait();
 					}
 				}
 			});
@@ -2095,6 +2182,12 @@ public class Roulette extends GameInterface
 	
 	public void playWheelAnimation()
 	{	
+		//Disable the buttons
+		
+		//Put a filter to disable the mouse click events on the table
+		
+		//Put a damped light effect on everything but the roulette?****************************************************************
+		
 		//Take the ball at it's initial position
 		bringBallToInitialPosition();
 		
@@ -2360,4 +2453,46 @@ public class Roulette extends GameInterface
 		}
 		return collidingPocket;
 	}
+	
+	//This method is used to make and return an ArrayList of LogicalPocket depending on the betKey paramater it receives.
+	//The String parameter is a bet zone key used to store the possible bets in the bet zone maps.
+	//With that bet zone key, this function determines which LogicalsPockets matches with that bet,
+	//stores them in an array and returns it.
+	private ArrayList<LogicalPocket> getLogicalPocketsOfBet(String betKey)
+	{
+		//Returned list
+		ArrayList<LogicalPocket> logicalPocketList = new ArrayList<LogicalPocket>();
+		
+		//If the betKey indicates a straight bet on a number (those keys are made of straight-XX, XX being 1 or two numbers)
+		if (betKey.matches("straight-.*"))
+		{
+			//Get the number of the bet
+			String[] betKeyParts = betKey.split("-");
+			String betNumber = betKeyParts[1];
+			
+			//Make a LogicalPocket object out of the number
+			if (blackNumbersList.contains(Integer.parseInt(betNumber)))
+			{
+				System.out.println("Black");
+				System.out.println(betNumber);
+				logicalPocketList.add(new LogicalPocket(betNumber, "black"));
+			}
+			else if (redNumbersList.contains(Integer.parseInt(betNumber)))
+			{
+				System.out.println("Red");
+				System.out.println(betNumber);
+				logicalPocketList.add(new LogicalPocket(betNumber, "red"));
+			}
+			else
+			{
+				System.out.println("Green");
+				System.out.println(betNumber);
+				logicalPocketList.add(new LogicalPocket(betNumber, "green"));
+			}
+		}
+		return logicalPocketList;
+	}
+	
+	
+
 }
