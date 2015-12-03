@@ -253,6 +253,7 @@ public class Roulette extends GameInterface
 	
 	//Table betting zones
 		//Map of the bet zones
+			Map<String, Shape> allBetZoneMap = new HashMap<String, Shape>();//Map containing all the other betZone maps content
 			Map<String, Shape> straightBetZoneMap = new HashMap<String, Shape>();
 			Map<String, Shape> splitBetZoneMap = new HashMap<String, Shape>();
 			Map<String, Shape> streetBetZoneMap = new HashMap<String, Shape>();
@@ -1234,6 +1235,7 @@ public class Roulette extends GameInterface
 					bet_00innerZone.getPoints().addAll(new Double[]{0.0, -zerosZonesInnerHeight/2, zerosZonesInnerTriangleWidth, 0.0, zerosZonesInnerTriangleWidth+TABLE_MAIN_CELL_WIDTH, 0.0, zerosZonesInnerTriangleWidth+TABLE_MAIN_CELL_WIDTH, -zerosZonesInnerHeight, zerosZonesInnerTriangleWidth, -zerosZonesInnerHeight});
 					bet_00innerZone.setFill(Color.TRANSPARENT);
 					straightBetZoneMap.put("straight-00", bet_00innerZone);//Add this betting zone to the straightBetZonemap
+					allBetZoneMap.put("straight-00", bet_00innerZone);//Add this betting zone to the allBetZoneMap
 					bet_00innerZone.setOnMouseEntered(new EventHandler<MouseEvent>()
 							{
 								@Override
@@ -1262,6 +1264,7 @@ public class Roulette extends GameInterface
 					bet_0innerZone.getPoints().addAll(new Double[]{0.0, -zerosZonesInnerHeight/2, zerosZonesInnerTriangleWidth, 0.0, zerosZonesInnerTriangleWidth+TABLE_MAIN_CELL_WIDTH, 0.0, zerosZonesInnerTriangleWidth+TABLE_MAIN_CELL_WIDTH, -zerosZonesInnerHeight, zerosZonesInnerTriangleWidth, -zerosZonesInnerHeight});
 					bet_0innerZone.setFill(Color.TRANSPARENT);
 					straightBetZoneMap.put("straight-0", bet_0innerZone);//Add this betting zone to the straightBetZonemap
+					allBetZoneMap.put("straight-0", bet_0innerZone);//Add this betting zone to the allBetZoneMap
 					bet_0innerZone.setOnMouseEntered(new EventHandler<MouseEvent>()
 							{
 								@Override
@@ -1298,6 +1301,7 @@ public class Roulette extends GameInterface
 				{
 					Rectangle rect = new Rectangle(TABLE_MAIN_CELL_WIDTH, TABLE_MAIN_CELL_HEIGHT, Color.TRANSPARENT);
 					straightBetZoneMap.put("straight-" + String.valueOf(number), rect);//Add this betting zone to the straightBetZonemap. Key is "straight-" + number. Ex: "straight-20"
+					allBetZoneMap.put("straight-" + String.valueOf(number), rect);//Add this betting zone to the allBetZoneMap
 					rect.setOnMouseEntered(new EventHandler<MouseEvent>()
 					{
 						@Override
@@ -1333,7 +1337,8 @@ public class Roulette extends GameInterface
 				//First 12
 					int table_12sZoneWidth = TABLE_MAIN_CELL_WIDTH*4 + 3*TABLE_MAIN_CELL_GAP;//Column size, spanning on 4 normal columns
 					Rectangle rect1 = new Rectangle(table_12sZoneWidth, (int)(TABLE_MAIN_CELL_HEIGHT*0.75), Color.TRANSPARENT);//height is casted to int to avoid getting floating point number for a pixel size 
-					straightBetZoneMap.put("first12", rect1);//Add this betting zone to the straightBetZonemap
+					straightBetZoneMap.put("straight-first12", rect1);//Add this betting zone to the straightBetZonemap
+					allBetZoneMap.put("straight-first12", rect1);//Add this betting zone to the allBetZoneMap
 					rect1.setOnMouseEntered(new EventHandler<MouseEvent>()
 							{
 								@Override
@@ -1358,7 +1363,8 @@ public class Roulette extends GameInterface
 			
 				//12nd 12
 					Rectangle rect2 = new Rectangle(table_12sZoneWidth, (int)(TABLE_MAIN_CELL_HEIGHT*0.75), Color.TRANSPARENT);//height is casted to int to avoid getting floating point number for a pixel size 
-					straightBetZoneMap.put("second12", rect2);//Add this betting zone to the straightBetZonemap
+					straightBetZoneMap.put("straight-second12", rect2);//Add this betting zone to the straightBetZonemap
+					allBetZoneMap.put("straight-second12", rect2);//Add this betting zone to the allBetZoneMap
 					rect2.setOnMouseEntered(new EventHandler<MouseEvent>()
 							{
 								@Override
@@ -1383,7 +1389,8 @@ public class Roulette extends GameInterface
 			
 				//3rd 12
 					Rectangle rect3 = new Rectangle(table_12sZoneWidth, (int)(TABLE_MAIN_CELL_HEIGHT*0.75), Color.TRANSPARENT);//height is casted to int to avoid getting floating point number for a pixel size 
-					straightBetZoneMap.put("third12", rect3);//Add this betting zone to the straightBetZonemap
+					straightBetZoneMap.put("straight-third12", rect3);//Add this betting zone to the straightBetZonemap
+					allBetZoneMap.put("straight-third12", rect3);//Add this betting zone to the allBetZoneMap
 					rect3.setOnMouseEntered(new EventHandler<MouseEvent>()		
 							{
 								@Override
@@ -1414,7 +1421,8 @@ public class Roulette extends GameInterface
 			int table_BottomZoneWidth = TABLE_MAIN_CELL_WIDTH*2 + TABLE_MAIN_CELL_GAP;//Column size, spanning on 2 normal columns
 			//1 to 18 bet
 				Rectangle rect4 = new Rectangle(table_BottomZoneWidth, (int)(TABLE_MAIN_CELL_HEIGHT*0.75), Color.TRANSPARENT);//height is casted to int to avoid getting floating point number for a pixel size 
-				straightBetZoneMap.put("1to18", rect4);//Add this betting zone to the straightBetZonemap
+				straightBetZoneMap.put("straight-1to18", rect4);//Add this betting zone to the straightBetZonemap
+				allBetZoneMap.put("straight-1to18", rect4);//Add this betting zone to the allBetZoneMap
 				rect4.setOnMouseEntered(new EventHandler<MouseEvent>()
 						{
 							@Override
@@ -1438,7 +1446,8 @@ public class Roulette extends GameInterface
 				
 			//Even bet
 				Rectangle rect5 = new Rectangle(table_BottomZoneWidth, (int)(TABLE_MAIN_CELL_HEIGHT*0.75), Color.TRANSPARENT);//height is casted to int to avoid getting floating point number for a pixel size 
-				straightBetZoneMap.put("even", rect5);//Add this betting zone to the straightBetZonemap
+				straightBetZoneMap.put("straight-even", rect5);//Add this betting zone to the straightBetZonemap
+				allBetZoneMap.put("straight-even", rect5);//Add this betting zone to the allBetZoneMap
 				rect5.setOnMouseEntered(new EventHandler<MouseEvent>()
 						{
 							@Override
@@ -1463,7 +1472,8 @@ public class Roulette extends GameInterface
 			//Color bets
 				//Red
 					Rectangle rect6 = new Rectangle(table_BottomZoneWidth, (int)(TABLE_MAIN_CELL_HEIGHT*0.75), Color.TRANSPARENT);//height is casted to int to avoid getting floating point number for a pixel size 
-					straightBetZoneMap.put("red", rect6);//Add this betting zone to the straightBetZonemap
+					straightBetZoneMap.put("straight-red", rect6);//Add this betting zone to the straightBetZonemap
+					allBetZoneMap.put("straight-red", rect6);//Add this betting zone to the allBetZoneMap
 					rect6.setOnMouseEntered(new EventHandler<MouseEvent>()
 							{
 								@Override
@@ -1487,7 +1497,8 @@ public class Roulette extends GameInterface
 					
 				//Black
 					Rectangle rect7 = new Rectangle(table_BottomZoneWidth, (int)(TABLE_MAIN_CELL_HEIGHT*0.75), Color.TRANSPARENT);//height is casted to int to avoid getting floating point number for a pixel size 
-					straightBetZoneMap.put("black", rect7);//Add this betting zone to the straightBetZonemap
+					straightBetZoneMap.put("straight-black", rect7);//Add this betting zone to the straightBetZonemap
+					allBetZoneMap.put("straight-black", rect7);//Add this betting zone to the allBetZoneMap
 					rect7.setOnMouseEntered(new EventHandler<MouseEvent>()
 							{
 								@Override
@@ -1511,7 +1522,8 @@ public class Roulette extends GameInterface
 					
 			//Odd bet
 					Rectangle rect8 = new Rectangle(table_BottomZoneWidth, (int)(TABLE_MAIN_CELL_HEIGHT*0.75), Color.TRANSPARENT);//height is casted to int to avoid getting floating point number for a pixel size 
-					straightBetZoneMap.put("odd", rect8);//Add this betting zone to the straightBetZonemap
+					straightBetZoneMap.put("straight-odd", rect8);//Add this betting zone to the straightBetZonemap
+					allBetZoneMap.put("straight-odd", rect8);//Add this betting zone to the allBetZoneMap
 					rect8.setOnMouseEntered(new EventHandler<MouseEvent>()
 							{
 								@Override
@@ -1535,7 +1547,8 @@ public class Roulette extends GameInterface
 					
 			//19 to 36 bet
 					Rectangle rect9 = new Rectangle(table_BottomZoneWidth, (int)(TABLE_MAIN_CELL_HEIGHT*0.75), Color.TRANSPARENT);//height is casted to int to avoid getting floating point number for a pixel size 
-					straightBetZoneMap.put("19to36", rect9);//Add this betting zone to the straightBetZonemap
+					straightBetZoneMap.put("straight-19to36", rect9);//Add this betting zone to the straightBetZonemap
+					allBetZoneMap.put("straight-19to36", rect9);//Add this betting zone to the allBetZoneMap
 					rect9.setOnMouseEntered(new EventHandler<MouseEvent>()
 							{
 								@Override
@@ -1568,7 +1581,8 @@ public class Roulette extends GameInterface
 			
 	/*2 to 1 zones*/
 		Rectangle rect10 = new Rectangle(TABLE_MAIN_CELL_WIDTH, TABLE_MAIN_CELL_HEIGHT, Color.TRANSPARENT);
-		straightBetZoneMap.put("columnTop", rect10);//Add this betting zone to the straightBetZonemap
+		straightBetZoneMap.put("straight-columnTop", rect10);//Add this betting zone to the straightBetZonemap
+		allBetZoneMap.put("straight-columnTop", rect10);//Add this betting zone to the allBetZoneMap
 		rect10.setOnMouseEntered(new EventHandler<MouseEvent>()
 				{
 					@Override
@@ -1591,7 +1605,8 @@ public class Roulette extends GameInterface
 				});
 		
 		Rectangle rect11 = new Rectangle(TABLE_MAIN_CELL_WIDTH, TABLE_MAIN_CELL_HEIGHT, Color.TRANSPARENT);
-		straightBetZoneMap.put("columnMid", rect11);//Add this betting zone to the straightBetZonemap
+		straightBetZoneMap.put("straight-columnMid", rect11);//Add this betting zone to the straightBetZonemap
+		allBetZoneMap.put("straight-columnMid", rect11);//Add this betting zone to the allBetZoneMap
 		rect11.setOnMouseEntered(new EventHandler<MouseEvent>()
 				{
 					@Override
@@ -1615,7 +1630,8 @@ public class Roulette extends GameInterface
 				
 		
 		Rectangle rect12 = new Rectangle(TABLE_MAIN_CELL_WIDTH, TABLE_MAIN_CELL_HEIGHT, Color.TRANSPARENT);
-		straightBetZoneMap.put("columnBottom", rect12);//Add this betting zone to the straightBetZonemap
+		straightBetZoneMap.put("straight-columnBottom", rect12);//Add this betting zone to the straightBetZonemap
+		allBetZoneMap.put("straight-columnBottom", rect12);//Add this betting zone to the allBetZoneMap
 		rect12.setOnMouseEntered(new EventHandler<MouseEvent>()
 				{
 					@Override
@@ -1686,7 +1702,8 @@ public class Roulette extends GameInterface
 				for (int j=1; j<=3; j++)
 				{
 					Rectangle sideBetZone = new Rectangle((int)(TABLE_MAIN_CELL_WIDTH*0.40), (int)(TABLE_MAIN_CELL_HEIGHT*2/3), Color.TRANSPARENT);
-					splitBetZoneMap.put("split" + String.valueOf(3*i-(j-1))+"-"+(String.valueOf(3*(i+1)-(j-1))), sideBetZone); //The key is a string made of both numbers included in the split bet. Ex: split3-6 for the 3 and 6 split bet
+					splitBetZoneMap.put("split-" + String.valueOf(3*i-(j-1))+"-"+(String.valueOf(3*(i+1)-(j-1))), sideBetZone); //The key is a string made of both numbers included in the split bet. Ex: split-3-6 for the 3 and 6 split bet
+					allBetZoneMap.put("split-" + String.valueOf(3*i-(j-1))+"-"+(String.valueOf(3*(i+1)-(j-1))), sideBetZone);//Add this betting zone to the allBetZoneMap
 					sideBetZone.setTranslateX(i * (TABLE_MAIN_CELL_WIDTH + TABLE_MAIN_CELL_GAP) - sideBetZone.getWidth()/2 + TABLE_MAIN_CELL_GAP/2);
 					sideBetZone.setTranslateY(((j-1)*TABLE_MAIN_CELL_HEIGHT) + (TABLE_MAIN_CELL_HEIGHT*1/6) + (j*TABLE_MAIN_CELL_GAP));
 					
@@ -1726,6 +1743,7 @@ public class Roulette extends GameInterface
 				{
 					Rectangle bottomBetZone = new Rectangle((int)(TABLE_MAIN_CELL_WIDTH*2/3), (int)(TABLE_MAIN_CELL_HEIGHT*0.4), Color.TRANSPARENT);
 					splitBetZoneMap.put(("split"+String.valueOf(3*i-(j-1)-1) +"-"+ String.valueOf(3*i-(j-1))), bottomBetZone); //The key is a string made of both numbers included in the split bet. Ex: split2-3 for the 2 and 3 split bet
+					allBetZoneMap.put(("split"+String.valueOf(3*i-(j-1)-1) +"-"+ String.valueOf(3*i-(j-1))), bottomBetZone);//Add this betting zone to the allBetZoneMap
 					bottomBetZone.setTranslateX(((i-1)*TABLE_MAIN_CELL_WIDTH) + (TABLE_MAIN_CELL_WIDTH*1/6) + (i*TABLE_MAIN_CELL_GAP) + TABLE_MAIN_CELL_GAP/2);
 					bottomBetZone.setTranslateY(j*(TABLE_MAIN_CELL_HEIGHT + TABLE_MAIN_CELL_GAP) - bottomBetZone.getHeight()/2 + TABLE_MAIN_CELL_GAP/2);
 					
@@ -1766,7 +1784,8 @@ public class Roulette extends GameInterface
 			for (int i=1; i<=12 ; i++)
 			{
 				Rectangle streetBetZone = new Rectangle((int)(TABLE_MAIN_CELL_WIDTH*2/3), (int)(TABLE_MAIN_CELL_HEIGHT*0.4), Color.TRANSPARENT);
-				streetBetZoneMap.put("street"+mapKeyNumber, streetBetZone); //The key is a string made of "street" + the first number of the column (1, 4, 7, 10,...)
+				streetBetZoneMap.put("street-"+mapKeyNumber, streetBetZone); //The key is a string made of "street" + the first number of the column (1, 4, 7, 10,...)
+				allBetZoneMap.put("street-"+mapKeyNumber, streetBetZone);//Add this betting zone to the allBetZoneMap
 				streetBetZone.setTranslateX(((i-1)*TABLE_MAIN_CELL_WIDTH) + (TABLE_MAIN_CELL_WIDTH*1/6) + (i*TABLE_MAIN_CELL_GAP) + TABLE_MAIN_CELL_GAP/2);
 				streetBetZone.setTranslateY(3*(TABLE_MAIN_CELL_HEIGHT + TABLE_MAIN_CELL_GAP) - streetBetZone.getHeight()/2 + TABLE_MAIN_CELL_GAP/2);
 				
@@ -1798,10 +1817,14 @@ public class Roulette extends GameInterface
 			}
 		//Double street bet zones
 			//The street between each street bet zone
+			mapKeyNumber = 1;
+			int mapKeyNumberPlus3;
 			for (int i=1; i<=11; i++)
-			{
+			{	
+				mapKeyNumberPlus3 = mapKeyNumber +3;
 				Rectangle doubleStreetBetZone = new Rectangle((int)(TABLE_MAIN_CELL_WIDTH*1/2), (int)(TABLE_MAIN_CELL_HEIGHT*0.4), Color.TRANSPARENT);
-				streetBetZoneMap.put("doublestreet"+mapKeyNumber, doubleStreetBetZone); //The key is a string made of "doublestreet" + the first numbers of the 2 columns (dobuelstreet14, doublestreet47,...)
+				streetBetZoneMap.put("doublestreet-" + mapKeyNumber +"-"+ mapKeyNumberPlus3, doubleStreetBetZone); //The key is a string made of "doublestreet" + the first numbers of the 2 columns (dobuelstreet14, doublestreet47,...)
+				allBetZoneMap.put("doublestreet-" + mapKeyNumber +"-"+ mapKeyNumberPlus3, doubleStreetBetZone);//Add this betting zone to the allBetZoneMap
 				doubleStreetBetZone.setTranslateX(i * (TABLE_MAIN_CELL_WIDTH + TABLE_MAIN_CELL_GAP) - doubleStreetBetZone.getWidth()/2 + TABLE_MAIN_CELL_GAP/2);
 				doubleStreetBetZone.setTranslateY(3*(TABLE_MAIN_CELL_HEIGHT + TABLE_MAIN_CELL_GAP) - doubleStreetBetZone.getHeight()/2 + TABLE_MAIN_CELL_GAP/2);
 				
@@ -1841,7 +1864,8 @@ public class Roulette extends GameInterface
 			for (int j=1; j<=2; j++)
 			{
 				Rectangle cornerBetZone = new Rectangle((int)(TABLE_MAIN_CELL_WIDTH*1/2), (int)(TABLE_MAIN_CELL_HEIGHT*0.4), Color.TRANSPARENT);
-				cornerBetZoneMap.put("corner" + String.valueOf(3*i-(j-1)-1) +"-"+ String.valueOf(3*i-(j-1)) +"-"+ String.valueOf(3*(i+1)-(j-1)-1) +"-"+ String.valueOf(3*(i+1)-(j-1)), cornerBetZone); //The key is a string made of all the number included in the corner bet Ex: corner2-3-4-5 or corner1-2-3-4
+				cornerBetZoneMap.put("corner-" + String.valueOf(3*i-(j-1)-1) +"-"+ String.valueOf(3*i-(j-1)) +"-"+ String.valueOf(3*(i+1)-(j-1)-1) +"-"+ String.valueOf(3*(i+1)-(j-1)), cornerBetZone); //The key is a string made of all the number included in the corner bet Ex: corner-2-3-4-5 or corner-1-2-3-4
+				allBetZoneMap.put("corner-" + String.valueOf(3*i-(j-1)-1) +"-"+ String.valueOf(3*i-(j-1)) +"-"+ String.valueOf(3*(i+1)-(j-1)-1) +"-"+ String.valueOf(3*(i+1)-(j-1)), cornerBetZone);//Add this betting zone to the allBetZoneMap
 				cornerBetZone.setTranslateX(i * (TABLE_MAIN_CELL_WIDTH + TABLE_MAIN_CELL_GAP) - cornerBetZone.getWidth()/2 + TABLE_MAIN_CELL_GAP/2);
 				cornerBetZone.setTranslateY(j*(TABLE_MAIN_CELL_HEIGHT + TABLE_MAIN_CELL_GAP) - cornerBetZone.getHeight()/2 + TABLE_MAIN_CELL_GAP/2);
 				
@@ -1891,7 +1915,8 @@ public class Roulette extends GameInterface
 					}					
 					
 					Rectangle basketBetZone = new Rectangle((int)(TABLE_MAIN_CELL_WIDTH*1/2), (int)(TABLE_MAIN_CELL_HEIGHT*0.4), Color.TRANSPARENT);
-					basketBetZoneMap.put("basket" + mapKeyValue,basketBetZone); //The key is a string made of all the number included in the basket bet: basket2-00-3 , basket0-2-00, basket1-0-2
+					basketBetZoneMap.put("basket-" + mapKeyValue,basketBetZone); //The key is a string made of all the number included in the basket bet: basket-2-00-3 , basket-0-2-00, basket-1-0-2
+					allBetZoneMap.put("basket-" + mapKeyValue,basketBetZone);//Add this betting zone to the allBetZoneMap
 					basketBetZone.setTranslateX(-basketBetZone.getWidth()/2 + TABLE_MAIN_CELL_GAP/2);
 					if (i==2)
 						basketBetZone.setTranslateY(TABLE_MAIN_CELL_HEIGHT*1.5 + 2*TABLE_MAIN_CELL_GAP - basketBetZone.getHeight()/2);	
@@ -1932,7 +1957,8 @@ public class Roulette extends GameInterface
 	{
 		//TopLine bet zone1		
 			Rectangle topLineBetZone1 = new Rectangle((int)(TABLE_MAIN_CELL_WIDTH*1/2), (int)(TABLE_MAIN_CELL_HEIGHT*0.4), Color.TRANSPARENT);
-			topLineBetZoneMap.put("topline1",topLineBetZone1);//The key of the bottom topLineBet is topline1
+			topLineBetZoneMap.put("topline-1",topLineBetZone1);//The key of the bottom topLineBet is topline-1
+			allBetZoneMap.put("topline-1",topLineBetZone1);//Add this betting zone to the allBetZoneMap
 			topLineBetZone1.setTranslateX(-topLineBetZone1.getWidth()/2 + TABLE_MAIN_CELL_GAP/2);
 			topLineBetZone1.setTranslateY(3*(TABLE_MAIN_CELL_HEIGHT + TABLE_MAIN_CELL_GAP) - topLineBetZone1.getHeight()/2 + TABLE_MAIN_CELL_GAP/2);
 			
@@ -1960,7 +1986,8 @@ public class Roulette extends GameInterface
 			
 		//TopLine bet zone2	
 		Rectangle topLineBetZone2 = new Rectangle((int)(TABLE_MAIN_CELL_WIDTH*1/2), (int)(TABLE_MAIN_CELL_HEIGHT*0.4), Color.TRANSPARENT);
-		topLineBetZoneMap.put("topline2",topLineBetZone2); //The key of the top topLineBet is topline2
+		topLineBetZoneMap.put("topline-2",topLineBetZone2); //The key of the top topLineBet is topline-2
+		allBetZoneMap.put("topline-2",topLineBetZone2);//Add this betting zone to the allBetZoneMap
 		topLineBetZone2.setTranslateX(-topLineBetZone2.getWidth()/2 + TABLE_MAIN_CELL_GAP/2);
 		topLineBetZone2.setTranslateY(- topLineBetZone2.getHeight()/2 + TABLE_MAIN_CELL_GAP/2);
 		
@@ -1996,8 +2023,7 @@ public class Roulette extends GameInterface
 	//on the betting zone
 	private void setOnClickEventHandlerToBettingZones()
 	{
-		//Set the straightBetZone Events
-		for (Map.Entry<String, Shape> entry : straightBetZoneMap.entrySet())
+		for (Map.Entry<String, Shape> entry : allBetZoneMap.entrySet())
 		{
 			Shape betZone = entry.getValue();//get the bet Zone from the entry of the map
 			String betKey = entry.getKey();//get the bet key from the entry map
@@ -2021,7 +2047,25 @@ public class Roulette extends GameInterface
 							int maxBet = (500 < playerCashProperty.get()) ? 500 :  playerCashProperty.get();	
 							TextInputDialog stakeDialog = new TextInputDialog();
 							stakeDialog.setTitle("Bet");
-							stakeDialog.setHeaderText("Straight bet.\nEnter a number between 1 and " + maxBet + ".");
+							
+							//Get the bet type of the bet
+							String[] betKeyParts = betKey.split("-"); //(map keys begin with "straight-", "split-", "topline-", ...)
+							String betTypeString = betKeyParts[0];
+																	
+							if (betTypeString.compareTo("straight") == 0)
+							stakeDialog.setHeaderText("Straight bet.\nEnter a stake between 1 and " + maxBet + ".");
+							else if (betTypeString.compareTo("split") == 0)
+							stakeDialog.setHeaderText("Split bet.\nEnter a stake between 1 and " + maxBet + ".");
+							else if (betTypeString.compareTo("street") == 0)
+								stakeDialog.setHeaderText("Street bet.\nEnter a stake between 1 and " + maxBet + ".");
+							else if (betTypeString.compareTo("doublestreet") == 0)
+								stakeDialog.setHeaderText("Double street bet.\nEnter a stake between 1 and " + maxBet + ".");
+							else if (betTypeString.compareTo("corner") == 0)
+								stakeDialog.setHeaderText("Corner bet.\nEnter a stake between 1 and " + maxBet + ".");
+							else if (betTypeString.compareTo("basket") == 0)
+								stakeDialog.setHeaderText("Basket bet.\nEnter a stake between 1 and " + maxBet + ".");
+							else if (betTypeString.compareTo("topline") == 0)
+								stakeDialog.setHeaderText("Topline bet.\nEnter a stake between 1 and " + maxBet + ".");
 					
 							ButtonType buttonTypeBet = new ButtonType("Bet", ButtonData.OK_DONE);
 							ButtonType buttonTypeCancel = new ButtonType("Cancel", ButtonData.CANCEL_CLOSE);
@@ -2071,16 +2115,6 @@ public class Roulette extends GameInterface
 								Point2D stackPaneCoordMin = betZone.localToScene(Point2D.ZERO);
 								int stackPaneCenterXCoord;
 								int stackPaneCenterYCoord;
-//								if (betZone instanceof Rectangle)
-//								{
-//									stackPaneCenterXCoord = (int)(stackPaneCoordMin.getX() + ((Rectangle)betZone).getWidth()/2 - chipImgView.getFitHeight()/2);
-//									stackPaneCenterYCoord = (int)(stackPaneCoordMin.getY() + ((Rectangle)betZone).getHeight()/2 - chipImgView.getFitHeight()/2);
-//								}
-//								else
-//								{
-//									stackPaneCenterXCoord = (int)(stackPaneCoordMin.getX() + ((Polygon)betZone).getWidth()/2 - chipImgView.getFitHeight()/2);
-//									stackPaneCenterYCoord = (int)(stackPaneCoordMin.getY() + ((Rectangle)betZone).getHeight()/2 - chipImgView.getFitHeight()/2);
-//								}
 								stackPaneCenterXCoord = (int)(stackPaneCoordMin.getX() + betZone.getBoundsInLocal().getWidth()/2 - chipImgView.getFitHeight()/2);
 								stackPaneCenterYCoord = (int)(stackPaneCoordMin.getY() + betZone.getBoundsInLocal().getHeight()/2 - chipImgView.getFitHeight()/2);
 								chipStackPane.setTranslateX(stackPaneCenterXCoord);
@@ -2091,7 +2125,10 @@ public class Roulette extends GameInterface
 								
 							//Bet Addition to the betStack
 								//Create the bet
-								Bet bet = new Bet("straight", getLogicalPocketsOfBet(betKey), Integer.parseInt(stakeInputString.get()));
+									//Get the bet type of the bet
+									String[] betKeyParts = betKey.split("-");
+									String betTypeString = betKeyParts[0];
+								Bet bet = new Bet(betTypeString, getLogicalPocketsOfBet(betKey), Integer.parseInt(stakeInputString.get()));
 							//Substract the bet's cash amount from the player's cash
 								playerCashProperty.set(playerCashProperty.get() - bet.getCash());
 								
@@ -2116,8 +2153,8 @@ public class Roulette extends GameInterface
 			});
 		}
 		
-		//straightBetZoneMap. 
-		//splitBetZoneMap. 
+		//splitBetZoneMap
+		
 		//streetBetZoneMap.
 		//cornerBetZoneMap. 
 		//basketBetZoneMap. 
@@ -2183,10 +2220,21 @@ public class Roulette extends GameInterface
 	public void playWheelAnimation()
 	{	
 		//Disable the buttons
+		spinTheWheelButton.setDisable(true);
+		removeAllBetsButton.setDisable(true);
+		removeLastBetButton.setDisable(true);
 		
 		//Put a filter to disable the mouse click events on the table
-		
-		//Put a damped light effect on everything but the roulette?****************************************************************
+		EventHandler<MouseEvent> mouseEventHandler = new EventHandler<MouseEvent>()
+		{
+			@Override
+			public void handle(MouseEvent event)
+			{
+				event.consume();
+			}	
+		}
+		;
+		root.addEventFilter(MouseEvent.ANY, mouseEventHandler);
 		
 		//Take the ball at it's initial position
 		bringBallToInitialPosition();
@@ -2213,8 +2261,21 @@ public class Roulette extends GameInterface
 			SequentialTransition wheelAnimationSequence = new SequentialTransition(timelineWheel);
 			
 			wheelAnimationSequence.play();
-			
-			
+			wheelAnimationSequence.setOnFinished(new EventHandler<ActionEvent>()
+					{
+						@Override
+						public void handle(ActionEvent event)
+						{
+							//Enable the buttons
+							spinTheWheelButton.setDisable(false);
+							removeAllBetsButton.setDisable(false);
+							removeLastBetButton.setDisable(false);
+							
+							//Enable the mouse event on the root
+							root.removeEventFilter(MouseEvent.ANY, mouseEventHandler);
+						}	
+			});
+				
 		//Ball Animation
 			//Ball rotations
 				Path ballPath = new Path();
@@ -2395,7 +2456,7 @@ public class Roulette extends GameInterface
 						System.out.println(finalPocket.getNumber());
 						System.out.println("test");
 						System.out.println(rouletteBallStack.getParent());*/
-						}	
+					}	
 				});
 	}
 	
@@ -2464,7 +2525,7 @@ public class Roulette extends GameInterface
 		ArrayList<LogicalPocket> logicalPocketList = new ArrayList<LogicalPocket>();
 		
 		//If the betKey indicates a straight bet on a number (those keys are made of straight-XX, XX being 1 or two numbers)
-		if (betKey.matches("straight-.*"))
+		if (betKey.matches("straight-\\d\\d?"))
 		{
 			//Get the number of the bet
 			String[] betKeyParts = betKey.split("-");
@@ -2490,6 +2551,246 @@ public class Roulette extends GameInterface
 				logicalPocketList.add(new LogicalPocket(betNumber, "green"));
 			}
 		}
+		else if (betKey.matches("first12"))
+		{
+			logicalPocketList.add(new LogicalPocket("00", "green"));
+			logicalPocketList.add(new LogicalPocket("0", "green"));
+			logicalPocketList.add(new LogicalPocket("1", "red"));
+			logicalPocketList.add(new LogicalPocket("2", "black"));
+			logicalPocketList.add(new LogicalPocket("3", "red"));
+			logicalPocketList.add(new LogicalPocket("4", "black"));
+			logicalPocketList.add(new LogicalPocket("5", "red"));
+			logicalPocketList.add(new LogicalPocket("6", "black"));	
+			logicalPocketList.add(new LogicalPocket("7", "red"));
+			logicalPocketList.add(new LogicalPocket("8", "black"));
+			logicalPocketList.add(new LogicalPocket("9", "red"));
+			logicalPocketList.add(new LogicalPocket("10", "black"));
+			logicalPocketList.add(new LogicalPocket("11", "black"));
+			logicalPocketList.add(new LogicalPocket("12", "red"));
+		}
+		
+		else if (betKey.matches("second12"))
+		{
+			logicalPocketList.add(new LogicalPocket("13", "black"));
+			logicalPocketList.add(new LogicalPocket("14", "red"));
+			logicalPocketList.add(new LogicalPocket("15", "black"));
+			logicalPocketList.add(new LogicalPocket("16", "red"));
+			logicalPocketList.add(new LogicalPocket("17", "black"));
+			logicalPocketList.add(new LogicalPocket("18", "red"));
+			logicalPocketList.add(new LogicalPocket("19", "red"));
+			logicalPocketList.add(new LogicalPocket("20", "black"));
+			logicalPocketList.add(new LogicalPocket("21", "red"));
+			logicalPocketList.add(new LogicalPocket("22", "black"));
+			logicalPocketList.add(new LogicalPocket("23", "red"));
+			logicalPocketList.add(new LogicalPocket("24", "black"));
+		}
+		
+		else if (betKey.matches("third12"))
+		{
+			logicalPocketList.add(new LogicalPocket("25", "red"));
+			logicalPocketList.add(new LogicalPocket("26", "black"));
+			logicalPocketList.add(new LogicalPocket("27", "red"));
+			logicalPocketList.add(new LogicalPocket("28", "black"));
+			logicalPocketList.add(new LogicalPocket("29", "black"));
+			logicalPocketList.add(new LogicalPocket("30", "red"));
+			logicalPocketList.add(new LogicalPocket("31", "black"));
+			logicalPocketList.add(new LogicalPocket("32", "red"));
+			logicalPocketList.add(new LogicalPocket("33", "black"));
+			logicalPocketList.add(new LogicalPocket("34", "red"));
+			logicalPocketList.add(new LogicalPocket("35", "black"));
+			logicalPocketList.add(new LogicalPocket("36", "red"));
+		}
+		
+		else if (betKey.matches("1to18"))
+		{
+			logicalPocketList.add(new LogicalPocket("1", "red"));
+			logicalPocketList.add(new LogicalPocket("2", "black"));
+			logicalPocketList.add(new LogicalPocket("3", "red"));
+			logicalPocketList.add(new LogicalPocket("4", "black"));
+			logicalPocketList.add(new LogicalPocket("5", "red"));
+			logicalPocketList.add(new LogicalPocket("6", "black"));	
+			logicalPocketList.add(new LogicalPocket("7", "red"));
+			logicalPocketList.add(new LogicalPocket("8", "black"));
+			logicalPocketList.add(new LogicalPocket("9", "red"));
+			logicalPocketList.add(new LogicalPocket("10", "black"));
+			logicalPocketList.add(new LogicalPocket("11", "black"));
+			logicalPocketList.add(new LogicalPocket("12", "red"));
+			logicalPocketList.add(new LogicalPocket("13", "black"));
+			logicalPocketList.add(new LogicalPocket("14", "red"));
+			logicalPocketList.add(new LogicalPocket("15", "black"));
+			logicalPocketList.add(new LogicalPocket("16", "red"));
+			logicalPocketList.add(new LogicalPocket("17", "black"));
+			logicalPocketList.add(new LogicalPocket("18", "red"));
+		}
+		
+		else if (betKey.matches("even"))
+		{
+			
+			
+			logicalPocketList.add(new LogicalPocket("2", "black"));
+			logicalPocketList.add(new LogicalPocket("4", "black"));
+			logicalPocketList.add(new LogicalPocket("6", "black"));	
+			logicalPocketList.add(new LogicalPocket("8", "black"));
+			logicalPocketList.add(new LogicalPocket("10", "black"));
+			logicalPocketList.add(new LogicalPocket("12", "red"));
+			logicalPocketList.add(new LogicalPocket("14", "red"));
+			logicalPocketList.add(new LogicalPocket("16", "red"));
+			logicalPocketList.add(new LogicalPocket("18", "red"));
+			logicalPocketList.add(new LogicalPocket("20", "black"));
+			logicalPocketList.add(new LogicalPocket("22", "black"));
+			logicalPocketList.add(new LogicalPocket("24", "black"));
+			logicalPocketList.add(new LogicalPocket("26", "black"));
+			logicalPocketList.add(new LogicalPocket("28", "black"));
+			logicalPocketList.add(new LogicalPocket("30", "red"));
+			logicalPocketList.add(new LogicalPocket("32", "red"));
+			logicalPocketList.add(new LogicalPocket("34", "red"));
+			logicalPocketList.add(new LogicalPocket("36", "red"));
+		}
+		
+		else if (betKey.matches("red"))
+		{	
+			logicalPocketList.add(new LogicalPocket("1", "red"));
+			logicalPocketList.add(new LogicalPocket("3", "red"));
+			logicalPocketList.add(new LogicalPocket("5", "red"));	
+			logicalPocketList.add(new LogicalPocket("7", "red"));
+			logicalPocketList.add(new LogicalPocket("9", "red"));
+			logicalPocketList.add(new LogicalPocket("12", "red"));
+			logicalPocketList.add(new LogicalPocket("14", "red"));
+			logicalPocketList.add(new LogicalPocket("16", "red"));
+			logicalPocketList.add(new LogicalPocket("18", "red"));
+			logicalPocketList.add(new LogicalPocket("19", "red"));
+			logicalPocketList.add(new LogicalPocket("21", "red"));
+			logicalPocketList.add(new LogicalPocket("23", "red"));
+			logicalPocketList.add(new LogicalPocket("25", "red"));
+			logicalPocketList.add(new LogicalPocket("27", "red"));
+			logicalPocketList.add(new LogicalPocket("30", "red"));
+			logicalPocketList.add(new LogicalPocket("32", "red"));
+			logicalPocketList.add(new LogicalPocket("34", "red"));
+			logicalPocketList.add(new LogicalPocket("36", "red"));
+		}
+		
+		else if (betKey.matches("black"))
+		{	
+			logicalPocketList.add(new LogicalPocket("2", "black"));
+			logicalPocketList.add(new LogicalPocket("4", "black"));
+			logicalPocketList.add(new LogicalPocket("6", "black"));	
+			logicalPocketList.add(new LogicalPocket("8", "black"));
+			logicalPocketList.add(new LogicalPocket("10", "black"));
+			logicalPocketList.add(new LogicalPocket("11", "black"));
+			logicalPocketList.add(new LogicalPocket("13", "black"));
+			logicalPocketList.add(new LogicalPocket("15", "black"));
+			logicalPocketList.add(new LogicalPocket("17", "black"));
+			logicalPocketList.add(new LogicalPocket("20", "black"));
+			logicalPocketList.add(new LogicalPocket("22", "black"));
+			logicalPocketList.add(new LogicalPocket("24", "black"));
+			logicalPocketList.add(new LogicalPocket("26", "black"));
+			logicalPocketList.add(new LogicalPocket("28", "black"));
+			logicalPocketList.add(new LogicalPocket("29", "black"));
+			logicalPocketList.add(new LogicalPocket("31", "black"));
+			logicalPocketList.add(new LogicalPocket("33", "black"));
+			logicalPocketList.add(new LogicalPocket("35", "black"));
+		}
+		
+		else if (betKey.matches("odd"))
+		{	
+			logicalPocketList.add(new LogicalPocket("1", "red"));
+			logicalPocketList.add(new LogicalPocket("3", "red"));
+			logicalPocketList.add(new LogicalPocket("5", "red"));	
+			logicalPocketList.add(new LogicalPocket("7", "red"));
+			logicalPocketList.add(new LogicalPocket("9", "red"));
+			logicalPocketList.add(new LogicalPocket("11", "black"));
+			logicalPocketList.add(new LogicalPocket("13", "black"));
+			logicalPocketList.add(new LogicalPocket("15", "black"));
+			logicalPocketList.add(new LogicalPocket("17", "black"));
+			logicalPocketList.add(new LogicalPocket("19", "red"));
+			logicalPocketList.add(new LogicalPocket("21", "red"));
+			logicalPocketList.add(new LogicalPocket("23", "red"));
+			logicalPocketList.add(new LogicalPocket("25", "red"));
+			logicalPocketList.add(new LogicalPocket("27", "red"));
+			logicalPocketList.add(new LogicalPocket("29", "black"));
+			logicalPocketList.add(new LogicalPocket("31", "black"));
+			logicalPocketList.add(new LogicalPocket("33", "black"));
+			logicalPocketList.add(new LogicalPocket("35", "black"));
+		}
+		
+		else if (betKey.matches("19to36"))
+		{	
+			logicalPocketList.add(new LogicalPocket("19", "red"));
+			logicalPocketList.add(new LogicalPocket("20", "black"));
+			logicalPocketList.add(new LogicalPocket("21", "red"));
+			logicalPocketList.add(new LogicalPocket("22", "black"));
+			logicalPocketList.add(new LogicalPocket("23", "red"));
+			logicalPocketList.add(new LogicalPocket("24", "black"));
+			logicalPocketList.add(new LogicalPocket("25", "red"));
+			logicalPocketList.add(new LogicalPocket("26", "black"));
+			logicalPocketList.add(new LogicalPocket("27", "red"));
+			logicalPocketList.add(new LogicalPocket("28", "black"));
+			logicalPocketList.add(new LogicalPocket("29", "black"));
+			logicalPocketList.add(new LogicalPocket("30", "red"));
+			logicalPocketList.add(new LogicalPocket("31", "black"));
+			logicalPocketList.add(new LogicalPocket("32", "red"));
+			logicalPocketList.add(new LogicalPocket("33", "black"));
+			logicalPocketList.add(new LogicalPocket("34", "red"));
+			logicalPocketList.add(new LogicalPocket("35", "black"));
+			logicalPocketList.add(new LogicalPocket("36", "red"));
+		}
+		
+		else if (betKey.matches("columnTop"))//****************************************************************************************
+		{	
+			
+		}
+		
+		
+		
+		//If the betKey indicates a split bet on a number (those keys are made of split-XX-XX, XX being 1 or two numbers)
+		else if (betKey.matches("split-\\d\\d?-?\\d?\\d?"))
+		{
+			//Get the numbers of the bet
+			String[] betKeyParts = betKey.split("-");
+			String betNumber1 = betKeyParts[1];
+			String betNumber2 = betKeyParts[2];
+			
+			//Make a LogicalPocket object out of the number1
+			if (blackNumbersList.contains(Integer.parseInt(betNumber1)))
+			{
+				System.out.println("Black");
+				System.out.println(betNumber1);
+				logicalPocketList.add(new LogicalPocket(betNumber1, "black"));
+			}
+			else if (redNumbersList.contains(Integer.parseInt(betNumber1)))
+			{
+				System.out.println("Red");
+				System.out.println(betNumber1);
+				logicalPocketList.add(new LogicalPocket(betNumber1, "red"));
+			}
+			else
+			{
+				System.out.println("Green");
+				System.out.println(betNumber1);
+				logicalPocketList.add(new LogicalPocket(betNumber1, "green"));
+			}
+			
+			//Make a LogicalPocket object out of the number2
+			if (blackNumbersList.contains(Integer.parseInt(betNumber2)))
+			{
+				System.out.println("Black");
+				System.out.println(betNumber2);
+				logicalPocketList.add(new LogicalPocket(betNumber2, "black"));
+			}
+			else if (redNumbersList.contains(Integer.parseInt(betNumber2)))
+			{
+				System.out.println("Red");
+				System.out.println(betNumber2);
+				logicalPocketList.add(new LogicalPocket(betNumber2, "red"));
+			}
+			else
+			{
+				System.out.println("Green");
+				System.out.println(betNumber2);
+				logicalPocketList.add(new LogicalPocket(betNumber2, "green"));
+			}
+		}
+		
 		return logicalPocketList;
 	}
 	
