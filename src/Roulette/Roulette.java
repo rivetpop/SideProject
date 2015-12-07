@@ -23,6 +23,7 @@ import com.sun.javafx.collections.ObservableListWrapper;
 import Casino.Control;
 import Casino.GameInterface;
 import javafx.animation.RotateTransition;
+import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleStringProperty;
@@ -285,6 +286,12 @@ public class Roulette extends GameInterface
 	
 	//Winning pocket
 		VisualPocket winningPocket;
+		
+	//Boolean indicating the end of a play
+		public boolean endOfPlay = false;
+		
+	//Mouse Event handler. Used to filter mouse events
+		public EventHandler<MouseEvent> mouseEventHandler;
 			
 	public Roulette()
 	{
@@ -2143,8 +2150,16 @@ public class Roulette extends GameInterface
 								Point2D stackPaneCoordMin = betZone.localToScene(Point2D.ZERO);
 								int stackPaneCenterXCoord;
 								int stackPaneCenterYCoord;
-								stackPaneCenterXCoord = (int)(stackPaneCoordMin.getX() + betZone.getBoundsInLocal().getWidth()/2 - chipImgView.getFitHeight()/2);
-								stackPaneCenterYCoord = (int)(stackPaneCoordMin.getY() + betZone.getBoundsInLocal().getHeight()/2 - chipImgView.getFitHeight()/2);
+								if (betKey.matches("straight-0.*"))//Small hack to place the chip at the rightplace for the 0 and 00 bets zone, otherwise they would'nt be
+								{
+									stackPaneCenterXCoord = (int)(stackPaneCoordMin.getX() + betZone.getBoundsInLocal().getWidth()/2 - chipImgView.getFitHeight()/2);
+									stackPaneCenterYCoord = (int)(stackPaneCoordMin.getY() + betZone.getBoundsInLocal().getHeight()/2 - chipImgView.getFitHeight()/2 - betZone.getBoundsInLocal().getHeight());
+								}
+								else
+								{
+									stackPaneCenterXCoord = (int)(stackPaneCoordMin.getX() + betZone.getBoundsInLocal().getWidth()/2 - chipImgView.getFitHeight()/2);
+									stackPaneCenterYCoord = (int)(stackPaneCoordMin.getY() + betZone.getBoundsInLocal().getHeight()/2 - chipImgView.getFitHeight()/2);
+								}
 								chipStackPane.setTranslateX(stackPaneCenterXCoord);
 								chipStackPane.setTranslateY(stackPaneCenterYCoord);
 								
@@ -2157,12 +2172,17 @@ public class Roulette extends GameInterface
 							//Bet Addition to the betStack
 								//Create the bet
 									String[] betKeyParts = betKey.split("-");
-									String betTypeString = betKeyParts[0];//Tis gets the bet type of the bet
+									String betTypeString = betKeyParts[0];//This gets the bet type of the bet
+									System.out.println(betTypeString);
 									Bet bet = new Bet(betTypeString, getLogicalPocketsOfBet(betKey), Integer.parseInt(stakeInputString.get()));
 									betStack.push(bet);
 							//Substract the bet's cash amount from the player's cash
 								playerCashProperty.set(playerCashProperty.get() - bet.getCash());
 								
+							//Enable the buttons
+								removeAllBetsButton.setDisable(false);
+								removeLastBetButton.setDisable(false);
+								spinTheWheelButton.setDisable(false);
 								
 								//DEBUG
 								//System.out.println("betType:" + bet.getBetType());
@@ -2196,7 +2216,7 @@ public class Roulette extends GameInterface
 	{
 		spinTheWheelButton = new Button("Spin the wheel!");
 		spinTheWheelButton.setPrefSize(200, 75);
-		//spinTheWheelButton.setDisable(true);
+		spinTheWheelButton.setDisable(true);
 		spinTheWheelButton.setTranslateX(60);
 		spinTheWheelButton.setStyle("-fx-font-size:18pt; -fx-background-color: linear-gradient(#f2f2f2, #d6d6d6), linear-gradient(#fcfcfc 0%, #d9d9d9 20%, #d6d6d6 100%), linear-gradient(#dddddd 0%, #f6f6f6 50%); -fx-background-radius: 8,7,6; -fx-background-insets: 0,1,2; -fx-text-fill: black;");
 		
@@ -2256,7 +2276,7 @@ public class Roulette extends GameInterface
 		removeLastBetButton.setDisable(true);
 		
 		//Put a filter to disable the mouse click events on the table
-		EventHandler<MouseEvent> mouseEventHandler = new EventHandler<MouseEvent>()
+		mouseEventHandler = new EventHandler<MouseEvent>()
 		{
 			@Override
 			public void handle(MouseEvent event)
@@ -2297,19 +2317,21 @@ public class Roulette extends GameInterface
 						@Override
 						public void handle(ActionEvent event)
 						{
-							//Manage the end of the play
-							manageEndOfPlay();
-							
-							
-							//Enable the buttons
-							spinTheWheelButton.setDisable(false);
-							
-							//Enable the mouse event on the root
-							root.removeEventFilter(MouseEvent.ANY, mouseEventHandler);
-							
-							//Remove all the bets
-							removeAllBets(true);
-							
+							Platform.runLater(new Runnable()//This Platform.runLater code is necessary to allow alert.showAndWait() in the function manageEndOfPlay(). Javafx won't allow showAndWait during animation. 
+							{
+			                    @Override
+			                    public void run() 
+			                    {
+			                    	//Manage the end of the play
+									manageEndOfPlay();						
+									
+									//Enable the mouse event on the root
+									root.removeEventFilter(MouseEvent.ANY, mouseEventHandler);
+									
+									//Remove all the bets
+									removeAllBets(true);                       
+			                    }
+							});
 						}	
 			});
 				
@@ -2567,6 +2589,7 @@ public class Roulette extends GameInterface
 			//Get the number of the bet
 			String[] betKeyParts = betKey.split("-");
 			String betNumber = betKeyParts[1];
+			System.out.println(betNumber);
 			
 			//Make a LogicalPocket object out of the number
 			if (blackNumbersList.contains(Integer.parseInt(betNumber)))
@@ -3277,36 +3300,96 @@ public class Roulette extends GameInterface
 		return logicalPocketList;
 	}
 	
-	private void manageEndOfPlay()
+	//This function check if the player wins, calculates the cash won/loss and informs the player about the win/loss.
+	public void manageEndOfPlay()
 	{
 		//Check for winning bets
 			//ArrayList to stack the winning bets
 			ArrayList<Bet> winningBetList = new ArrayList<>();
 			
-			//Compare each player bet's pocket with the winningPocket
+			//Compare each player bet's pocket with the winningPocket, and calculate the sum of the bet's stakes
+			int stakeSum = 0;
 			for (Bet bet : betStack)
 			{
+				stakeSum += bet.getCash();
 				for (LogicalPocket betPocket : bet.getPocketList())
 				{
+					//DEBUG  - set the winning pocket
+					//winningPocket = new VisualPocket("31", Color.BLACK, null);
+					
 					if ((betPocket.getNum()).compareTo(winningPocket.getNumber()) == 0)
 						winningBetList.add(bet);
 				}
 			}
 			
 			//If at least 1 bet is winning
-			if (winningBetList.size() == 0)
+			if (winningBetList.size() > 0)
 			{
-				//changeMessage("You won: );
+				int cashWon = 0;//Total cash won for the winning bets
+				int winningStake = 0;//The cash the player bet on the winnings bets
+				
+				for (Bet bet : winningBetList)
+				{
+					cashWon += bet.getCash()*bet.getPayoutRatio(bet.getBetType());
+					winningStake += bet.getCash();
+					playerCashProperty.set(playerCashProperty.get() + bet.getCash() + (int)(bet.getCash()*bet.getPayoutRatio(bet.getBetType())));//Give the cash won to the player
+				}
+				
+				
+				//Inform the player that he won
+				if (cashWon + winningStake < stakeSum)
+				{	
+					int absoluteNetGain = Math.abs(cashWon + winningStake - stakeSum);
+					Alert winAlert1 = new Alert(AlertType.INFORMATION);
+					winAlert1.setTitle("You lose!");
+					winAlert1.setHeaderText(null);
+					winAlert1.setContentText("Some of your bets win, but overall you lose " +absoluteNetGain + "$...Sorry buddy!");
+					winAlert1.showAndWait();
+				}
+				
+				else if (cashWon + winningStake == stakeSum)
+				{
+					Alert winAlert2 = new Alert(AlertType.INFORMATION);
+					winAlert2.setTitle("Even");
+					winAlert2.setHeaderText(null);
+					winAlert2.setContentText("You win as much cash as you lose. Phew!");
+					winAlert2.showAndWait();
+				}
+				
+				else
+				{
+					Alert winAlert3 = new Alert(AlertType.INFORMATION);
+					winAlert3.setTitle("We have a winner!");
+					winAlert3.setHeaderText(null);
+					if	(winningStake != stakeSum)
+					{
+						int absoluteLoss = stakeSum-winningStake;
+						int totalCashWon = cashWon + winningStake;
+						winAlert3.setContentText("You lose " + absoluteLoss + ", but you win " + totalCashWon + "$ !");
+					}
+					else
+					{
+						int totalCashWon = cashWon + winningStake;
+						winAlert3.setContentText("You win " + totalCashWon + "$ !");
+					}
+					winAlert3.showAndWait();
+				}
+				
 			}
 			
 			//If not bet is winning
 			else
 			{
-				
-			}
+				//Inform the player that he lost
+				Alert loseAlert = new Alert(AlertType.INFORMATION);
+				loseAlert.setTitle("You lost!");
+				loseAlert.setHeaderText(null);
+				loseAlert.setContentText("Sorry pal, you lost " + stakeSum + "$.");
+				loseAlert.showAndWait();
+			}		
 	}
 	
-	private void removeLastBet()
+	public void removeLastBet()
 	{
 		//Get the most recent bet of the stack
 		Bet lastBet = betStack.pop();
@@ -3314,15 +3397,23 @@ public class Roulette extends GameInterface
 		//Add the last bet cash amount to player's cash
 		playerCashProperty.set(playerCashProperty.get() + lastBet.getCash());
 		
-		//Remove the chip StackPane from it's parent and from the chip stack**************************TESTER CA, apres, lors d'un 1er bet. activer le bouton spin the wheel, a la fin d'une animation de roue, afficher le smessage de win/loss, changer le texte du bouton Spinthewheel pour Play again
+		//Remove the chip StackPane from it's parent and from the chip stack
 		StackPane stackPane = chipStack.pop();
 		Pane parent = (Pane)stackPane.getParent();
 		parent.getChildren().remove(stackPane);
+		
+		//If the betStack is empty, disable the removeLastBet button
+		if (betStack.size() == 0)
+		{
+			removeLastBetButton.setDisable(true);
+			removeAllBetsButton.setDisable(true);
+			spinTheWheelButton.setDisable(true);
+		}
 	}
 	
-	private void removeAllBets(boolean endOfPlay)
+	public void removeAllBets(boolean endOfPlay)
 	{
-		//If the removeAllBets function is not called a the end of a play (by the player clicking the button)
+		//If the removeAllBets function is not called a the end of a play (but by the player clicking the button)
 		if (!endOfPlay)
 		{	
 			//Refund all the bets cash to the player
@@ -3346,6 +3437,11 @@ public class Roulette extends GameInterface
 		
 		//Clear the chipStack
 		chipStack.clear();
+		
+		//Disable the removeAllBets button
+		removeAllBetsButton.setDisable(true);
+		removeLastBetButton.setDisable(true);
+		spinTheWheelButton.setDisable(true);
 		
 	}
 }

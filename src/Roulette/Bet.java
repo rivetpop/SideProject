@@ -30,7 +30,7 @@ public class Bet
 		this.betType = betType;
 	}
 
-	private double getPayoutRatio(String betType)
+	public double getPayoutRatio(String betType)
 	{	
 		double payoutRatio = 0;
 		switch (betType)
@@ -53,7 +53,9 @@ public class Bet
 			case "doublestreet":
 					payoutRatio = 5;
 					break;
-			case "column":
+			case "columnTop":
+			case "columnMid":
+			case "columnBottom":
 					payoutRatio = 2;
 					break;
 			case "first12":

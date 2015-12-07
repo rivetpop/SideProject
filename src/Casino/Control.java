@@ -28,6 +28,7 @@ import javafx.scene.control.TextInputDialog;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.paint.Color;
 import javafx.stage.FileChooser;
 import javafx.stage.FileChooser.ExtensionFilter;
@@ -193,16 +194,16 @@ public class Control  extends Application{
 			{
 				if(e.getSource() == viewRoulette.spinTheWheelButton)
 				{
-					viewRoulette.playWheelAnimation();;
+					viewRoulette.playWheelAnimation();
 				}
 				
 				else if(e.getSource() == viewRoulette.removeLastBetButton)
 				{
-					
+					viewRoulette.removeLastBet();
 				}
 				else if (e.getSource() == viewRoulette.removeAllBetsButton)
 				{
-					
+					viewRoulette.removeAllBets(true);
 				}
 			}
 		}
