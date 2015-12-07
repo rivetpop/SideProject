@@ -1,9 +1,3 @@
-//Note: Envisager de générer un ArrayList avec les informations des joueurs provenant du fichier de 
-//sauvegarde lors du démarrage du programme,
-//ca pourrais simplifier beaucoup certaines methodes.
-
-//Note: Envisager de créer un fichier de sauvegarde par profile de joueur
-
 package Casino;
 
 import java.io.BufferedReader;
@@ -34,6 +28,8 @@ import javafx.scene.control.TextInputDialog;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.input.MouseEvent;
+import javafx.scene.paint.Color;
 import javafx.stage.FileChooser;
 import javafx.stage.FileChooser.ExtensionFilter;
 import javafx.stage.Stage;
@@ -60,7 +56,6 @@ public class Control  extends Application{
 	public void start(Stage pStage){
 		
 		viewMainMenu = new Main_menu();
-		
 		
 		stage = pStage;
 		addListeners();
@@ -390,6 +385,23 @@ public class Control  extends Application{
 					viewBlackJack.txtOptions.setText("Your current bet : " + bjGame.getBet());
 					viewBlackJack.btnDraw.setDisable(false);
 					
+				}
+			}
+			
+			if (viewRoulette != null)
+			{
+				if(e.getSource() == viewRoulette.spinTheWheelButton)
+				{
+					viewRoulette.playWheelAnimation();
+				}
+				
+				else if(e.getSource() == viewRoulette.removeLastBetButton)
+				{
+					viewRoulette.removeLastBet();
+				}
+				else if (e.getSource() == viewRoulette.removeAllBetsButton)
+				{
+					viewRoulette.removeAllBets(true);
 				}
 			}
 		}
@@ -901,6 +913,10 @@ public class Control  extends Application{
 		//Menu Listeners	
 			viewRoulette.menuItemCasinoHall.setOnAction(new ListenerMenu());
 			viewRoulette.menuItemQuit.setOnAction(new ListenerMenu());
+		//Button Listeners
+			viewRoulette.spinTheWheelButton.setOnAction(new ListenerButton());
+			viewRoulette.removeLastBetButton.setOnAction(new ListenerButton());
+			viewRoulette.removeAllBetsButton.setOnAction(new ListenerButton());
 		
 		//Set playerInfos
 			Image pImg = null;

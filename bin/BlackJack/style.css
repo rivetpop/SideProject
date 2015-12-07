@@ -4,26 +4,11 @@
 	-fx-font-family: "Dialog"; 
 	-fx-alignement: center;
 }
-
-.buttonRoulette
-{
-	-fx-font-size: 12pt;
-	-fx-font-family: "Dialog"; 
-	-fx-alignement: center;
-}
-
 .text
 {
 	-fx-font-size: 15pt;
 	-fx-font-family: "Dialog"; 
 }
-
-.textRouletteMsg
-{
-	-fx-font-size: 50pt;
-	-fx-font-family: "Dialog"; 
-}
-
 .menu
 {
 	-fx-font-size: 16pt;
@@ -37,9 +22,4 @@
 {
 	-fx-font-size: 30pt;
 	-fx-alignment: center;
-}
-
-.title2
-{
-	-fx-font-size: 20pt;
 }
