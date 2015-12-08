@@ -327,7 +327,7 @@ public class Roulette extends GameInterface
 		root.getChildren().addAll(rouletteWheel, msgZone, super.playerInfo, super.upperZone, tableLayout, buttonsGroup, tableBetLayout);
 		
 		super.playerInfo.setTranslateX(500);
-		super.playerInfo.setTranslateY(15);
+		super.playerInfo.setTranslateY(-35);
 		
 		buttonsGroup.setTranslateX(430);
 		buttonsGroup.setTranslateY(370);
