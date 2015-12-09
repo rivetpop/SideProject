@@ -139,7 +139,9 @@ public class LoadPlayerScreen
 		
 		//Read the save file (Player_info.dat) to gather the profiles infos (name and cash)
 		try
-		{
+		{	
+			playerInfoFile.createNewFile();//This creates the file if it does not exists
+			
 			bufferRead = new BufferedReader(new FileReader(playerInfoFile));
 					
 				//Look for the name in the save file
@@ -151,7 +153,8 @@ public class LoadPlayerScreen
 					playerProfiles_array.add(temp_vector[0]);
 					playerProfiles_array.add(temp_vector[1]);
 					numberOfProfiles++;
-				}				
+				}
+			
 		}		
 	
 		catch (IOException e)

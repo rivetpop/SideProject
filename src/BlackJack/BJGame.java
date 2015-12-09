@@ -11,6 +11,8 @@ import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.TextInputDialog;
 import javafx.scene.image.Image;
+import javafx.scene.input.MouseEvent;
+import javafx.stage.WindowEvent;
 import Casino.Card;
 import Casino.Player;
 
@@ -90,7 +92,6 @@ public class BJGame {
 			
 		}while (!setBet(bet));
 			
-		
 		return bet;
 	}
 	

@@ -109,6 +109,7 @@ import javafx.util.Duration;
 import javafx.util.StringConverter;
 import javafx.util.converter.NumberStringConverter;
 import javafx.scene.effect.Light;
+import javafx.stage.WindowEvent;
 
 public class Roulette extends GameInterface
 {
@@ -282,7 +283,7 @@ public class Roulette extends GameInterface
 	
 	//Player cash Integer Object (the basic player cash is a int, so it is not observable).
 	//For the roulette graphic interface we need a player cash property to bind it to the cash display text in the scene.
-		private SimpleIntegerProperty playerCashProperty = new SimpleIntegerProperty(Control.currentPlayer.getCash());
+		public SimpleIntegerProperty playerCashProperty = new SimpleIntegerProperty(Control.currentPlayer.getCash());
 	
 	//Winning pocket
 		VisualPocket winningPocket;
@@ -292,6 +293,8 @@ public class Roulette extends GameInterface
 		
 	//Mouse Event handler. Used to filter mouse events
 		public EventHandler<MouseEvent> mouseEventHandler;
+	//Window event handler. Used to cancel X quit button during a play.
+		public EventHandler<WindowEvent> windowEventHandler;
 			
 	public Roulette()
 	{
@@ -2287,6 +2290,18 @@ public class Roulette extends GameInterface
 		;
 		root.addEventFilter(MouseEvent.ANY, mouseEventHandler);
 		
+		//Disable the X quit button 
+		windowEventHandler = new EventHandler<WindowEvent>()
+				{
+					
+					public void handle(WindowEvent ev)
+					{
+						ev.consume();
+					}
+				}
+				;
+		scene.getWindow().addEventFilter(WindowEvent.WINDOW_CLOSE_REQUEST,windowEventHandler);
+		
 		//Take the ball at it's initial position
 		bringBallToInitialPosition();
 		
@@ -2325,9 +2340,9 @@ public class Roulette extends GameInterface
 			                    	//Manage the end of the play
 									manageEndOfPlay();						
 									
-									//Enable the mouse event on the root
+									//Enable the mouse event on the root and on the X quit button
 									root.removeEventFilter(MouseEvent.ANY, mouseEventHandler);
-									
+									scene.getWindow().removeEventFilter(WindowEvent.WINDOW_CLOSE_REQUEST, windowEventHandler);
 									//Remove all the bets
 									removeAllBets(true);                       
 			                    }

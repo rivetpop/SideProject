@@ -63,7 +63,7 @@ public class BlackJack extends GameInterface {
 		public Button btnBet;
 		
 		public Scene scene;
-		private BorderPane root;
+		public BorderPane root;
 		
 		
 		public BlackJack(){

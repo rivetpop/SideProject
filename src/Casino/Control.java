@@ -8,6 +8,9 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Optional;
 
 import BlackJack.BJGame;
@@ -31,6 +34,7 @@ import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.paint.Color;
 import javafx.stage.FileChooser;
+import javafx.stage.WindowEvent;
 import javafx.stage.FileChooser.ExtensionFilter;
 import javafx.stage.Stage;
 
@@ -53,6 +57,12 @@ public class Control  extends Application{
 	
 	private File playerInfoFile = new File(".\\src\\Player_info.dat");
 	
+	//Mouse Event handler. Used to filter mouse events on menu buttons during a round.
+	private EventHandler<MouseEvent> mouseEventHandler;
+		
+	//Window event handler. Used to cancel X quit button during a round.
+	private EventHandler<WindowEvent> windowEventHandler;
+	
 	public void start(Stage pStage){
 		
 		viewMainMenu = new Main_menu();
@@ -70,6 +80,9 @@ public class Control  extends Application{
 		viewMainMenu.newPlayerButton.setOnAction(new ListenerButton());
 		viewMainMenu.loadPlayerButton.setOnAction(new ListenerButton());
 		viewMainMenu.quitButton.setOnAction(new ListenerButton());
+		
+		//Window
+		setWindowListener();
 	}
 	
 	public class ListenerMenu implements EventHandler<ActionEvent>{
@@ -81,12 +94,16 @@ public class Control  extends Application{
 			{
 				if (e.getSource() == viewBlackJack.menuItemCasinoHall)
 				{
+					//Save the game
+					manageSaveProfile();
 					
 					manageWelcome();
 				}
 			
 				else if (e.getSource() == viewBlackJack.menuItemQuit)
 				{
+					//Save the game
+					manageSaveProfile();
 					
 					manageQuit();
 				}
@@ -96,11 +113,18 @@ public class Control  extends Application{
 			{
 				if (e.getSource() == viewRoulette.menuItemCasinoHall)
 				{
+					
+					//Save the game
+					manageSaveProfile();
+					
 					manageWelcome();
 				}
 				
 				else if (e.getSource() == viewRoulette.menuItemQuit)
 				{
+					//Save the game
+					manageSaveProfile();
+					
 					manageQuit();
 				}
 			}
@@ -218,6 +242,10 @@ public class Control  extends Application{
 						viewBlackJack.btnHit.setDisable(true);
 						viewBlackJack.btnStand.setDisable(true);
 						
+						//Enable the mouse event on the root and on the X quit button
+						viewBlackJack.mainMenu.removeEventFilter(MouseEvent.ANY, mouseEventHandler);
+						viewBlackJack.scene.getWindow().removeEventFilter(WindowEvent.WINDOW_CLOSE_REQUEST, windowEventHandler);
+						
 					}
 					
 					viewBlackJack.playerHandTotal.setText("Value: " + bjGame.countHand(bjGame.playerHand));
@@ -293,6 +321,10 @@ public class Control  extends Application{
 						viewBlackJack.btnBet.setDisable(false);
 						viewBlackJack.btnHit.setDisable(true);
 						viewBlackJack.btnStand.setDisable(true);
+						
+						//Enable the mouse event on the root and on the X quit button
+						viewBlackJack.mainMenu.removeEventFilter(MouseEvent.ANY, mouseEventHandler);
+						viewBlackJack.scene.getWindow().removeEventFilter(WindowEvent.WINDOW_CLOSE_REQUEST, windowEventHandler);
 					}
 					
 					//if player hand stronger than dealer hand , player gain bet
@@ -304,6 +336,10 @@ public class Control  extends Application{
 						viewBlackJack.btnBet.setDisable(false);
 						viewBlackJack.btnHit.setDisable(true);
 						viewBlackJack.btnStand.setDisable(true);
+						
+						//Enable the mouse event on the root and on the X quit button
+						viewBlackJack.mainMenu.removeEventFilter(MouseEvent.ANY, mouseEventHandler);
+						viewBlackJack.scene.getWindow().removeEventFilter(WindowEvent.WINDOW_CLOSE_REQUEST, windowEventHandler);
 					}
 					
 					//if player and dealer hands are same value
@@ -313,6 +349,10 @@ public class Control  extends Application{
 						viewBlackJack.btnBet.setDisable(false);
 						viewBlackJack.btnHit.setDisable(true);
 						viewBlackJack.btnStand.setDisable(true);
+						
+						//Enable the mouse event on the root and on the X quit button
+						viewBlackJack.mainMenu.removeEventFilter(MouseEvent.ANY, mouseEventHandler);
+						viewBlackJack.scene.getWindow().removeEventFilter(WindowEvent.WINDOW_CLOSE_REQUEST, windowEventHandler);
 					}
 					
 					//if player hand lower than dealer hand, player lose bet
@@ -324,6 +364,10 @@ public class Control  extends Application{
 						viewBlackJack.btnBet.setDisable(false);
 						viewBlackJack.btnHit.setDisable(true);
 						viewBlackJack.btnStand.setDisable(true);
+						
+						//Enable the mouse event on the root and on the X quit button
+						viewBlackJack.mainMenu.removeEventFilter(MouseEvent.ANY, mouseEventHandler);
+						viewBlackJack.scene.getWindow().removeEventFilter(WindowEvent.WINDOW_CLOSE_REQUEST, windowEventHandler);
 					}
 				}
 				
@@ -384,7 +428,28 @@ public class Control  extends Application{
 					viewBlackJack.btnBet.setDisable(true);
 					viewBlackJack.txtOptions.setText("Your current bet : " + bjGame.getBet());
 					viewBlackJack.btnDraw.setDisable(false);
-					
+					mouseEventHandler = new EventHandler<MouseEvent>()
+							{
+								@Override
+								public void handle(MouseEvent event)
+								{
+									event.consume();
+								}	
+							}
+							;
+							viewBlackJack.mainMenu.addEventFilter(MouseEvent.ANY, mouseEventHandler);
+							
+							//Disable the X quit button 
+							windowEventHandler = new EventHandler<WindowEvent>()
+									{
+										
+										public void handle(WindowEvent ev)
+										{
+											ev.consume();
+										}
+									}
+									;
+							viewBlackJack.scene.getWindow().addEventFilter(WindowEvent.WINDOW_CLOSE_REQUEST,windowEventHandler);
 				}
 			}
 			
@@ -407,11 +472,24 @@ public class Control  extends Application{
 		}
 	}
 	
+	private void setWindowListener()
+	{
+		stage.setOnCloseRequest(new EventHandler<WindowEvent>() {
+			@Override
+	        public void handle(WindowEvent ev) {
+				ev.consume();
+	            manageQuit();
+	        }
+	    });
+	}
+	
 	public void manageQuit(){
 		if(currentPlayer == null){
 			
 			System.exit(0);
 		}
+		
+		manageSaveProfile();
 		
 		Alert alert = new Alert(AlertType.CONFIRMATION);
 		alert.setTitle("Casino");
@@ -421,24 +499,17 @@ public class Control  extends Application{
 		Optional<ButtonType> result = alert.showAndWait();
 		
 		if(result.get() == ButtonType.OK){
-			
+			manageSaveProfile();
 			System.exit(0);
 		}
 	}
 	
 	public void manageNewPlayer(){
 		
-		if(currentPlayer != null  || createPlayer()){
+		createPlayer();
+		if(currentPlayer != null){
 			
 			manageWelcome();
-		}
-		
-		else
-		{
-			Alert alert = new Alert(AlertType.ERROR);
-			alert.setTitle("Player creation error");
-			alert.setContentText("The player could not be created");
-			alert.showAndWait();
 		}
 	}
 	
@@ -471,57 +542,73 @@ public class Control  extends Application{
 		stage.show();
 	}
 	
-	public boolean createPlayer(){
+	public void createPlayer(){
 		
-		boolean ok = false;
+		try 
+		{
+			playerInfoFile.createNewFile();//This creates the file if it does not exists
+		} 
+		catch (IOException e1) 
+		{
+			e1.printStackTrace();
+		}
 		
+		boolean creationCanceled = false;
+		
+		String name = "";
 		//Ask to choose a name
-			String name = enterName("Enter player name:");
+		try
+		{
+			name = enterName("Enter player name:");
 			
 			//while the file contains at least 1 line and the name is already used
 			while(!emptyFileCheck() && nameExists(name))
-			{
-				name = enterName("This name is already used. Please choose another name.");
+			{			
+					name = enterName("This name is already used. Please choose another name.");
 			}
+		}
+		catch (NoSuchElementException e)
+		{
+			creationCanceled = true;
+		}
 			
+		if (!creationCanceled)
+		{
 			int cash = Player.STARTING_MONEY;
-		
-		//Ask to choose an image
-			Alert imgAlert = new Alert(AlertType.CONFIRMATION);
-			imgAlert.setTitle("Image selection");
-			imgAlert.setContentText("Do you want to set an image for your player profile");
 			
-			ButtonType yesButton = new ButtonType("Yes");
-			ButtonType noButton = new ButtonType("No");
+			//Ask to choose an image
+				Alert imgAlert = new Alert(AlertType.CONFIRMATION);
+				imgAlert.setTitle("Image selection");
+				imgAlert.setContentText("Do you want to set an image for your player profile");
+				
+				ButtonType yesButton = new ButtonType("Yes");
+				ButtonType noButton = new ButtonType("No");
+				
+				imgAlert.getButtonTypes().setAll(yesButton, noButton);
+				
+				Optional<ButtonType> result = imgAlert.showAndWait();
+				
+				String img = null;
+				if(result.get() == yesButton)
+				{
+					img = choosePicture();
+				}
+				
+				if(result.get() == noButton)
+				{
+					img = Player.DEFAULT_IMG_URL;
+				}
 			
-			imgAlert.getButtonTypes().setAll(yesButton, noButton);
-			
-			Optional<ButtonType> result = imgAlert.showAndWait();
-			
-			String img = null;
-			if(result.get() == yesButton)
-			{
-				img = choosePicture();
-			}
-			
-			if(result.get() == noButton)
-			{
-				img = Player.DEFAULT_IMG_URL;
-			}
-		
-		//Create the new player
-			Player player = new Player(name, cash, img);
-			currentPlayer = player;
-			
-			if (currentPlayer != null)
-			{
-				ok = true;
-			}
-			
-			return ok;
+			//Create the new player
+				Player player = new Player(name, cash, img);
+				currentPlayer = player;
+				
+				//Save the new player
+				manageSaveProfile();
+		}		
 	}
 	
-	public static String enterName(String message){
+	public static String enterName(String message) throws NoSuchElementException{
 		
 		Optional<String>nameEntered = null;
 		TextInputDialog dialog = new TextInputDialog();
@@ -531,11 +618,13 @@ public class Control  extends Application{
 		
 		nameEntered = dialog.showAndWait();
 		
-		
-		while(!Player.validateName(nameEntered.get())){
-			
-			dialog.setContentText("Between 2 and 15 characters.\n" + message);
-			nameEntered = dialog.showAndWait();
+		if (nameEntered.isPresent())
+		{
+			while(!Player.validateName(nameEntered.get())){
+				
+				dialog.setContentText("Between 2 and 15 characters.\n" + message);
+				nameEntered = dialog.showAndWait();
+			}
 		}
 		
 		return nameEntered.get();
@@ -636,10 +725,12 @@ public class Control  extends Application{
 		FileChooser pictureChoice = new FileChooser();
 		
 		//Allow only image extension files to be chosen
-		pictureChoice.getExtensionFilters().add(new ExtensionFilter("JPG", "*.jpeg"));
-		pictureChoice.getExtensionFilters().add(new ExtensionFilter("PNG", "*.png"));
-		pictureChoice.getExtensionFilters().add(new ExtensionFilter("GIF", "*.gif"));
-		pictureChoice.getExtensionFilters().add(new ExtensionFilter("BMP", "*.bmp"));
+		List<String> imagesExtensionList = new ArrayList<>();
+		imagesExtensionList.add("*.jpg");
+		imagesExtensionList.add("*.png");
+		imagesExtensionList.add("*.gif");
+		imagesExtensionList.add("*.bmp");
+		pictureChoice.getExtensionFilters().add(new ExtensionFilter("Images", imagesExtensionList));
 		
 		pictureChoice.setInitialDirectory(new File(System.getProperty("user.dir")));
 		File fichier = pictureChoice.showOpenDialog(stage);
@@ -669,9 +760,16 @@ public class Control  extends Application{
 				program won't work as expected if we ever try to load that profile again */
 				
 				if (currentPlayer != null && nameExists(currentPlayer.getName()))
-				{			
+				{	
+					//If a roulette game is going on
+					if (viewRoulette != null && stage.getScene() == viewRoulette.scene)
+					{
+						//Change the player cash (in roulette, the player cash is changed to a property for binding purpose)
+						currentPlayer.setCash(viewRoulette.playerCashProperty.get());
+					}
+					
 					try
-					{	
+					{						
 						String line = "";
 								
 						bufferRead = new BufferedReader(new FileReader(playerInfoFile));
@@ -682,11 +780,15 @@ public class Control  extends Application{
 						{
 							oldText += line+"\n";
 						}
+						//System.out.println("oldText: "+oldText);
 						
 						//Create a new String variable containing the oldText, but replace the data for the line concerning the current player
 						// A regular expression is used in the method replaceAll to find the data we want to replace
-						String newText = oldText.replaceAll(currentPlayer.getName()+";\\d+;[^\\\\]+", 
-															currentPlayer.getName() + ";" + currentPlayer.getCash() +";" +currentPlayer.getImg());
+						// We also have to replace the backslash (\) with a double backslash (\\) because it is an escape character
+						String newText = oldText.replaceAll(currentPlayer.getName()+";\\d+;.+", 
+															currentPlayer.getName() + ";" + currentPlayer.getCash() +";" +currentPlayer.getImg().replace("\\", "\\\\"));
+			
+						//System.out.println("newText: "+newText);
 						
 						bufferWrite= new BufferedWriter(new FileWriter(playerInfoFile));
 						bufferWrite.write(newText);
@@ -727,19 +829,25 @@ public class Control  extends Application{
 		//In this case, we save the name, cash and picture of the player profile on a new line
 		if (currentPlayer != null && !nameExists(currentPlayer.getName()))
 		{
+			//If a roulette game is going on
+			if (viewRoulette != null && stage.getScene() == viewRoulette.scene)
+			{
+				//Change the player cash (in roulette, the player cash is changed to a property for binding purpose)
+				currentPlayer.setCash(viewRoulette.playerCashProperty.get());
+			}
 			
 			try
-			{
+			{				
 				bufferWrite= new BufferedWriter(new FileWriter(playerInfoFile, true));
 				
 				String player_save = null;
-				
-				player_save = currentPlayer.getName() + ";" + currentPlayer.getCash() + ";" + currentPlayer.getImg();
-				
+				String formattedImagePath = currentPlayer.getImg().replace("\\", "\\\\");// We have to replace the backslash (\) with a double backslash (\\) because it is an escape character
+				player_save = currentPlayer.getName() + ";" + currentPlayer.getCash() + ";" + formattedImagePath;
+				System.out.println(formattedImagePath);
+				//System.out.println("new_player_save: " +player_save);
 				bufferWrite.write(player_save);
 				bufferWrite.newLine();
-				
-				
+				//****************************************************CREATE A IMG FOLDER THAT SAVES THE IMAGES CHOSEN BY THE USER
 			}
 			catch (IOException e)
 			{

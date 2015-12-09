@@ -15,7 +15,7 @@ public class GameInterface{
 	
 	//Menu	
 		public HBox upperZone = null;
-		private MenuBar mainMenu = null;
+		public MenuBar mainMenu = null;
 		public Menu gameMenu = null;
 		public MenuItem menuItemCasinoHall = null;
 		public MenuItem menuItemQuit = null;
