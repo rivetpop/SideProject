@@ -39,13 +39,15 @@ public class GameInterface{
 		gameMenu = new Menu("Menu");
 		gameMenu.getItems().addAll(menuItemCasinoHall, menuItemQuit);
 		
+		
 		mainMenu = new MenuBar();
 		mainMenu.getMenus().addAll(gameMenu);
+		mainMenu.setStyle("-fx-font-size:18pt; -fx-background-color: linear-gradient(#f2f2f2, #d6d6d6), linear-gradient(#fcfcfc 0%, #d9d9d9 20%, #d6d6d6 100%), linear-gradient(#dddddd 0%, #f6f6f6 50%); -fx-background-radius: 8,7,6; -fx-background-insets: 0,1,2; -fx-text-fill: black;");
 		
 		upperZone = new HBox();
 		upperZone.getChildren().addAll(mainMenu);
-		upperZone.setTranslateX(5);
-		upperZone.setTranslateY(5);
+		upperZone.setTranslateX(2);
+		upperZone.setTranslateY(2);
 	}
 	
 	public void createPlayerInfo(){

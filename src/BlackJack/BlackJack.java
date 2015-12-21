@@ -157,21 +157,25 @@ public class BlackJack extends GameInterface {
 			btnHit.setPrefSize(125, 50);
 			btnHit.getStyleClass().add("Button");
 			btnHit.setDisable(true);
+			btnHit.setStyle("-fx-font-size:18pt; -fx-background-color: linear-gradient(#f2f2f2, #d6d6d6), linear-gradient(#fcfcfc 0%, #d9d9d9 20%, #d6d6d6 100%), linear-gradient(#dddddd 0%, #f6f6f6 50%); -fx-background-radius: 8,7,6; -fx-background-insets: 0,1,2; -fx-text-fill: black;");
 			
 			btnStand = new Button("Stand");
 			btnStand.setPrefSize(125, 50);
 			btnStand.getStyleClass().add("Button");
 			btnStand.setDisable(true);
+			btnStand.setStyle("-fx-font-size:18pt; -fx-background-color: linear-gradient(#f2f2f2, #d6d6d6), linear-gradient(#fcfcfc 0%, #d9d9d9 20%, #d6d6d6 100%), linear-gradient(#dddddd 0%, #f6f6f6 50%); -fx-background-radius: 8,7,6; -fx-background-insets: 0,1,2; -fx-text-fill: black;");
 			
 			btnDraw = new Button("Draw");
 			btnDraw.setPrefSize(125, 50);
 			btnDraw.getStyleClass().add("Button");
 			btnDraw.setDisable(true);
+			btnDraw.setStyle("-fx-font-size:18pt; -fx-background-color: linear-gradient(#f2f2f2, #d6d6d6), linear-gradient(#fcfcfc 0%, #d9d9d9 20%, #d6d6d6 100%), linear-gradient(#dddddd 0%, #f6f6f6 50%); -fx-background-radius: 8,7,6; -fx-background-insets: 0,1,2; -fx-text-fill: black;");
 			
 			btnBet = new Button("Bet");
 			btnBet.setPrefSize(125, 50);
 			btnBet.getStyleClass().add("Button");
 			btnBet.setDisable(true);
+			btnBet.setStyle("-fx-font-size:18pt; -fx-background-color: linear-gradient(#f2f2f2, #d6d6d6), linear-gradient(#fcfcfc 0%, #d9d9d9 20%, #d6d6d6 100%), linear-gradient(#dddddd 0%, #f6f6f6 50%); -fx-background-radius: 8,7,6; -fx-background-insets: 0,1,2; -fx-text-fill: black;");
 			
 			lowerZone = new HBox();
 			lowerZone.setPadding(new Insets(10, 60, 10, 60));

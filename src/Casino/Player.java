@@ -78,7 +78,16 @@ public class Player {
 	
 	public String getImg()
 	{
-		return picture_URL;
+		File file = new File(picture_URL);
+		if (file.exists())
+		{
+			return picture_URL;
+		}
+		
+		else
+		{
+			return DEFAULT_IMG_URL;
+		}
 	}
 	
 	public static boolean validateName(String pName){

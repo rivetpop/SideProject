@@ -180,6 +180,11 @@ public class Control  extends Application{
 					
 					manageRoulette();
 				}
+				
+				else if (e.getSource() == viewWelcome.changeProfileButton)
+				{
+					manageLoadProfile();
+				}
 			}
 			
 			if (viewBlackJack != null){
@@ -396,7 +401,7 @@ public class Control  extends Application{
 					//Disable draw button,
 					viewBlackJack.btnDraw.setDisable(true);
 					
-					System.out.println(bjGame.countHand(bjGame.playerHand));
+					//System.out.println(bjGame.countHand(bjGame.playerHand));
 					if(bjGame.checkWin(bjGame.playerHand) == 1){
 						
 						//Enable stand button only
@@ -520,6 +525,7 @@ public class Control  extends Application{
 		//Welcome screen listeners
 		viewWelcome.blackJackButton.setOnAction(new ListenerButton());
 		viewWelcome.rouletteButton.setOnAction(new ListenerButton());
+		viewWelcome.changeProfileButton.setOnAction(new ListenerButton());
 		
 		viewWelcome.playerInfo.setAlignment(Pos.CENTER);
 		viewWelcome.titleWelcome.setText("Welcome " + currentPlayer.getName() + "!");
@@ -843,7 +849,7 @@ public class Control  extends Application{
 				String player_save = null;
 				String formattedImagePath = currentPlayer.getImg().replace("\\", "\\\\");// We have to replace the backslash (\) with a double backslash (\\) because it is an escape character
 				player_save = currentPlayer.getName() + ";" + currentPlayer.getCash() + ";" + formattedImagePath;
-				System.out.println(formattedImagePath);
+				//System.out.println(formattedImagePath);
 				//System.out.println("new_player_save: " +player_save);
 				bufferWrite.write(player_save);
 				bufferWrite.newLine();

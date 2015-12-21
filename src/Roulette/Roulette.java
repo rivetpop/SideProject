@@ -2176,7 +2176,7 @@ public class Roulette extends GameInterface
 								//Create the bet
 									String[] betKeyParts = betKey.split("-");
 									String betTypeString = betKeyParts[0];//This gets the bet type of the bet
-									System.out.println(betTypeString);
+									//System.out.println(betTypeString);
 									Bet bet = new Bet(betTypeString, getLogicalPocketsOfBet(betKey), Integer.parseInt(stakeInputString.get()));
 									betStack.push(bet);
 							//Substract the bet's cash amount from the player's cash
@@ -2604,7 +2604,7 @@ public class Roulette extends GameInterface
 			//Get the number of the bet
 			String[] betKeyParts = betKey.split("-");
 			String betNumber = betKeyParts[1];
-			System.out.println(betNumber);
+			//System.out.println(betNumber);
 			
 			//Make a LogicalPocket object out of the number
 			if (blackNumbersList.contains(Integer.parseInt(betNumber)))
@@ -3306,11 +3306,11 @@ public class Roulette extends GameInterface
 		}
 		
 		//DEBUG
-			System.out.println("This bets winning pockets are:");
-			for (LogicalPocket lp : logicalPocketList)
-			{
-				System.out.println(lp.getNum() + " " + lp.getColor());
-			}
+			//System.out.println("This bets winning pockets are:");
+			//for (LogicalPocket lp : logicalPocketList)
+			//{
+				//System.out.println(lp.getNum() + " " + lp.getColor());
+			//}
 		
 		return logicalPocketList;
 	}

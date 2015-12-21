@@ -19,7 +19,12 @@ import javafx.scene.control.ListView;
 import javafx.scene.control.SelectionMode;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
+import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.effect.Blend;
+import javafx.scene.effect.BlendMode;
+import javafx.scene.effect.DropShadow;
+import javafx.scene.effect.InnerShadow;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.Background;
@@ -30,6 +35,7 @@ import javafx.scene.layout.CornerRadii;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
+import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextAlignment;
 
@@ -43,7 +49,7 @@ public class LoadPlayerScreen
 	
 	private VBox titleZone = null;
 	private Text titleText = null;
-	Image casino = new Image("CasinoMenu.jpg");
+	Image casino = new Image("CasinoMenu.png");
 	
 	Button loadPlayerButton = null;
 	Button cancelButton = null;
@@ -59,23 +65,70 @@ public class LoadPlayerScreen
 			titleZone = new VBox();
 			titleZone.setAlignment(Pos.TOP_CENTER);
 			titleZone.setPadding(new Insets(30,0,0,0));
-			titleText = new Text("Bro Casino!");
-			titleText.getStyleClass().add("title");
-			
-			
+			titleText = new Text();
+			TextField titleTextField = new TextField();
+			titleTextField.setText("Bro Casino");
+			titleText.setFont(new Font("Tahoma", 100));
+			titleText.setFill(Color.web("#FFFAF0"));
+			titleText.textProperty().bind(titleTextField.textProperty());
+				
+				
 			ImageView casinoView = new ImageView();
 			casinoView.setImage(casino);
 			casinoView.setFitWidth(400);
 			casinoView.setPreserveRatio(true);
 			casinoView.setSmooth(true);
 			casinoView.setCache(true);
+			casinoView.setBlendMode(BlendMode.LIGHTEN);
 			
 			titleZone.getChildren().addAll(titleText, casinoView);
 			root.setTop(titleZone);
+			
+			//Title text effect Source: (Neon Sign application) https://docs.oracle.com/javafx/2/text/jfxpub-text.htm
+			Blend blend = new Blend();
+			blend.setMode(BlendMode.MULTIPLY);
+	
+			DropShadow ds = new DropShadow();
+			ds.setColor(Color.rgb(254, 235, 66, 0.3));
+			ds.setOffsetX(5);
+			ds.setOffsetY(5);
+			ds.setRadius(5);
+			ds.setSpread(0.2);
+	
+			blend.setBottomInput(ds);
+	
+			DropShadow ds1 = new DropShadow();
+			ds1.setColor(Color.web("#f13a00"));
+			ds1.setRadius(20);
+			ds1.setSpread(0.2);
+	
+			Blend blend2 = new Blend();
+			blend2.setMode(BlendMode.MULTIPLY);
+	
+			InnerShadow is = new InnerShadow();
+			is.setColor(Color.web("#feeb42"));
+			is.setRadius(9);
+			is.setChoke(0.8);
+			blend2.setBottomInput(is);
+	
+			InnerShadow is1 = new InnerShadow();
+			is1.setColor(Color.web("#f13a00"));
+			is1.setRadius(5);
+			is1.setChoke(0.4);
+			blend2.setTopInput(is1);
+	
+			Blend blend1 = new Blend();
+			blend1.setMode(BlendMode.MULTIPLY);
+			blend1.setBottomInput(ds1);
+			blend1.setTopInput(blend2);
+	
+			blend.setTopInput(blend1);
+	
+			titleText.setEffect(blend);		
 		
 		//Center zone (text + TableView)
 			//Text
-				Text subtitle = new Text("Select a player profile");
+				Text subtitle = new Text("Select a player profile!");
 				subtitle.setTextAlignment(TextAlignment.CENTER);
 				subtitle.getStyleClass().add("title2");
 			
@@ -99,13 +152,13 @@ public class LoadPlayerScreen
 					profileTableView.setItems(createPlayersList(playerProfiles_array));
 			
 				//Size
-				profileTableView.setMaxSize(500, 300);
+				profileTableView.setMaxSize(500, 220);
 			
 			//Add the Text and TableView to the VBox
 				VBox centerBox = new VBox();
 				centerBox.getChildren().addAll(subtitle, profileTableView);
 				centerBox.setAlignment(Pos.TOP_CENTER);
-				centerBox.setPadding(new Insets(15,0,0,0));
+				centerBox.setPadding(new Insets(30,0,0,0));
 				centerBox.setMargin(profileTableView, new Insets(10,0,0,0));
 				
 			root.setCenter(centerBox);
@@ -113,11 +166,14 @@ public class LoadPlayerScreen
 		//Bottom zone (buttons)
 			loadPlayerButton = new Button("Load");
 			loadPlayerButton.setPrefSize(150,50);
+			loadPlayerButton.setStyle("-fx-font-size:18pt; -fx-background-color: linear-gradient(#f2f2f2, #d6d6d6), linear-gradient(#fcfcfc 0%, #d9d9d9 20%, #d6d6d6 100%), linear-gradient(#dddddd 0%, #f6f6f6 50%); -fx-background-radius: 8,7,6; -fx-background-insets: 0,1,2; -fx-text-fill: black;");
 			cancelButton = new Button("Cancel");
 			cancelButton.setPrefSize(150, 50);
+			cancelButton.setStyle("-fx-font-size:18pt; -fx-background-color: linear-gradient(#f2f2f2, #d6d6d6), linear-gradient(#fcfcfc 0%, #d9d9d9 20%, #d6d6d6 100%), linear-gradient(#dddddd 0%, #f6f6f6 50%); -fx-background-radius: 8,7,6; -fx-background-insets: 0,1,2; -fx-text-fill: black;");
 			HBox buttonsZone = new HBox();
 			buttonsZone.getChildren().addAll(loadPlayerButton, cancelButton);
 			buttonsZone.setAlignment(Pos.TOP_CENTER);
+			buttonsZone.setSpacing(10);
 			root.setBottom(buttonsZone);
 			BorderPane.setAlignment(buttonsZone, Pos.TOP_CENTER);
 			buttonsZone.setPrefHeight(75);

@@ -15,6 +15,7 @@ import javafx.scene.layout.BackgroundFill;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.CornerRadii;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Text;
@@ -27,6 +28,9 @@ public class Welcome extends GameInterface{
 	
 	//Borderpane to display the different menu items(title, buttons, etc.)
 	private BorderPane root = null;
+
+	//Pane for the buttons zone
+	Pane buttonPane;
 		
 	//Main menu title
 	private VBox titleZone = null;
@@ -43,19 +47,25 @@ public class Welcome extends GameInterface{
 	//A button for each game
 	private VBox buttonZone = null;
 	private HBox buttonGame = null;
-	Button blackJackButton = null;
-	Button rouletteButton = null;
+	protected Button blackJackButton = null;
+	protected Button rouletteButton = null;
+	
+	//A change profile button
+	protected Button changeProfileButton;
 	
 	public Welcome(){
+		
+		buttonPane = new Pane();
 		
 		createWelcomeZone();
 		createPlayerZone();
 		createPickGameZone();
+		createChangeProfileButton();
 		
 		root = new BorderPane();
 		root.setTop(titleZone);
 		root.setCenter(playerZone);
-		root.setBottom(buttonZone);
+		root.setBottom(buttonPane);
 		
 		scene = new Scene(root, 800, 800);
 		root.setBackground(new Background(new BackgroundFill(Color.GREEN, CornerRadii.EMPTY, Insets.EMPTY)));
@@ -86,10 +96,12 @@ public class Welcome extends GameInterface{
 		
 		//Create one button for each game
 		blackJackButton = new Button("Blackjack");
-		blackJackButton.setPrefSize(125, 50);
+		blackJackButton.setPrefSize(150, 50);
+		blackJackButton.setStyle("-fx-font-size:18pt; -fx-background-color: linear-gradient(#f2f2f2, #d6d6d6), linear-gradient(#fcfcfc 0%, #d9d9d9 20%, #d6d6d6 100%), linear-gradient(#dddddd 0%, #f6f6f6 50%); -fx-background-radius: 8,7,6; -fx-background-insets: 0,1,2; -fx-text-fill: black;");
 		 
 		rouletteButton = new Button("Roulette");
-		rouletteButton.setPrefSize(125, 50);
+		rouletteButton.setPrefSize(150, 50);
+		rouletteButton.setStyle("-fx-font-size:18pt; -fx-background-color: linear-gradient(#f2f2f2, #d6d6d6), linear-gradient(#fcfcfc 0%, #d9d9d9 20%, #d6d6d6 100%), linear-gradient(#dddddd 0%, #f6f6f6 50%); -fx-background-radius: 8,7,6; -fx-background-insets: 0,1,2; -fx-text-fill: black;");
 		 
 		//Add buttons to the HBox
 		buttonZone = new VBox();
@@ -99,12 +111,27 @@ public class Welcome extends GameInterface{
 		buttonGame = new HBox();
 		buttonGame.setAlignment(Pos.CENTER);
 		buttonGame.setPadding(new Insets(30,0,0,0));
+		buttonGame.setSpacing(20);
+		
 		 
 		pickGameText = new Text("Pick your game!");
 		pickGameText.getStyleClass().add("title");
+		pickGameText.setTranslateX(230);
 		 
 		buttonGame.getChildren().addAll(blackJackButton, rouletteButton);
 		buttonZone.getChildren().addAll(pickGameText, buttonGame);
+		buttonPane.getChildren().add(buttonZone);
+		buttonGame.setTranslateX(230);
+		
+	}
 	
+	public void createChangeProfileButton()
+	{
+		changeProfileButton = new Button("Change profile");
+		changeProfileButton.setPrefSize(120, 38);
+		changeProfileButton.setStyle("-fx-font-size:10pt; -fx-background-color: linear-gradient(#f2f2f2, #d6d6d6), linear-gradient(#fcfcfc 0%, #d9d9d9 20%, #d6d6d6 100%), linear-gradient(#dddddd 0%, #f6f6f6 50%); -fx-background-radius: 8,7,6; -fx-background-insets: 0,1,2; -fx-text-fill: black;");
+		buttonPane.getChildren().add(changeProfileButton);
+		changeProfileButton.setTranslateX(660);
+		changeProfileButton.setTranslateY(155);
 	}
 }
